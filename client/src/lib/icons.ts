@@ -1,0 +1,108 @@
+import {
+  ArrowDownUp,
+  ArrowLeftRight,
+  Atom,
+  BookOpen,
+  Boxes,
+  Braces,
+  Brain,
+  Briefcase,
+  CalendarRange,
+  ChartGantt,
+  Coffee,
+  Columns2,
+  Cpu,
+  Database,
+  Gauge,
+  GitBranch,
+  Globe,
+  Grid3x3,
+  Hash,
+  Layers,
+  Link2,
+  ListTree,
+  MessagesSquare,
+  Network,
+  Puzzle,
+  Pyramid,
+  Rows3,
+  Search,
+  Server,
+  Sigma,
+  SlidersHorizontal,
+  Table2,
+  TableProperties,
+  Repeat,
+  Waypoints,
+  Workflow,
+  Wrench,
+  Code,
+  type LucideIcon,
+} from "lucide-react";
+import type { Category, QuestionKind, VisualType } from "@/lib/types";
+
+/** Icon per topic slug (docs/ARCHITECTURE.md). Unknown slugs fall back to BookOpen. */
+export const TOPIC_ICONS: Record<string, LucideIcon> = {
+  "big-o": Gauge,
+  "arrays-hashing": Hash,
+  "two-pointers": ArrowLeftRight,
+  "sliding-window": SlidersHorizontal,
+  "stack-queue": Layers,
+  "binary-search": Search,
+  "linked-list": Link2,
+  sorting: ArrowDownUp,
+  "recursion-backtracking": Repeat,
+  trees: ListTree,
+  heap: Pyramid,
+  graphs: Waypoints,
+  "dynamic-programming": Grid3x3,
+  "greedy-intervals": CalendarRange,
+  "math-bits": Sigma,
+  oop: Boxes,
+  "design-patterns": Puzzle,
+  dbms: Database,
+  sql: TableProperties,
+  "operating-systems": Cpu,
+  "computer-networks": Network,
+  javascript: Braces,
+  "react-nextjs": Atom,
+  "nodejs-express": Server,
+  "web-fundamentals": Globe,
+  "java-spring": Coffee,
+  "system-design": Workflow,
+  git: GitBranch,
+  behavioral: MessagesSquare,
+};
+
+export function topicIcon(slug: string): LucideIcon {
+  return TOPIC_ICONS[slug] ?? BookOpen;
+}
+
+export const CATEGORY_ICONS: Record<Category, LucideIcon> = {
+  dsa: Brain,
+  "cs-fundamentals": Cpu,
+  web: Globe,
+  engineering: Wrench,
+  career: Briefcase,
+};
+
+export const KIND_ICONS: Record<QuestionKind, LucideIcon> = {
+  coding: Code,
+  concept: BookOpen,
+  sql: Database,
+  design: Workflow,
+  behavioral: MessagesSquare,
+};
+
+export const VISUAL_TYPE_ICONS: Record<VisualType, LucideIcon> = {
+  array: Rows3,
+  grid: Grid3x3,
+  "linked-list": Link2,
+  tree: ListTree,
+  graph: Waypoints,
+  table: Table2,
+  state: Layers,
+  timeline: ChartGantt,
+  diagram: Workflow,
+  comparison: Columns2,
+};
