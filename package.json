@@ -1,0 +1,20 @@
+{
+  "name": "hireready",
+  "version": "1.0.0",
+  "description": "HireReady — interview preparation platform for new-grad software engineers",
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "dev": "concurrently -k -n api,web -c cyan,magenta \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "seed": "npm --prefix server run seed",
+    "validate": "npm --prefix server run validate:content",
+    "build": "npm --prefix server run build && npm --prefix client run build",
+    "typecheck": "npm --prefix server run typecheck && npm --prefix client exec tsc -- --noEmit"
+  },
+  "author": "",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^10.0.6"
+  },
+  "private": true
+}

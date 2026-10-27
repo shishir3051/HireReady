@@ -1,0 +1,10 @@
+# Store and check out text files with LF line endings on every OS (Node, Next.js and ESLint expect LF).
+# Overrides a global core.autocrlf=true for this repository only.
+* text=auto eol=lf
+
+# Never touch binary files
+*.png binary
+*.jpg binary
+*.ico binary
+*.woff binary
+*.woff2 binary
