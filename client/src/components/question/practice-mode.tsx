@@ -1,0 +1,140 @@
+"use client";
+
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { motion } from "motion/react";
+import { Eye, EyeOff, GraduationCap, Lock } from "lucide-react";
+import { STORAGE_KEYS } from "@/lib/constants";
+import { createLocalStore, parseBoolean, useIsClient } from "@/lib/storage";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+
+const practiceStore = createLocalStore<boolean>(STORAGE_KEYS.practiceMode, false, parseBoolean, String);
+
+function setHtmlFlag(on: boolean) {
+  if (on) document.documentElement.setAttribute("data-practice", "on");
+  else document.documentElement.removeAttribute("data-practice");
+}
+
+interface PracticeModeValue {
+  /** practice mode preference (persisted, site-wide) */
+  enabled: boolean;
+  setEnabled: (on: boolean) => void;
+  /** the answer was revealed on this page */
+  revealed: boolean;
+  reveal: () => void;
+  /** answer sections are currently hidden */
+  hidden: boolean;
+}
+
+const PracticeModeContext = createContext<PracticeModeValue | null>(null);
+
+/** Per-question-page practice state. Remounts (and re-hides) for every question. */
+export function PracticeModeProvider({ children }: { children: ReactNode }) {
+  const enabled = practiceStore.useValue();
+  const [revealed, setRevealed] = useState(false);
+
+  const setEnabled = useCallback((on: boolean) => {
+    practiceStore.set(on);
+    setHtmlFlag(on);
+    if (on) setRevealed(false);
+  }, []);
+  const reveal = useCallback(() => setRevealed(true), []);
+
+  const value = useMemo(
+    () => ({ enabled, setEnabled, revealed, reveal, hidden: enabled && !revealed }),
+    [enabled, setEnabled, revealed, reveal],
+  );
+  return <PracticeModeContext.Provider value={value}>{children}</PracticeModeContext.Provider>;
+}
+
+export function usePracticeMode(): PracticeModeValue {
+  const ctx = useContext(PracticeModeContext);
+  if (!ctx) throw new Error("usePracticeMode must be used inside <PracticeModeProvider>");
+  return ctx;
+}
+
+/** Switch in the question header. */
+export function PracticeModeToggle({ className }: { className?: string }) {
+  const { enabled, setEnabled } = usePracticeMode();
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={enabled}
+      onClick={() => setEnabled(!enabled)}
+      title="Hide the walkthrough and solution until you reveal them"
+      className={cn(
+        "inline-flex h-9 items-center gap-2.5 rounded-lg border border-border bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-2",
+        className,
+      )}
+    >
+      <GraduationCap className="size-4 text-muted" aria-hidden />
+      Practice mode
+      <span
+        aria-hidden
+        className={cn(
+          "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
+          enabled ? "bg-brand" : "bg-border",
+        )}
+      >
+        <motion.span
+          layout
+          transition={{ type: "spring", bounce: 0.2, duration: 0.25 }}
+          className={cn("size-4 rounded-full bg-surface shadow-sm", enabled ? "ml-[18px]" : "ml-0.5")}
+        />
+      </span>
+    </button>
+  );
+}
+
+/**
+ * Hides its children while practice mode is on and the answer is not revealed.
+ * Before hydration a CSS rule keyed on <html data-practice="on"> (set by the boot script) does the hiding,
+ * so the answer never flashes on a hard load.
+ */
+export function PracticeGate({
+  children,
+  sectionCount,
+  className,
+}: {
+  children: ReactNode;
+  sectionCount?: number;
+  /** classes for the wrapper around the gated sections (e.g. vertical spacing) */
+  className?: string;
+}) {
+  const { hidden, reveal, setEnabled } = usePracticeMode();
+  const isClient = useIsClient();
+
+  const card = (
+    <div
+      id="answer"
+      className="relative scroll-mt-20 overflow-hidden rounded-2xl border border-dashed border-brand/40 bg-brand-soft/30 px-5 py-8 text-center"
+    >
+      <span className="mx-auto grid size-12 place-items-center rounded-full bg-surface text-brand shadow-sm">
+        <Lock className="size-5" aria-hidden />
+      </span>
+      <h2 className="mt-4 text-lg font-semibold">The answer is hidden — try it yourself first</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+        Say your approach out loud, write it down, use the hints if you are stuck. Then reveal the visual walkthrough,
+        approaches and model answer{sectionCount ? ` (${sectionCount} sections)` : ""}.
+      </p>
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+        <Button onClick={reveal} leftIcon={<Eye aria-hidden />}>
+          Reveal the answer
+        </Button>
+        <Button variant="ghost" onClick={() => setEnabled(false)} leftIcon={<EyeOff aria-hidden />}>
+          Turn off practice mode
+        </Button>
+      </div>
+    </div>
+  );
+
+  // SSR + hydration pass: CSS decides from the boot-script flag. Afterwards React state decides.
+  // Children stay mounted (just hidden) so revealing never re-initialises the walkthrough.
+  return (
+    <>
+      {(!isClient || hidden) && <div className={isClient ? undefined : "hidden [html[data-practice=on]_&]:block"}>{card}</div>}
+      <div className={cn(className, isClient ? hidden && "hidden" : "[html[data-practice=on]_&]:hidden")}>{children}</div>
+    </>
+  );
+}
