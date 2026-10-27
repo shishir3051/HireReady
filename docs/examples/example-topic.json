@@ -1,0 +1,191 @@
+{
+  "topic": {
+    "slug": "example-topic",
+    "title": "Example Topic (reference only)",
+    "category": "dsa",
+    "order": 999,
+    "summary": "Reference file that shows the expected shape and quality bar for content authors.",
+    "overview": "This file is **not** seeded. It demonstrates one coding question (array visual + hash-map panel synced to code lines) and one concept question (comparison table + Mermaid sequence diagram). Copy the structure, not the topic.",
+    "cheatsheet": [
+      { "title": "Hash map lookups", "points": ["Average O(1) insert/lookup", "Trade O(n) extra space for O(n) time", "Store what you have seen; ask for what you need"] }
+    ],
+    "patterns": [
+      {
+        "name": "Complement lookup",
+        "whenToUse": "Pairs that must combine to a target (sum, difference, XOR).",
+        "template": { "language": "javascript", "code": "const seen = new Map();\nfor (let i = 0; i < arr.length; i++) {\n  const need = target - arr[i];\n  if (seen.has(need)) return [seen.get(need), i];\n  seen.set(arr[i], i);\n}" }
+      }
+    ],
+    "estimatedHours": 1
+  },
+  "questions": [
+    {
+      "slug": "example-two-sum",
+      "title": "Two Sum",
+      "topic": "example-topic",
+      "difficulty": "easy",
+      "kind": "coding",
+      "frequency": "very-high",
+      "tags": ["array", "hash-map"],
+      "pattern": "Hash Map Complement",
+      "prompt": "Given an array of integers `nums` and an integer `target`, return the **indices** of the two numbers that add up to `target`.\n\nExactly one valid answer exists and you may not use the same element twice.",
+      "examples": [
+        { "input": "nums = [3, 8, 4, 1, 6], target = 10", "output": "[2, 4]", "explanation": "nums[2] + nums[4] = 4 + 6 = 10" },
+        { "input": "nums = [3, 3], target = 6", "output": "[0, 1]" }
+      ],
+      "constraints": ["2 ≤ nums.length ≤ 10⁴", "-10⁹ ≤ nums[i], target ≤ 10⁹", "Exactly one valid answer exists"],
+      "hints": [
+        "The brute force checks every pair. Which work is repeated?",
+        "For each number x you need exactly target − x. How can you check if you've already seen it in O(1)?",
+        "Store each value → index in a hash map as you scan; look up the complement before inserting."
+      ],
+      "approaches": [
+        { "name": "Brute force", "idea": "Try every pair (i, j) with i < j and return the first that sums to target.", "time": "O(n²)", "space": "O(1)" },
+        { "name": "Sort + two pointers", "idea": "Sort (value, index) pairs and move two pointers inward. Works, but sorting costs O(n log n) and you must keep original indices.", "time": "O(n log n)", "space": "O(n)" },
+        { "name": "One-pass hash map", "idea": "Scan once; for each x, check whether target − x is already in the map, otherwise record x → index.", "time": "O(n)", "space": "O(n)" }
+      ],
+      "solution": {
+        "summary": "Scan once with a hash map from value to index; for each number check if its complement (target − x) was already seen.",
+        "explanation": "Every pair that sums to `target` has a **complement** relationship: if we are at `x`, the partner must be `target − x`.\n\n1. Keep a map `seen` from value → index of everything to the **left** of the current position.\n2. At index `i`, compute `need = target − nums[i]`.\n3. If `need` is in `seen`, the answer is `[seen[need], i]`.\n4. Otherwise store `nums[i] → i` and continue.\n\nChecking *before* inserting guarantees we never pair an element with itself, and duplicates like `[3, 3]` still work because the first 3 is already stored when we reach the second.",
+        "code": [
+          { "language": "javascript", "code": "function twoSum(nums, target) {\n  const seen = new Map(); // value -> index\n  for (let i = 0; i < nums.length; i++) {\n    const need = target - nums[i];\n    if (seen.has(need)) {\n      return [seen.get(need), i];\n    }\n    seen.set(nums[i], i);\n  }\n  return [];\n}" },
+          { "language": "python", "code": "def two_sum(nums, target):\n    seen = {}  # value -> index\n    for i, x in enumerate(nums):\n        need = target - x\n        if need in seen:\n            return [seen[need], i]\n        seen[x] = i\n    return []" },
+          { "language": "java", "code": "public int[] twoSum(int[] nums, int target) {\n    Map<Integer, Integer> seen = new HashMap<>(); // value -> index\n    for (int i = 0; i < nums.length; i++) {\n        int need = target - nums[i];\n        if (seen.containsKey(need)) {\n            return new int[] { seen.get(need), i };\n        }\n        seen.put(nums[i], i);\n    }\n    return new int[0];\n}" }
+        ],
+        "complexity": { "time": "O(n) — one pass, O(1) average per map operation", "space": "O(n) — the map can hold every element" },
+        "keyPoints": [
+          "State the brute force O(n²) first, then optimise",
+          "Hash map trades O(n) space for O(n) time",
+          "Check for the complement before inserting the current value",
+          "Mention the sort + two-pointer alternative and why it is worse here (loses indices, O(n log n))"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "array",
+          "title": "One-pass hash map on nums = [3, 8, 4, 1, 6], target = 10",
+          "caption": "Blue = current index, green = the answer pair. The map on the right holds every value seen so far.",
+          "steps": [
+            {
+              "note": "Start with an empty map `seen` (value → index).",
+              "codeLine": 2,
+              "vars": { "target": 10 },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [] }]
+            },
+            {
+              "note": "i = 0: need = 10 − 3 = 7. 7 is not in `seen`, so store 3 → 0.",
+              "codeLine": 8,
+              "vars": { "i": 0, "nums[i]": 3, "need": 7 },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6], "pointers": [{ "name": "i", "index": 0, "color": "primary" }], "highlights": [{ "indices": [0], "color": "primary" }] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [{ "key": "3", "value": "0" }], "highlight": ["3"] }]
+            },
+            {
+              "note": "i = 1: need = 2, not seen. Store 8 → 1.",
+              "codeLine": 8,
+              "vars": { "i": 1, "nums[i]": 8, "need": 2 },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6], "pointers": [{ "name": "i", "index": 1, "color": "primary" }], "highlights": [{ "indices": [1], "color": "primary" }, { "indices": [0], "color": "info" }] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [{ "key": "3", "value": "0" }, { "key": "8", "value": "1" }], "highlight": ["8"] }]
+            },
+            {
+              "note": "i = 2: need = 6, not seen. Store 4 → 2.",
+              "codeLine": 8,
+              "vars": { "i": 2, "nums[i]": 4, "need": 6 },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6], "pointers": [{ "name": "i", "index": 2, "color": "primary" }], "highlights": [{ "indices": [2], "color": "primary" }, { "indices": [0, 1], "color": "info" }] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [{ "key": "3", "value": "0" }, { "key": "8", "value": "1" }, { "key": "4", "value": "2" }], "highlight": ["4"] }]
+            },
+            {
+              "note": "i = 3: need = 9, not seen. Store 1 → 3.",
+              "codeLine": 8,
+              "vars": { "i": 3, "nums[i]": 1, "need": 9 },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6], "pointers": [{ "name": "i", "index": 3, "color": "primary" }], "highlights": [{ "indices": [3], "color": "primary" }, { "indices": [0, 1, 2], "color": "info" }] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [{ "key": "3", "value": "0" }, { "key": "8", "value": "1" }, { "key": "4", "value": "2" }, { "key": "1", "value": "3" }], "highlight": ["1"] }]
+            },
+            {
+              "note": "i = 4: need = 10 − 6 = 4, and **4 is in `seen` at index 2**. Return [2, 4].",
+              "codeLine": 6,
+              "vars": { "i": 4, "nums[i]": 6, "need": 4, "answer": "[2, 4]" },
+              "arrays": [{ "name": "nums", "values": [3, 8, 4, 1, 6], "pointers": [{ "name": "i", "index": 4, "color": "primary" }], "highlights": [{ "indices": [2, 4], "color": "success" }] }],
+              "panels": [{ "kind": "map", "title": "seen", "entries": [{ "key": "3", "value": "0" }, { "key": "8", "value": "1" }, { "key": "4", "value": "2" }, { "key": "1", "value": "3" }], "highlight": ["4"] }]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Inserting before checking can pair an element with itself (e.g. target 6, nums[i] = 3)",
+        "Returning values instead of indices",
+        "Sorting the array destroys the original indices"
+      ],
+      "followUps": [
+        { "question": "What if the array is already sorted?", "answer": "Use two pointers from both ends: O(n) time, O(1) space." },
+        { "question": "What if you must return all unique pairs?", "answer": "Sort, then two pointers while skipping duplicates, or use a set of seen values and a set of emitted pairs." }
+      ],
+      "related": ["example-tcp-vs-udp"]
+    },
+    {
+      "slug": "example-tcp-vs-udp",
+      "title": "TCP vs UDP — what is the difference?",
+      "topic": "example-topic",
+      "difficulty": "easy",
+      "kind": "concept",
+      "frequency": "very-high",
+      "tags": ["networking", "transport-layer"],
+      "prompt": "Explain the difference between **TCP** and **UDP**. When would you choose each?",
+      "hints": ["Think about guarantees: ordering, delivery, connection setup.", "What does each guarantee cost in latency and overhead?"],
+      "approaches": [
+        { "name": "Weak answer", "idea": "\"TCP is reliable, UDP is fast.\" True but shallow — no mechanisms, no examples.", "time": "—", "space": "—" },
+        { "name": "Strong answer", "idea": "Compare connection setup, reliability mechanisms (ACKs, retransmission, sequence numbers), flow/congestion control, header size, and give real use cases.", "time": "—", "space": "—" }
+      ],
+      "solution": {
+        "summary": "TCP is connection-oriented and guarantees ordered, reliable delivery using a handshake, sequence numbers, ACKs and retransmission; UDP is connectionless, sends independent datagrams with no guarantees, and is used when low latency matters more than reliability.",
+        "explanation": "**TCP (Transmission Control Protocol)**\n- Opens a connection with a **3-way handshake** (SYN → SYN-ACK → ACK).\n- Numbers every byte, acknowledges received data and **retransmits** lost segments, so data arrives complete and in order.\n- Has **flow control** (receiver window) and **congestion control** (slow start, AIMD).\n- Byte-stream; 20–60 byte header.\n- Used by HTTP/1.1, HTTP/2, SSH, SMTP, database connections.\n\n**UDP (User Datagram Protocol)**\n- No handshake, no connection state — just send datagrams.\n- No ordering, no retransmission; a lost packet is simply gone.\n- 8 byte header, very low overhead and latency.\n- Used by DNS lookups, video calls, online games, live streaming, and QUIC (HTTP/3 builds reliability on top of UDP).",
+        "keyPoints": [
+          "TCP = connection + reliability + ordering + flow/congestion control",
+          "UDP = connectionless, best-effort, minimal overhead",
+          "Choose UDP when stale data is useless (voice, games) or for tiny request/response (DNS)",
+          "Mention QUIC/HTTP-3 to show depth"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "comparison",
+          "title": "TCP vs UDP at a glance",
+          "columns": ["Aspect", "TCP", "UDP"],
+          "rows": [
+            ["Connection", "Connection-oriented (3-way handshake)", "Connectionless"],
+            ["Reliability", "ACKs + retransmission", "None (best effort)"],
+            ["Ordering", "Guaranteed in-order byte stream", "Datagrams may arrive out of order"],
+            ["Header size", "20–60 bytes", "8 bytes"],
+            ["Speed / latency", "Higher latency", "Lower latency"],
+            ["Typical uses", "Web (HTTP/1.1, HTTP/2), SSH, email, DB", "DNS, VoIP, games, streaming, QUIC"]
+          ]
+        },
+        {
+          "type": "diagram",
+          "title": "Connection setup",
+          "frames": [
+            {
+              "note": "TCP needs a 3-way handshake before any data flows.",
+              "mermaid": "sequenceDiagram\n    participant C as Client\n    participant S as Server\n    C->>S: SYN (seq = x)\n    S->>C: SYN-ACK (seq = y, ack = x + 1)\n    C->>S: ACK (ack = y + 1)\n    Note over C,S: Connection established\n    C->>S: Data"
+            },
+            {
+              "note": "UDP sends immediately — no setup, no acknowledgements.",
+              "mermaid": "sequenceDiagram\n    participant C as Client\n    participant S as Server\n    C->>S: Datagram 1\n    C->>S: Datagram 2\n    Note over C,S: No ACKs, lost datagrams are not resent"
+            }
+          ]
+        }
+      ],
+      "pitfalls": ["Saying UDP is \"unreliable so never used\" — DNS, video and HTTP/3 depend on it"],
+      "followUps": [
+        { "question": "How does HTTP/3 get reliability over UDP?", "answer": "QUIC implements its own streams, ACKs, retransmission and TLS 1.3 handshake in user space on top of UDP, avoiding TCP head-of-line blocking." }
+      ]
+    }
+  ],
+  "quiz": [
+    { "id": "example-topic-q1", "question": "What is the average time complexity of a hash map lookup?", "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"], "answer": 0, "explanation": "Hashing jumps directly to a bucket; collisions are rare on average, so lookups are O(1) average (O(n) worst case).", "difficulty": "easy" },
+    { "id": "example-topic-q2", "question": "Which protocol does DNS primarily use for normal queries?", "options": ["TCP", "UDP", "ICMP", "SCTP"], "answer": 1, "explanation": "DNS queries are small request/response pairs, so UDP on port 53 is used; TCP is used for large responses and zone transfers.", "difficulty": "easy" },
+    { "id": "example-topic-q3", "question": "What does this print?", "code": { "language": "javascript", "code": "const m = new Map();\nm.set(1, 'a');\nm.set('1', 'b');\nconsole.log(m.size);" }, "options": ["1", "2", "undefined", "TypeError"], "answer": 1, "explanation": "Map keys use SameValueZero equality, so the number 1 and the string '1' are different keys.", "difficulty": "medium" },
+    { "id": "example-topic-q4", "question": "How many messages are in the TCP connection handshake?", "options": ["1", "2", "3", "4"], "answer": 2, "explanation": "SYN, SYN-ACK, ACK.", "difficulty": "easy" },
+    { "id": "example-topic-q5", "question": "Why check for the complement before inserting the current value in Two Sum?", "options": ["It is faster", "To avoid pairing an element with itself", "Maps cannot store duplicates", "It sorts the input"], "answer": 1, "explanation": "If you insert first, target = 2·x would match the element with itself.", "difficulty": "medium" }
+  ]
+}

@@ -1,0 +1,3782 @@
+{
+  "topic": {
+    "slug": "behavioral",
+    "title": "Behavioral, HR & Interview Strategy",
+    "category": "career",
+    "order": 29,
+    "summary": "The questions that decide close calls: tell me about yourself, STAR stories, strengths and weaknesses, conflicts, failures, salary, and a repeatable routine for live coding rounds.",
+    "overview": "## Why this topic matters\nTechnical skill gets you shortlisted; communication, ownership and attitude often decide the offer. For junior roles in particular, interviewers hire for **potential**: can you learn, work with a team, take feedback and own your mistakes?\n\n## Typical interview process\nDetails differ by company, but a common sequence in Bangladesh and abroad is:\n1. **Online assessment or written test** (coding problems, sometimes MCQs on CS fundamentals; banks and some large companies may also have aptitude tests).\n2. **Technical interviews** (DSA, CS fundamentals, your projects and the stack on your CV).\n3. **HR / culture round** (motivation, behaviour, salary, joining date).\nBehavioral questions appear in *almost every* round: \"tell me about yourself\" and \"tell me about your project\" open most technical interviews.\n\n## What interviewers listen for\n- **Ownership**: \"I\" for your actions, honest about mistakes.\n- **Evidence**: stories and numbers instead of adjectives.\n- **Communication**: structured, concise answers (STAR).\n- **Learning**: what you changed after a failure or feedback.\n- **Fit**: genuine, researched interest in this company and role.\n\n## How to prepare\n1. Build a **story bank** of 5-6 STAR stories (challenge, conflict, failure, leadership, learning fast, pressure). Each story can answer several questions.\n2. Write and rehearse your **present-past-future** introduction for each type of company you apply to.\n3. Practise **out loud**, with a timer, in English (most software interviews use English or a mix with Bangla). Clarity beats accent.\n4. Research every company and prepare **questions to ask**.\n5. Rehearse the **coding-interview routine** until thinking aloud feels natural.",
+    "cheatsheet": [
+      {
+        "title": "STAR in one breath",
+        "points": [
+          "Situation: 1-2 sentences of context",
+          "Task: what YOU owned and what was at stake",
+          "Action: 50-60% of the answer, step by step, with reasons",
+          "Result: a number plus one lesson",
+          "About 2 minutes per story"
+        ]
+      },
+      {
+        "title": "Story bank (prepare 5-6)",
+        "points": [
+          "Hardest technical problem",
+          "Conflict or disagreement",
+          "Mistake or failure, and the fix",
+          "Leading or coordinating a team",
+          "Learning something new fast",
+          "Delivering under pressure"
+        ]
+      },
+      {
+        "title": "HR round classics",
+        "points": [
+          "Tell me about yourself: present -> past -> future, 60-90 s",
+          "Why us: company + role + you",
+          "Why hire you: three requirement -> evidence matches",
+          "Weakness: real, non-core, with an improvement system",
+          "Five years: grow in skills and responsibility"
+        ]
+      },
+      {
+        "title": "Coding round routine",
+        "points": [
+          "Clarify -> examples -> brute force -> optimise -> confirm",
+          "Code while narrating",
+          "Dry-run and edge cases, then complexity",
+          "Stuck 3-5 minutes? Say what you tried and ask for a hint"
+        ]
+      },
+      {
+        "title": "Salary and offer",
+        "points": [
+          "Research a market range; know walk-away, target, stretch",
+          "Ask for their range first; if pressed, give a range anchored at your target",
+          "Check gross vs take-home, bonuses, provident fund, probation, increments, bond",
+          "Negotiate politely; get it in writing"
+        ]
+      },
+      {
+        "title": "Red flags to avoid",
+        "points": [
+          "Blaming teammates, teachers or past employers",
+          "Adjectives without evidence",
+          "Skills on the CV you cannot discuss for five minutes",
+          "\"No questions\" at the end",
+          "Lying: about offers, skills or plans"
+        ]
+      }
+    ],
+    "patterns": [
+      {
+        "name": "STAR story",
+        "whenToUse": "Any \"Tell me about a time...\" question: challenge, conflict, failure, pressure, leadership.",
+        "template": {
+          "language": "text",
+          "code": "Situation: where and when, in 1-2 sentences\nTask:      what YOU were responsible for, and what was at stake\nAction:    3-4 concrete steps YOU took, and why (most of the time goes here)\nResult:    the outcome with a number, plus one lesson"
+        }
+      },
+      {
+        "name": "Present-past-future pitch",
+        "whenToUse": "\"Tell me about yourself\" and the opening of most rounds.",
+        "template": {
+          "language": "text",
+          "code": "Present: I am a ... graduate who enjoys ... (main stack / focus)\nPast:    proof 1 (best project + result), proof 2 (internship + result), proof 3 (extra)\nFuture:  now I am looking for ... and this role fits because ...\nEnd:     happy to go deeper into any of these"
+        }
+      },
+      {
+        "name": "Weakness formula",
+        "whenToUse": "\"What is your biggest weakness?\" or \"What would your supervisor say you should improve?\"",
+        "template": {
+          "language": "text",
+          "code": "Weakness:  a real one that is not core to the job\nExample:   a moment it hurt\nChanges:   the concrete system you use now\nEvidence:  how you know it is improving"
+        }
+      },
+      {
+        "name": "Company + role + you",
+        "whenToUse": "\"Why do you want to join us?\" and the motivation part of \"Why should we hire you?\"",
+        "template": {
+          "language": "text",
+          "code": "Company: one specific, researched thing (product, users, engineering)\nRole:    what you would do and learn in this team\nYou:     how your background fits and what you will contribute"
+        }
+      },
+      {
+        "name": "Think-aloud coding routine",
+        "whenToUse": "Every live coding round, and silently in online assessments.",
+        "template": {
+          "language": "text",
+          "code": "1. Clarify inputs, outputs, constraints, edge cases\n2. Work 1-2 examples\n3. Brute force + complexity\n4. Optimise, then confirm the plan\n5. Code while narrating\n6. Dry-run + edge cases\n7. Time and space complexity"
+        }
+      }
+    ],
+    "estimatedHours": 6
+  },
+  "questions": [
+    {
+      "slug": "tell-me-about-yourself",
+      "title": "Tell me about yourself",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "hr-round",
+        "introduction",
+        "elevator-pitch",
+        "fresh-graduate"
+      ],
+      "prompt": "\"So, tell me about yourself.\"\n\nIt is usually the very first question, in HR rounds *and* technical rounds. How do you answer it as a fresh graduate, and what should a strong 60-90 second answer contain?",
+      "hints": [
+        "They are not asking for your life story. They want a short pitch that shows why you are relevant to this job.",
+        "Use a simple structure: present -> past -> future.",
+        "Present: who you are and your focus. Past: 2-3 proof points (project, internship, achievement) with a number. Future: why this role is your natural next step."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Starts with hometown, school and family, lists every course and hobby, talks for four minutes, and ends with \"...so yeah, that's me.\"",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "A rehearsed (not memorised) 60-90 second present-past-future pitch with two or three concrete proof points that match the job description, ending with why this role, then handing the conversation back.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Answer in 60-90 seconds using present, past, future: who you are now, two or three concrete proof points from projects or internships, and why this role is the logical next step, all tailored to the job description.",
+        "explanation": "### Why they ask\nIt is a warm-up, but it also sets the agenda: interviewers often pick their next question from something you mention. So mention things you **want** to be asked about.\n\n### The present-past-future template\n1. **Present (1-2 sentences)**: degree, what you enjoy building, your main stack.\n2. **Past (2-3 proof points)**: your best project, an internship or part-time job, one extra achievement. For each: what *you* did plus a result or number.\n3. **Future (1-2 sentences)**: what you want next and why this role/company fits.\n\n### Sample answer for a fresh graduate (about 150 words, roughly a minute spoken)\n> I'm a Computer Science graduate from [University], and I enjoy building web applications end to end, mostly with Next.js, Node.js and MongoDB.\n>\n> For my final-year project I led a team of three building a bus-ticket booking system. I designed the REST API and the seat-reservation logic so two people can never book the same seat, and about 200 classmates used it during testing. I also did a three-month internship at a fintech startup, where I wrote integration tests for their payment APIs and found a bug that was sending duplicate receipts. I've also solved around 300 problems on LeetCode and Codeforces to sharpen my problem solving.\n>\n> Now I'm looking for a backend-focused role where I can work on real production systems, and this position on your payments team is exactly that, which is why I applied. I'm happy to go deeper into any of these.\n\nReplace the details with your own, and keep every claim something you can discuss for five minutes.\n\n### Tips\n- **Tailor it**: pick proof points that match 2-3 lines of the job description. A bank IT role and a startup frontend role deserve different versions.\n- **Leave out**: age, marital status, family details, every course you took, your full CGPA history (one line is enough if it is strong).\n- **No CV recital**: they have your CV; tell the story behind it.\n- **Practise out loud** until it sounds natural; memorise the structure and key facts, not every word.\n- **Language**: many software interviews are in English or a mix of English and Bangla. Prepare it in English; clarity matters far more than accent.\n- **Time it**: under 90 seconds. If they want more, they will ask.",
+        "keyPoints": [
+          "Present -> past -> future in 60-90 seconds",
+          "Two or three concrete proof points with what YOU did and a result",
+          "Tailored to the job description, not a recital of the CV",
+          "Ends with why this role, then hands the conversation back",
+          "Plant topics you are happy to be asked about"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "A one-minute answer, built piece by piece",
+          "caption": "Lanes are the three parts of the template; the axis is seconds of speaking time at a calm pace (about 130 words per minute).",
+          "unit": "s",
+          "steps": [
+            {
+              "note": "**Present (about 10 s).** Who you are now and what you focus on: *\"I'm a Computer Science graduate from [University], and I enjoy building web applications end to end, mostly with Next.js, Node.js and MongoDB.\"*",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Past, proof 1: your best project (about 20 s).** One sentence of context, what *you* did, one number: *\"For my final-year project I led a team of three building a bus-ticket booking system. I designed the REST API and the seat-reservation logic so two people can never book the same seat, and about 200 classmates used it during testing.\"*",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "info"
+                },
+                {
+                  "label": "Project",
+                  "start": 10,
+                  "end": 30,
+                  "lane": "Past",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Past, proof 2: internship or job (about 13 s).** *\"I also did a three-month internship at a fintech startup, where I wrote integration tests for their payment APIs and found a bug that was sending duplicate receipts.\"*",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "info"
+                },
+                {
+                  "label": "Project",
+                  "start": 10,
+                  "end": 30,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "Internship",
+                  "start": 30,
+                  "end": 43,
+                  "lane": "Past",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Past, proof 3: something extra (a few seconds).** Contests, open source, teaching assistant work: *\"I've also solved around 300 problems on LeetCode and Codeforces.\"* Skip it if you have nothing strong.",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "info"
+                },
+                {
+                  "label": "Project",
+                  "start": 10,
+                  "end": 30,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "Internship",
+                  "start": 30,
+                  "end": 43,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "Extra",
+                  "start": 43,
+                  "end": 48,
+                  "lane": "Past",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Future (about 12 s).** Connect your story to *this* role: *\"Now I'm looking for a backend-focused role where I can work on real production systems, and this position on your payments team is exactly that.\"*",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "info"
+                },
+                {
+                  "label": "Project",
+                  "start": 10,
+                  "end": 30,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "Internship",
+                  "start": 30,
+                  "end": 43,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "Extra",
+                  "start": 43,
+                  "end": 48,
+                  "lane": "Past",
+                  "color": "info"
+                },
+                {
+                  "label": "This role",
+                  "start": 48,
+                  "end": 60,
+                  "lane": "Future",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**End cleanly** and hand the conversation back: *\"That's a quick overview. I'm happy to go deeper into any of these.\"* Total: about 140-150 words, a little over a minute at a calm pace, which leaves room for one more detail while staying under 90 seconds.",
+              "segments": [
+                {
+                  "label": "Degree + focus",
+                  "start": 0,
+                  "end": 10,
+                  "lane": "Present",
+                  "color": "success"
+                },
+                {
+                  "label": "Project",
+                  "start": 10,
+                  "end": 30,
+                  "lane": "Past",
+                  "color": "success"
+                },
+                {
+                  "label": "Internship",
+                  "start": 30,
+                  "end": 43,
+                  "lane": "Past",
+                  "color": "success"
+                },
+                {
+                  "label": "Extra",
+                  "start": 43,
+                  "end": 48,
+                  "lane": "Past",
+                  "color": "success"
+                },
+                {
+                  "label": "This role",
+                  "start": 48,
+                  "end": 60,
+                  "lane": "Future",
+                  "color": "success"
+                },
+                {
+                  "label": "End",
+                  "start": 60,
+                  "end": 65,
+                  "lane": "Future",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Weak vs strong introduction",
+          "columns": [
+            "Aspect",
+            "Weak answer",
+            "Strong answer"
+          ],
+          "rows": [
+            [
+              "Length",
+              "Four minutes, or fifteen seconds",
+              "60-90 seconds, then stop"
+            ],
+            [
+              "Structure",
+              "Life story starting from school",
+              "Present -> past -> future"
+            ],
+            [
+              "Content",
+              "Hometown, family, hobbies, list of courses",
+              "Skills, projects and impact relevant to this job"
+            ],
+            [
+              "Evidence",
+              "Adjectives: hard-working, passionate, quick learner",
+              "Proof: what you built, numbers, results"
+            ],
+            [
+              "Tailoring",
+              "Same speech for every company",
+              "Matches 2-3 lines of the job description"
+            ],
+            [
+              "Ending",
+              "\"...so yeah, that's me.\"",
+              "Why this role, then \"happy to go deeper\""
+            ],
+            [
+              "Delivery",
+              "Recited word for word",
+              "Practised key points, natural tone"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Starting from childhood or school and never reaching the relevant part",
+        "Listing adjectives (\"hard-working, passionate\") without any proof",
+        "Mentioning a technology or project you cannot discuss in depth, which invites a question you cannot answer",
+        "Using the same version for every company instead of tailoring it"
+      ],
+      "followUps": [
+        {
+          "question": "What do you do outside of coding?",
+          "answer": "One or two genuine interests, briefly, ideally showing a quality such as discipline (sport), teaching (tutoring), or curiosity (reading). Keep it short and honest."
+        },
+        {
+          "question": "Why did you choose computer science?",
+          "answer": "A short, true story: the moment you first built something that worked, and what keeps you interested now. Connect it to the kind of work this role involves."
+        }
+      ],
+      "related": [
+        "walk-me-through-your-resume-and-projects",
+        "why-should-we-hire-you",
+        "why-do-you-want-to-join-this-company"
+      ]
+    },
+    {
+      "slug": "walk-me-through-your-resume-and-projects",
+      "title": "Walk me through your resume and projects",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "resume",
+        "projects",
+        "technical-depth",
+        "fresh-graduate"
+      ],
+      "prompt": "\"Walk me through your resume.\" / \"Tell me about a project you are proud of.\"\n\nHow do you present your CV and your projects so the interviewer sees real engineering depth, and how do you prepare for the follow-up questions that every line of your CV invites?",
+      "hints": [
+        "They already read the CV. What do they want that the CV cannot show?",
+        "For a project: problem, your role, architecture, hardest part, result, what you would improve.",
+        "Assume every line can be drilled three levels deep. Anything you cannot defend for five minutes should not be on the CV."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Reads the CV top to bottom, describes projects as feature lists (\"it has login, search and booking\"), says \"we\" throughout, and has no answer when asked \"why MongoDB?\" or \"what was the hardest bug?\".",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Gives a 2-minute guided tour that ends with the best project, then walks through that project as a story: problem, own role, architecture with reasons, hardest technical problem and how it was solved, measurable result, and honest improvements.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Give a two-minute guided tour of the CV (education in one line, experience, best projects, extras, why this role), then present your strongest project as an engineering story: the problem, what you personally built, the architecture and why, the hardest bug or decision, the result, and what you would improve.",
+        "explanation": "### Part 1: the 2-minute tour\nGo in an order that builds to your strongest material:\n1. **Education** in one line (degree, focus, a strong CGPA or thesis if relevant).\n2. **Experience**: internship or part-time work, with what you shipped.\n3. **Best project(s)**: one or two, briefly.\n4. **Extras**: contests, open source, teaching assistant, hackathons.\n5. **Bridge**: why this role is the next step.\n\n### Part 2: the project deep dive (the part that decides the interview)\nUse this ladder; each rung is a question they will ask anyway:\n1. **Problem and users**: who needed it and why.\n2. **Your role**: what *you* built. Say \"I\" for your work and \"we\" for the team's.\n3. **Architecture**: stack, data model, main flows, and **why** you chose them (and what you would choose today).\n4. **Hardest part**: one bug or decision in detail. Example: *\"During testing two users booked the same seat. I reproduced it with a script that sent 50 parallel requests, found a check-then-insert race, and replaced it with a single atomic update that only succeeds if the seat is still free, plus a unique index on (trip, seat).\"*\n5. **Result**: users, performance numbers, grade, demo, deployment.\n6. **Next time**: honest improvements (tests, caching, better schema). This shows maturity.\n\n### Prepare three levels down\n\"Why MongoDB?\" -> \"How did you model bookings?\" -> \"What happens with two concurrent bookings?\" -> \"How would it handle 100x users?\" If you cannot go three levels deep on a topic, either study it or remove it from the CV.\n\n### Common traps for freshers\n- **Buzzword skills**: listing Kubernetes, Kafka or machine learning after one tutorial. Interviewers pick exactly these lines.\n- **Group projects** where you cannot explain the parts you did not build. Know the whole system at a high level and your part in depth.\n- **No numbers**: \"fast\", \"many users\". Measure something: response time, users, test coverage, problems solved.\n- **Badmouthing** a teammate, a university or a previous employer.",
+        "keyPoints": [
+          "Two-minute tour that builds towards your strongest project",
+          "Project story: problem, your role, architecture and why, hardest part, result, improvements",
+          "Say \"I\" for your contribution; know the whole system at a high level",
+          "Every CV line must survive three levels of follow-up questions",
+          "Use numbers and one concrete technical story"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "table",
+          "title": "Turn every CV line into prepared answers",
+          "caption": "Example CV of a fresh graduate. Red = remove or relabel, green = strongest talking points.",
+          "steps": [
+            {
+              "note": "Read your own CV the way an interviewer does: every line is a possible question. Start by listing the lines you expect them to pick.",
+              "tables": [
+                {
+                  "name": "Your resume, line by line",
+                  "columns": [
+                    "Resume line"
+                  ],
+                  "rows": [
+                    [
+                      "Bus-ticket booking system (Next.js, Express, MongoDB), team of 3"
+                    ],
+                    [
+                      "Intern, fintech startup (3 months): integration tests for payment APIs"
+                    ],
+                    [
+                      "300+ problems solved on LeetCode / Codeforces"
+                    ],
+                    [
+                      "Skills: Java, JavaScript, SQL, Git, Docker"
+                    ],
+                    [
+                      "Skills: Kubernetes, Kafka, Machine Learning"
+                    ],
+                    [
+                      "Team lead, final-year project"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Next to each line, write the follow-up you would ask if you were the interviewer. Technical interviewers go **one level deeper than the CV** on purpose.",
+              "tables": [
+                {
+                  "name": "Your resume, line by line",
+                  "columns": [
+                    "Resume line",
+                    "Likely follow-up"
+                  ],
+                  "rows": [
+                    [
+                      "Bus-ticket booking system (Next.js, Express, MongoDB), team of 3",
+                      "Your part? Data model? How do you stop two people booking the same seat?"
+                    ],
+                    [
+                      "Intern, fintech startup (3 months): integration tests for payment APIs",
+                      "What did you test? A bug you found? Unit vs integration test?"
+                    ],
+                    [
+                      "300+ problems solved on LeetCode / Codeforces",
+                      "Expect live coding at that level"
+                    ],
+                    [
+                      "Skills: Java, JavaScript, SQL, Git, Docker",
+                      "What is in your Dockerfile? Explain a JOIN. Merge vs rebase?"
+                    ],
+                    [
+                      "Skills: Kubernetes, Kafka, Machine Learning",
+                      "How did you use Kafka? What is a partition?"
+                    ],
+                    [
+                      "Team lead, final-year project",
+                      "How did you split work? Any conflict?"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Now prepare a specific answer or story for each follow-up. Projects and internships need a 2-minute walkthrough plus one deep-dive story each.",
+              "tables": [
+                {
+                  "name": "Your resume, line by line",
+                  "columns": [
+                    "Resume line",
+                    "Likely follow-up",
+                    "Prepare"
+                  ],
+                  "rows": [
+                    [
+                      "Bus-ticket booking system (Next.js, Express, MongoDB), team of 3",
+                      "Your part? Data model? How do you stop two people booking the same seat?",
+                      "Architecture sketch + the seat-hold race condition story"
+                    ],
+                    [
+                      "Intern, fintech startup (3 months): integration tests for payment APIs",
+                      "What did you test? A bug you found? Unit vs integration test?",
+                      "One concrete bug story with impact (duplicate receipts)"
+                    ],
+                    [
+                      "300+ problems solved on LeetCode / Codeforces",
+                      "Expect live coding at that level",
+                      "Revise core patterns; code one medium problem cleanly"
+                    ],
+                    [
+                      "Skills: Java, JavaScript, SQL, Git, Docker",
+                      "What is in your Dockerfile? Explain a JOIN. Merge vs rebase?",
+                      "2-3 talking points per listed skill"
+                    ],
+                    [
+                      "Skills: Kubernetes, Kafka, Machine Learning",
+                      "How did you use Kafka? What is a partition?",
+                      "Only tutorials watched: remove, or move to \"currently learning\""
+                    ],
+                    [
+                      "Team lead, final-year project",
+                      "How did you split work? Any conflict?",
+                      "A STAR story about coordination or a disagreement"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Final check: red = a line you cannot defend for five minutes (remove it or label it honestly); green = your strongest talking points, which you should steer the conversation towards.",
+              "tables": [
+                {
+                  "name": "Your resume, line by line",
+                  "columns": [
+                    "Resume line",
+                    "Likely follow-up",
+                    "Prepare"
+                  ],
+                  "rows": [
+                    [
+                      "Bus-ticket booking system (Next.js, Express, MongoDB), team of 3",
+                      "Your part? Data model? How do you stop two people booking the same seat?",
+                      "Architecture sketch + the seat-hold race condition story"
+                    ],
+                    [
+                      "Intern, fintech startup (3 months): integration tests for payment APIs",
+                      "What did you test? A bug you found? Unit vs integration test?",
+                      "One concrete bug story with impact (duplicate receipts)"
+                    ],
+                    [
+                      "300+ problems solved on LeetCode / Codeforces",
+                      "Expect live coding at that level",
+                      "Revise core patterns; code one medium problem cleanly"
+                    ],
+                    [
+                      "Skills: Java, JavaScript, SQL, Git, Docker",
+                      "What is in your Dockerfile? Explain a JOIN. Merge vs rebase?",
+                      "2-3 talking points per listed skill"
+                    ],
+                    [
+                      "Skills: Kubernetes, Kafka, Machine Learning",
+                      "How did you use Kafka? What is a partition?",
+                      "Only tutorials watched: remove, or move to \"currently learning\""
+                    ],
+                    [
+                      "Team lead, final-year project",
+                      "How did you split work? Any conflict?",
+                      "A STAR story about coordination or a disagreement"
+                    ]
+                  ],
+                  "highlightRows": [
+                    {
+                      "rows": [
+                        4
+                      ],
+                      "color": "danger"
+                    },
+                    {
+                      "rows": [
+                        0,
+                        1
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "diagram",
+          "title": "The walkthrough and the project deep-dive ladder",
+          "frames": [
+            {
+              "note": "The 2-minute tour: one line of education, then build towards your strongest project and bridge to the role.",
+              "mermaid": "flowchart LR\n  edu[\"Education<br/>one line: degree, focus\"] --> exp[\"Experience<br/>internship: what you shipped\"]\n  exp --> proj[\"Best project<br/>problem, your role, result\"]\n  proj --> extra[\"Extras<br/>contests, open source, TA\"]\n  extra --> why[\"Bridge<br/>why this role now\"]"
+            },
+            {
+              "note": "The project ladder: each step answers a question the interviewer will ask anyway. Spend the most time on the hardest part.",
+              "mermaid": "flowchart TD\n  p[\"1. Problem and users<br/>who needed it and why\"] --> r[\"2. Your role<br/>what YOU built\"]\n  r --> a[\"3. Architecture<br/>stack, data model, why these choices\"]\n  a --> h[\"4. Hardest part<br/>a bug or decision, how you solved it\"]\n  h --> res[\"5. Result<br/>users, numbers, demo, grade\"]\n  res --> nxt[\"6. Next time<br/>what you would improve\"]"
+            },
+            {
+              "note": "How a real drill-down sounds. Each answer opens a deeper question, so prepare three levels down.",
+              "mermaid": "sequenceDiagram\n  participant I as Interviewer\n  participant Y as You\n  I->>Y: Tell me about the booking system\n  Y-->>I: Problem, my role (API + seat logic), stack, result\n  I->>Y: Why MongoDB and not PostgreSQL?\n  Y-->>I: Honest reason, and the trade-off I would reconsider\n  I->>Y: Two users book the same seat at once?\n  Y-->>I: The race I found, the atomic update, a test with 50 parallel requests\n  I->>Y: What would change at 100x users?\n  Y-->>I: Indexes, cached seat maps, a queue for emails\n  Note over I,Y: every answer invites a deeper question"
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Describing a project as a list of features instead of problems solved and decisions made",
+        "Saying \"we\" for everything, so the interviewer cannot tell what you did",
+        "Listing skills you have only seen in a tutorial",
+        "Being unable to explain why a technology was chosen"
+      ],
+      "followUps": [
+        {
+          "question": "What would you do differently if you rebuilt this project?",
+          "answer": "Name one or two concrete, technical improvements and why: \"I would add integration tests for the booking flow first, because the double-booking bug would have been caught earlier, and I would use PostgreSQL with a unique constraint because bookings are relational.\""
+        },
+        {
+          "question": "This was a group project. What exactly did you do?",
+          "answer": "Be specific and generous: \"I owned the booking API and the database schema; Rafi built the frontend and Mim did payments integration. I also set up the GitHub workflow and reviewed most pull requests.\""
+        }
+      ],
+      "related": [
+        "tell-me-about-yourself",
+        "most-challenging-project-star",
+        "how-to-approach-a-coding-interview"
+      ]
+    },
+    {
+      "slug": "why-should-we-hire-you",
+      "title": "Why should we hire you?",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "hr-round",
+        "self-pitch",
+        "job-description"
+      ],
+      "prompt": "\"Why should we hire you?\" or \"What makes you a good fit for this role?\"\n\nFresh graduates often freeze here or answer with adjectives. How do you build a convincing answer?",
+      "hints": [
+        "Answer from their side: what problem are they hiring to solve?",
+        "Match the job description's top requirements with evidence from your projects, internship and studies.",
+        "Three reasons, each with proof, then a one-line close about the value you bring. 45-60 seconds."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"I am hard-working, passionate and a quick learner.\" Every candidate says this; there is no proof and no link to the role.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Maps the top requirements of the job description to concrete evidence, picks the three strongest matches, adds one proof of fast learning, and closes with the value to the team, in under a minute and without putting other candidates down.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Pick the three requirements of the job that you match best and prove each one with something you actually built or did, add evidence that you learn quickly, and close with the value you will bring to their team, in under a minute.",
+        "explanation": "### What they are really asking\n\"Can you summarise, with evidence, why you fit *this* job?\" It tests self-awareness, preparation and communication.\n\n### Build it from the job description (see the visual)\n1. List the 5-6 key requirements from the job description.\n2. Write your evidence for each: a project, internship task, course project, contest, or teaching experience.\n3. Choose the **three strongest matches** for this role.\n4. Add one sign that you **learn fast** (juniors are hired for potential).\n5. Close with value: what you can contribute and how quickly.\n\n### Sample answer (junior backend role at a payments company)\n> You are looking for someone who can build reliable backend services. In my final-year project I built a 20-endpoint Express API with authentication, and I found and fixed a concurrency bug where two users could book the same seat. During my internship I learned PostgreSQL on the job and was writing production reports within three weeks, so I pick things up quickly. And I am genuinely interested in payments: I built a small wallet app to understand how to make transfers idempotent. So I can contribute to your API work early, and where I don't know something yet, I'll learn it fast.\n\n### Variations\n- **Service company**: emphasise adaptability (different stacks per client), communication with clients, delivering on deadlines.\n- **Bank / fintech IT**: emphasise reliability, attention to detail, SQL, and respect for process and security.\n- **Startup**: emphasise ownership, speed, and building end to end.\n\n### Do not\n- Compare yourself with other candidates (\"I'm better than the others\").\n- Sound desperate (\"I really need this job\").\n- Use only adjectives.",
+        "keyPoints": [
+          "Answer from the employer's side: the problem they are hiring for",
+          "Three requirement -> evidence matches, chosen for this specific role",
+          "Proof that you learn fast",
+          "Close with the value you bring; 45-60 seconds"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "table",
+          "title": "From job description to answer",
+          "caption": "Example: junior backend engineer at a payments company.",
+          "steps": [
+            {
+              "note": "Start from the job description, not from yourself. Copy the 5-6 requirements that matter most for this role (example: junior backend engineer at a payments company).",
+              "tables": [
+                {
+                  "name": "Job description",
+                  "columns": [
+                    "Requirement"
+                  ],
+                  "rows": [
+                    [
+                      "Strong problem solving / DSA"
+                    ],
+                    [
+                      "Backend APIs with Node.js or Java"
+                    ],
+                    [
+                      "SQL databases"
+                    ],
+                    [
+                      "Git and code review"
+                    ],
+                    [
+                      "Communication and teamwork"
+                    ],
+                    [
+                      "Interest in payments / fintech"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "For each requirement, write your **evidence**: something you built, did or achieved. No adjectives, only proof.",
+              "tables": [
+                {
+                  "name": "Requirement -> evidence",
+                  "columns": [
+                    "Requirement",
+                    "My evidence"
+                  ],
+                  "rows": [
+                    [
+                      "Strong problem solving / DSA",
+                      "300+ problems solved; comfortable with hash maps, graphs, DP"
+                    ],
+                    [
+                      "Backend APIs with Node.js or Java",
+                      "Built a 20-endpoint Express API with JWT auth for the booking project"
+                    ],
+                    [
+                      "SQL databases",
+                      "Internship: wrote PostgreSQL reports; know joins, indexes, transactions"
+                    ],
+                    [
+                      "Git and code review",
+                      "All projects on GitHub; reviewed teammates' pull requests"
+                    ],
+                    [
+                      "Communication and teamwork",
+                      "Led a 3-person final-year team with weekly demos to the supervisor"
+                    ],
+                    [
+                      "Interest in payments / fintech",
+                      "Side project: a mini wallet with transaction history and idempotent transfers"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Pick the **three** strongest matches for this specific role. For a backend payments team: APIs, SQL and the payments side project. The others still help, just not in this answer.",
+              "tables": [
+                {
+                  "name": "Requirement -> evidence",
+                  "columns": [
+                    "Requirement",
+                    "My evidence"
+                  ],
+                  "rows": [
+                    [
+                      "Strong problem solving / DSA",
+                      "300+ problems solved; comfortable with hash maps, graphs, DP"
+                    ],
+                    [
+                      "Backend APIs with Node.js or Java",
+                      "Built a 20-endpoint Express API with JWT auth for the booking project"
+                    ],
+                    [
+                      "SQL databases",
+                      "Internship: wrote PostgreSQL reports; know joins, indexes, transactions"
+                    ],
+                    [
+                      "Git and code review",
+                      "All projects on GitHub; reviewed teammates' pull requests"
+                    ],
+                    [
+                      "Communication and teamwork",
+                      "Led a 3-person final-year team with weekly demos to the supervisor"
+                    ],
+                    [
+                      "Interest in payments / fintech",
+                      "Side project: a mini wallet with transaction history and idempotent transfers"
+                    ]
+                  ],
+                  "highlightRows": [
+                    {
+                      "rows": [
+                        1,
+                        2,
+                        5
+                      ],
+                      "color": "success"
+                    },
+                    {
+                      "rows": [
+                        0,
+                        3,
+                        4
+                      ],
+                      "color": "muted"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Turn them into a 45-60 second answer: match, proof that you learn fast, attitude/domain interest, then a confident close that states the value to *them*.",
+              "tables": [
+                {
+                  "name": "Answer outline",
+                  "columns": [
+                    "Part",
+                    "What you say"
+                  ],
+                  "rows": [
+                    [
+                      "1. Match",
+                      "You need someone who can build reliable backend APIs. I built a 20-endpoint Express API and fixed a real concurrency bug in it."
+                    ],
+                    [
+                      "2. Learns fast",
+                      "In my internship I learned PostgreSQL on the job and was writing production reports within three weeks."
+                    ],
+                    [
+                      "3. Genuine interest",
+                      "I care about payments: I built a small wallet app to understand idempotent transfers."
+                    ],
+                    [
+                      "Close",
+                      "So I can contribute to your API work early, and where I do not know something yet, I learn it quickly."
+                    ]
+                  ],
+                  "highlightRows": [
+                    {
+                      "rows": [
+                        3
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Weak vs strong \"why hire me\"",
+          "columns": [
+            "Aspect",
+            "Weak answer",
+            "Strong answer"
+          ],
+          "rows": [
+            [
+              "Starting point",
+              "Me, my qualities",
+              "Their requirements"
+            ],
+            [
+              "Content",
+              "Adjectives: hard-working, passionate",
+              "Evidence: built, fixed, learned, measured"
+            ],
+            [
+              "Relevance",
+              "Generic, fits any job",
+              "Three matches for this role"
+            ],
+            [
+              "Junior angle",
+              "Apologises for lack of experience",
+              "Shows potential: learns fast, with proof"
+            ],
+            [
+              "Tone",
+              "Desperate or arrogant",
+              "Confident and specific"
+            ],
+            [
+              "Ending",
+              "Trails off",
+              "One-line value statement"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Listing adjectives without evidence",
+        "Repeating your CV instead of matching it to the role",
+        "Comparing yourself to other candidates",
+        "Talking for three minutes; this answer should be under one"
+      ],
+      "followUps": [
+        {
+          "question": "You have no professional experience. Why should we take the risk?",
+          "answer": "Acknowledge it calmly, then show evidence that reduces the risk: projects with real users, an internship, how quickly you learned something new, and your plan for your first months (\"I would start by reading the codebase and picking up small bugs to learn your systems\")."
+        },
+        {
+          "question": "What would your teammates say about you?",
+          "answer": "Two qualities with a quick example each, ideally qualities that complement your answer: \"They would say I am reliable, because I flagged the PDF delay early during my internship, and that I help others: I set up our GitHub workflow and reviewed most pull requests.\""
+        }
+      ],
+      "related": [
+        "tell-me-about-yourself",
+        "why-do-you-want-to-join-this-company",
+        "strengths-and-weaknesses"
+      ]
+    },
+    {
+      "slug": "why-do-you-want-to-join-this-company",
+      "title": "Why do you want to join this company?",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "hr-round",
+        "company-research",
+        "motivation"
+      ],
+      "prompt": "\"Why do you want to work here?\" or \"What do you know about our company?\"\n\nHow do you research a company and turn that research into an answer that sounds specific and genuine, whether it is a product company, a software service company, a bank or a startup?",
+      "hints": [
+        "If your answer would work for any other company, it is too generic.",
+        "Find something specific about the product or mission, the engineering work, and the role itself.",
+        "Formula: company (a specific thing you admire) + role (what you will do and learn) + you (why your background fits)."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"It is a big, well-known company with a good salary and work environment.\" Nothing specific, and it is about what you get, not what you bring.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Mentions one specific, researched thing about the company (product, customers, engineering practice), connects it to the role and team, and links it to your own background and goals in 45-60 seconds.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Show that you researched them: name one specific thing about their product or mission, one about their engineering or the role, and connect both to your own skills and goals, so the answer could only be about this company.",
+        "explanation": "### What they are testing\nInterest (are you likely to accept and stay?), preparation, and whether your goals match what the job really is.\n\n### Research in 30-60 minutes\n- **Use the product** (install the app, try the website) and read some user reviews.\n- **Website**: products, customers, markets, recent news.\n- **Engineering signals**: engineering blog, GitHub, conference talks, job posts (which stack, which teams), LinkedIn posts by their engineers.\n- **People**: seniors or alumni who work there; ask what the work is really like.\n- **The job description**: which team, which systems, what they emphasise.\n\n### The formula: company + role + you\n> **Company**: \"I've used your app for two years, and what stands out is how reliably payments go through even during festival rush hours. I'd love to understand how that is engineered.\"\n> **Role**: \"This role is on the backend payments team, so I would be working on exactly those reliability problems, with code reviews and mentoring from experienced engineers.\"\n> **You**: \"In my final-year project and a small wallet side project I worked on idempotent transactions and concurrency, so this is the direction I want to grow in.\"\n\n(The company details here are placeholders: use real, specific facts from your own research.)\n\n### Tailor by company type\nSee the comparison visual. A service company values adaptability and client work; a bank values reliability and process; a startup values ownership and speed.\n\n### Avoid\n- Only salary, location, brand name or \"work-life balance\" as reasons.\n- Facts you cannot back up, or copying the \"About us\" page word for word.\n- Saying it is your \"backup option\" or that you applied everywhere.",
+        "keyPoints": [
+          "Specific research: product, customers, engineering, the role",
+          "Formula: company + role + you",
+          "Tailor to the type of company",
+          "About what you will contribute and learn, not only what you get"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "diagram",
+          "title": "From research to answer",
+          "frames": [
+            {
+              "note": "Five research sources feed three hooks; the answer combines them with your own background.",
+              "mermaid": "flowchart LR\n  app[\"Use the product<br/>read user reviews\"] --> prod[\"Hook 1: product or mission\"]\n  site[\"Website, news<br/>products, customers\"] --> prod\n  blog[\"Engineering blog, GitHub,<br/>talks, engineers' posts\"] --> tech[\"Hook 2: engineering and tech\"]\n  jd[\"Job description<br/>team, stack\"] --> role[\"Hook 3: the role and growth\"]\n  people[\"Seniors, alumni,<br/>current employees\"] --> role\n  prod --> ans[\"Your answer:<br/>company + role + you\"]\n  tech --> ans\n  role --> ans"
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "What to emphasise by company type",
+          "columns": [
+            "Company type",
+            "What to emphasise",
+            "Example hook"
+          ],
+          "rows": [
+            [
+              "Product company (local or global)",
+              "The product, its users, scale, engineering quality",
+              "A feature you use and the engineering problem behind it"
+            ],
+            [
+              "Software service / outsourcing company",
+              "Variety of clients and stacks, learning fast, delivery",
+              "Their client domains and the chance to work across stacks"
+            ],
+            [
+              "Bank or fintech",
+              "Reliability, security, impact on how people pay and save",
+              "A digital service they launched and why reliability matters there"
+            ],
+            [
+              "Startup",
+              "Ownership, speed, building end to end",
+              "The problem they solve and the stage they are at"
+            ],
+            [
+              "Remote / international team",
+              "Communication, async work, engineering standards",
+              "Their open-source work or engineering culture"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "A generic answer that would fit any company",
+        "Focusing only on salary, perks or the brand name",
+        "Getting basic facts about the company wrong",
+        "Overpraising in a way that sounds memorised"
+      ],
+      "followUps": [
+        {
+          "question": "What do you know about our products?",
+          "answer": "Name the main products or services, who uses them, and one thing you noticed while using one. If you could not try it (internal banking systems, for example), mention what you learned from the website, news or people who work there."
+        },
+        {
+          "question": "Which other companies are you interviewing with?",
+          "answer": "Be honest but brief and non-specific: \"I am talking to a couple of other companies, mostly backend roles, but this role is my priority because...\" Do not list names or play companies against each other at this stage."
+        }
+      ],
+      "related": [
+        "why-should-we-hire-you",
+        "questions-to-ask-the-interviewer",
+        "where-do-you-see-yourself-in-five-years"
+      ]
+    },
+    {
+      "slug": "strengths-and-weaknesses",
+      "title": "What are your strengths and weaknesses?",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "hr-round",
+        "self-awareness",
+        "growth-mindset"
+      ],
+      "prompt": "\"What is your greatest strength?\" and \"What is your biggest weakness?\"\n\nHow do you choose a strength worth mentioning, and how do you talk about a real weakness honestly without hurting your chances?",
+      "hints": [
+        "A strength without an example is just a claim.",
+        "The weakness question tests self-awareness and growth, not perfection. Clichés like \"I am a perfectionist\" fail that test.",
+        "Weakness formula: a real but non-critical weakness, a moment it hurt, what you changed, and evidence it is improving."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Strength: \"I am hard-working.\" Weakness: \"I am a perfectionist\" or \"I work too hard\", or worse, a weakness that is central to the job.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Strength: one or two qualities relevant to the role, each with a short story. Weakness: a real, non-core weakness, a specific example of its impact, the concrete system used to improve, and measurable progress.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "For strengths, pick one or two that matter for the role and prove each with a short example. For the weakness, choose a real but non-critical one, show a moment it hurt, explain the concrete steps you took to improve, and give evidence that it is getting better.",
+        "explanation": "### Strengths: claim + proof + relevance\n> \"One of my strengths is debugging methodically. During my internship, a payment receipt was being emailed twice. Instead of guessing, I reproduced it in a test, traced it to a retry that was not idempotent, and fixed it with a unique event id. For a backend role, I think that habit matters a lot.\"\n\nGood junior strengths: learning fast, debugging, ownership, communication, consistency (e.g. daily problem solving), teaching others. Choose ones you can prove.\n\n### Weaknesses: the four-part formula (see the timeline)\n1. **A real weakness** that is not core to the job.\n2. **A moment it hurt** (shows honesty and self-awareness).\n3. **What you changed**: a concrete system, not \"I will try harder\".\n4. **Evidence of progress**.\n\n### Good weakness topics for a fresh graduate\n- Underestimating tasks (as in the visual).\n- Hesitating to ask for help and losing time when stuck; fix: a time box (e.g. ask after an hour of being stuck, with what you tried).\n- Nervousness in public speaking; fix: volunteering to present demos, joining a club.\n- A technical gap that is honest and fixable: \"I have not deployed to a cloud provider in production yet; I am deploying my side project with Docker on a VPS to learn.\"\n\n### Weaknesses to avoid\n- Clichés (\"perfectionist\", \"I work too hard\").\n- \"I have no weaknesses.\"\n- Weaknesses that are core to the role (\"I don't like working in teams\" for a team role, \"I am careless with details\" for a banking system).",
+        "keyPoints": [
+          "Strength = relevant quality + short proof story",
+          "Weakness = real, non-core, with an example of its impact",
+          "Show a concrete improvement system and evidence of progress",
+          "Avoid clichés and weaknesses that are central to the role"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "A weakness answer that shows growth",
+          "caption": "Example weakness: underestimating tasks. The axis is weeks.",
+          "unit": "weeks",
+          "steps": [
+            {
+              "note": "**The real weakness, with a moment it hurt**: *\"I used to underestimate tasks. In my final-year project I said the payment integration would take three days; it took two weeks, and our demo slipped by a week.\"*",
+              "segments": [
+                {
+                  "label": "Slipped a week",
+                  "start": 0,
+                  "end": 3,
+                  "lane": "What went wrong",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Action 1**: *\"Now I break every task into pieces of less than a day before I give an estimate,\"* which exposes the unknown parts early.",
+              "segments": [
+                {
+                  "label": "Slipped a week",
+                  "start": 0,
+                  "end": 3,
+                  "lane": "What went wrong",
+                  "color": "info"
+                },
+                {
+                  "label": "Split tasks",
+                  "start": 3,
+                  "end": 6,
+                  "lane": "What I changed",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Action 2**: *\"I log my estimate next to the actual time for each task,\"* so the estimates get calibrated by data, not optimism.",
+              "segments": [
+                {
+                  "label": "Slipped a week",
+                  "start": 0,
+                  "end": 3,
+                  "lane": "What went wrong",
+                  "color": "info"
+                },
+                {
+                  "label": "Split tasks",
+                  "start": 3,
+                  "end": 6,
+                  "lane": "What I changed",
+                  "color": "info"
+                },
+                {
+                  "label": "Log est. vs actual",
+                  "start": 6,
+                  "end": 10,
+                  "lane": "What I changed",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Action 3**: *\"If something is going over by day two, I tell the team immediately instead of hoping to catch up.\"*",
+              "segments": [
+                {
+                  "label": "Slipped a week",
+                  "start": 0,
+                  "end": 3,
+                  "lane": "What went wrong",
+                  "color": "info"
+                },
+                {
+                  "label": "Split tasks",
+                  "start": 3,
+                  "end": 6,
+                  "lane": "What I changed",
+                  "color": "info"
+                },
+                {
+                  "label": "Log est. vs actual",
+                  "start": 6,
+                  "end": 10,
+                  "lane": "What I changed",
+                  "color": "info"
+                },
+                {
+                  "label": "Flag risk early",
+                  "start": 10,
+                  "end": 13,
+                  "lane": "What I changed",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Evidence it is improving**: *\"During the last two months of my internship my estimates were within about 20% of the actual time, and I have not missed a deadline since.\"* Real weakness, concrete system, measurable progress.",
+              "segments": [
+                {
+                  "label": "Slipped a week",
+                  "start": 0,
+                  "end": 3,
+                  "lane": "What went wrong",
+                  "color": "success"
+                },
+                {
+                  "label": "Split tasks",
+                  "start": 3,
+                  "end": 6,
+                  "lane": "What I changed",
+                  "color": "success"
+                },
+                {
+                  "label": "Log est. vs actual",
+                  "start": 6,
+                  "end": 10,
+                  "lane": "What I changed",
+                  "color": "success"
+                },
+                {
+                  "label": "Flag risk early",
+                  "start": 10,
+                  "end": 13,
+                  "lane": "What I changed",
+                  "color": "success"
+                },
+                {
+                  "label": "Within ~20%",
+                  "start": 13,
+                  "end": 21,
+                  "lane": "Evidence it works",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Weakness answers: use or avoid",
+          "columns": [
+            "Weakness answer",
+            "Verdict",
+            "Why"
+          ],
+          "rows": [
+            [
+              "\"I am a perfectionist.\"",
+              "Avoid",
+              "Cliché; sounds rehearsed and dodges the question"
+            ],
+            [
+              "\"I don't have any weaknesses.\"",
+              "Avoid",
+              "Signals low self-awareness"
+            ],
+            [
+              "\"I am not good at working in teams.\"",
+              "Avoid",
+              "Core to almost every engineering job"
+            ],
+            [
+              "\"I used to underestimate tasks; now I split and track them.\"",
+              "Use",
+              "Real, common, fixable, with a concrete system"
+            ],
+            [
+              "\"I hesitated to ask for help; now I ask after an hour, with what I tried.\"",
+              "Use",
+              "Honest and shows good team habits"
+            ],
+            [
+              "\"I have not used a cloud provider in production; I am deploying my project to learn.\"",
+              "Use",
+              "Honest skill gap plus an active plan"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Using \"perfectionist\" or \"I work too hard\" as a weakness",
+        "Naming a weakness that disqualifies you for the role",
+        "Describing the weakness but no concrete improvement",
+        "Claiming strengths without any example"
+      ],
+      "followUps": [
+        {
+          "question": "What would your previous manager or supervisor say you need to improve?",
+          "answer": "Use real feedback you received and what you did with it: \"My internship lead said I should ask questions earlier. I started posting what I had tried after an hour of being stuck, and it saved me a lot of time.\""
+        },
+        {
+          "question": "Give me another weakness.",
+          "answer": "Prepare a second one in the same format, ideally a technical gap with a learning plan, so you are not caught off guard."
+        }
+      ],
+      "related": [
+        "why-should-we-hire-you",
+        "a-time-you-failed-or-made-a-mistake",
+        "tell-me-about-yourself"
+      ]
+    },
+    {
+      "slug": "most-challenging-project-star",
+      "title": "Tell me about your most challenging project (STAR method)",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "very-high",
+      "tags": [
+        "star-method",
+        "projects",
+        "problem-solving",
+        "storytelling"
+      ],
+      "prompt": "\"Tell me about the most challenging project you have worked on.\"\n\nAnswer it with the **STAR** method (Situation, Task, Action, Result). What makes a STAR story strong, how long should each part be, and what does a good technical example from a fresh graduate sound like?",
+      "hints": [
+        "Choose a story where the challenge was real and *you* made the difference.",
+        "STAR: Situation (context), Task (your responsibility), Action (what you did), Result (outcome and lesson).",
+        "Spend most of the time on Action, say \"I\", include technical detail, and end with a number and a lesson."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"Our final-year project was very challenging because we had little time, but we worked hard as a team and finished it.\" No specific problem, no personal actions, no result.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "A focused STAR story about one hard problem: brief situation, clear personal responsibility and stakes, step-by-step actions with technical reasoning, a measurable result and a lesson, in about two minutes.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Use STAR in about two minutes: one or two sentences of situation, your specific task and the stakes, then most of the time on the concrete actions you personally took and why, finishing with a measurable result and what you learned.",
+        "explanation": "### STAR in one line each\n- **Situation**: the context, briefly (where, when, what was happening).\n- **Task**: what **you** were responsible for and why it was hard or important.\n- **Action**: the steps **you** took, in order, with your reasoning. This is 50-60% of the answer.\n- **Result**: the outcome, with numbers if possible, plus one lesson.\n\n### Picking the story\n- A real technical challenge (a hard bug, performance problem, learning a new technology under a deadline) beats \"we had little time\".\n- You must have played a central role.\n- It should be recent and relevant to the job.\n- Have a second story ready in case they say \"something else, please\".\n\n### Full sample answer (the visual walks through it piece by piece)\n> **Situation**: In my final-year project, a bus-ticket booking web app, we invited about 200 classmates to test it a week before our final demo.\n> **Task**: I owned the booking API. During testing two students got tickets for the same seat, and I had a week to fix it.\n> **Action**: First I reproduced it: I wrote a script that sent 50 booking requests for the same seat at the same moment, and it double-booked in most runs. The code checked whether the seat was free and then inserted the booking, so two requests could both pass the check. I replaced it with one atomic update that only succeeds if the seat is still available, and added a unique index on trip and seat as a safety net. I re-ran the script 20 times, turned it into an automated test, and explained the pattern to my teammates so they checked the payment flow too.\n> **Result**: Zero double bookings in 1,000 concurrent attempts, a smooth demo, and one of the top grades in our batch. I learned to think about concurrency whenever two users can touch the same data, and to always reproduce a bug before fixing it.\n\n### Build a story bank\nPrepare 5-6 STAR stories (challenge, conflict, failure, leadership, learning something fast, pressure). Each story can answer several questions with a different emphasis.",
+        "keyPoints": [
+          "STAR: short situation and task, long action, measurable result",
+          "Say \"I\" and explain your reasoning, not just the steps",
+          "Choose a real technical challenge where you made the difference",
+          "End with a number and a lesson; about two minutes total",
+          "Keep a bank of 5-6 stories for different questions"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "A STAR answer in under two minutes",
+          "caption": "Lanes are the four STAR parts; the axis is seconds at a calm interview pace (about 115 words per minute). Notice how much of the time is Action.",
+          "unit": "s",
+          "steps": [
+            {
+              "note": "**S - Situation (1-2 sentences).** *\"In my final-year project, a bus-ticket booking web app, we invited about 200 classmates to test it a week before our final demo.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**T - Task.** What *you* owned and what was at stake: *\"I owned the booking API. During testing, two students received tickets for the same seat, and I had one week to fix it before the demo.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "info"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**A - Action, step 1: reproduce.** *\"I couldn't fix what I couldn't see, so I wrote a script that sent 50 booking requests for the same seat at the same time. It double-booked in most runs.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "info"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "info"
+                },
+                {
+                  "label": "Reproduce",
+                  "start": 26,
+                  "end": 42,
+                  "lane": "A - Action",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**A - Action, step 2: root cause and fix.** *\"The code checked whether the seat was free and then inserted the booking: two requests could both pass the check. I replaced it with one atomic update that only succeeds if the seat is still available, and added a unique index on trip and seat as a safety net.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "info"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "info"
+                },
+                {
+                  "label": "Reproduce",
+                  "start": 26,
+                  "end": 42,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Root cause + fix",
+                  "start": 42,
+                  "end": 68,
+                  "lane": "A - Action",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**A - Action, step 3: verify.** *\"I re-ran the script 20 times, added it as an automated test, and explained the race condition to my teammates so they checked the payment flow for the same pattern.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "info"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "info"
+                },
+                {
+                  "label": "Reproduce",
+                  "start": 26,
+                  "end": 42,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Root cause + fix",
+                  "start": 42,
+                  "end": 68,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Verify",
+                  "start": 68,
+                  "end": 84,
+                  "lane": "A - Action",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**R - Result.** Numbers: *\"Zero double bookings in 1,000 concurrent attempts, the demo went smoothly, and the project received one of the top grades in our batch.\"*",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "info"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "info"
+                },
+                {
+                  "label": "Reproduce",
+                  "start": 26,
+                  "end": 42,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Root cause + fix",
+                  "start": 42,
+                  "end": 68,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Verify",
+                  "start": 68,
+                  "end": 84,
+                  "lane": "A - Action",
+                  "color": "info"
+                },
+                {
+                  "label": "Result",
+                  "start": 84,
+                  "end": 96,
+                  "lane": "R - Result",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**R - Lesson.** One line: *\"I learned to think about concurrency whenever two users can touch the same data, and to reproduce a bug before fixing it.\"* Most of the time went to **Action**, which is what the interviewer is scoring.",
+              "segments": [
+                {
+                  "label": "Situation",
+                  "start": 0,
+                  "end": 12,
+                  "lane": "S - Situation",
+                  "color": "success"
+                },
+                {
+                  "label": "Task",
+                  "start": 12,
+                  "end": 26,
+                  "lane": "T - Task",
+                  "color": "success"
+                },
+                {
+                  "label": "Reproduce",
+                  "start": 26,
+                  "end": 42,
+                  "lane": "A - Action",
+                  "color": "success"
+                },
+                {
+                  "label": "Root cause + fix",
+                  "start": 42,
+                  "end": 68,
+                  "lane": "A - Action",
+                  "color": "success"
+                },
+                {
+                  "label": "Verify",
+                  "start": 68,
+                  "end": 84,
+                  "lane": "A - Action",
+                  "color": "success"
+                },
+                {
+                  "label": "Result",
+                  "start": 84,
+                  "end": 96,
+                  "lane": "R - Result",
+                  "color": "success"
+                },
+                {
+                  "label": "Lesson",
+                  "start": 96,
+                  "end": 107,
+                  "lane": "R - Result",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Weak vs strong STAR story",
+          "columns": [
+            "Aspect",
+            "Weak",
+            "Strong"
+          ],
+          "rows": [
+            [
+              "Challenge",
+              "\"We had a tight deadline\"",
+              "One specific hard problem (a race condition before the demo)"
+            ],
+            [
+              "Ownership",
+              "\"We\" throughout",
+              "\"I\" for your actions, credit to others where due"
+            ],
+            [
+              "Action",
+              "One vague sentence",
+              "Step by step, with technical reasoning"
+            ],
+            [
+              "Result",
+              "\"It went well\"",
+              "Numbers: 0 double bookings in 1,000 attempts"
+            ],
+            [
+              "Lesson",
+              "None",
+              "One transferable lesson"
+            ],
+            [
+              "Length",
+              "30 seconds or 6 minutes",
+              "About 2 minutes"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Spending most of the time on the situation and background",
+        "Saying \"we\" so the interviewer cannot see your contribution",
+        "A result with no outcome or number",
+        "Picking a story where the challenge was only \"we were busy\""
+      ],
+      "followUps": [
+        {
+          "question": "What would you do differently?",
+          "answer": "Name a real improvement: \"I would write the concurrency test before building the feature, and use an atomic conditional update or a unique constraint from day one rather than a check-then-insert in application code (a plain transaction at the default isolation level does not stop this race).\""
+        },
+        {
+          "question": "How did your team react?",
+          "answer": "Show collaboration: \"They were worried about the demo, so I shared daily progress and explained the fix in a short session, which also helped them spot a similar issue in payments.\""
+        }
+      ],
+      "related": [
+        "walk-me-through-your-resume-and-projects",
+        "conflict-with-a-teammate",
+        "a-time-you-failed-or-made-a-mistake"
+      ]
+    },
+    {
+      "slug": "conflict-with-a-teammate",
+      "title": "Tell me about a conflict with a teammate",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "high",
+      "tags": [
+        "teamwork",
+        "conflict-resolution",
+        "star-method",
+        "communication"
+      ],
+      "prompt": "\"Tell me about a time you had a conflict or disagreement with a teammate. How did you handle it?\"\n\nWhat is the interviewer looking for, and how do you tell a conflict story that shows maturity rather than blame?",
+      "hints": [
+        "They want to see how you behave under friction, not who was right.",
+        "Good conflict stories show: talking privately and early, understanding the other side, focusing on the shared goal, and a constructive outcome.",
+        "STAR again, with extra attention to empathy and what you learned. Never make the other person the villain."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"My teammate was lazy, so I did his part myself and told our supervisor.\" Blames, avoids the conversation, escalates first, and shows no learning.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "A STAR story about a real disagreement where you talked one-to-one early, listened to understand the cause, agreed on a shared goal or criteria, found a solution, and kept a good relationship, with a lesson about how you work with people.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Tell a short STAR story where you raised the issue privately and early, listened to understand the other person's view, moved the discussion to the shared goal and facts, agreed on a solution (escalating only if needed), and kept the working relationship good, then share what you learned.",
+        "explanation": "### What they evaluate\nEmotional maturity, communication, ownership and whether you can disagree without damaging the team. Engineers disagree all the time (design choices, code review, priorities); the question is how.\n\n### A healthy conflict path (see the state diagram)\n1. **Talk one-to-one, early**, not in a group chat or in front of the supervisor.\n2. **Listen and ask why** before arguing. Many \"conflicts\" are hidden constraints.\n3. **Agree on the shared goal** (\"we both want a working demo on Friday\").\n4. **Compare options with facts** (data, a quick prototype, documentation).\n5. **Decide**; if still stuck, **escalate together** to the lead with both options.\n6. **Commit fully** to the decision, and **follow up**.\n\n### Sample STAR answer\n> **Situation**: In our final-year project, one teammate kept missing the deadlines for his part, the admin dashboard, and the rest of us were getting frustrated.\n> **Task**: As the team lead, I needed the dashboard done for our mid-term review in two weeks without damaging the team.\n> **Action**: Instead of complaining in the group chat, I asked him for a coffee and simply asked how things were going. He told me he had started a part-time tutoring job in the evenings and was embarrassed to say so. We re-split the work: he took the report generation and UI components he could build in shorter sessions, and I took the dashboard's API. We also started a 10-minute daily check-in for the whole team so problems surfaced earlier.\n> **Result**: We delivered the dashboard two days early, he finished his parts, and the team was in a better mood. I learned to assume good intent and to ask before judging; many \"lazy teammate\" problems turn out to be hidden constraints.\n\n### Technical disagreement variant\n\"In a course project we disagreed on MongoDB vs PostgreSQL. I suggested we list our access patterns and build a tiny prototype of the main query in both. The data showed relational queries mattered most, so we chose PostgreSQL, and my teammate led the schema design.\"\n\n### Red flags\nBlaming, \"I was right and they were wrong\", going to the supervisor first, choosing a story with no resolution, or claiming you have never had any conflict.",
+        "keyPoints": [
+          "Raise it privately and early; listen first",
+          "Move from people to the shared goal and facts",
+          "Escalate only after trying, and together",
+          "Positive outcome and a preserved relationship",
+          "A lesson about how you work with people"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "diagram",
+          "title": "A healthy path through a disagreement",
+          "frames": [
+            {
+              "note": "The states a mature answer goes through. Escalation is a fallback, not the first move.",
+              "mermaid": "stateDiagram-v2\n  [*] --> Disagreement\n  Disagreement --> PrivateTalk : talk one-to-one, early\n  PrivateTalk --> Understand : listen, ask why\n  Understand --> SharedGoal : agree what success means\n  SharedGoal --> Options : compare options with facts\n  Options --> Agreed : decision made\n  Options --> Escalate : still stuck\n  Escalate --> Agreed : lead decides with both views\n  Agreed --> FollowUp : commit fully, check in later\n  FollowUp --> [*]"
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Red flags vs green flags in a conflict story",
+          "columns": [
+            "Aspect",
+            "Red flag",
+            "Green flag"
+          ],
+          "rows": [
+            [
+              "Framing",
+              "The other person is the villain",
+              "A reasonable person with a different view or constraint"
+            ],
+            [
+              "First move",
+              "Complain in the group chat or to the supervisor",
+              "Private conversation, early"
+            ],
+            [
+              "Approach",
+              "Prove you were right",
+              "Understand, then decide using the shared goal and facts"
+            ],
+            [
+              "Emotion",
+              "Frustration still visible in the telling",
+              "Calm, factual"
+            ],
+            [
+              "Outcome",
+              "No resolution, or \"I just did it myself\"",
+              "A solution both accepted, work delivered"
+            ],
+            [
+              "Relationship",
+              "Damaged",
+              "Same or better than before"
+            ],
+            [
+              "Lesson",
+              "None",
+              "Something you now do differently"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Blaming or mocking the other person",
+        "Saying you have never had a conflict",
+        "Escalating to the supervisor as the first step",
+        "A story that ends without resolution or learning"
+      ],
+      "followUps": [
+        {
+          "question": "What if the other person still disagreed after the discussion?",
+          "answer": "Agree on how to decide (a data point, a quick prototype, or the lead's call), escalate together with both options laid out fairly, then commit fully to the decision even if it was not yours: \"disagree and commit\"."
+        },
+        {
+          "question": "Tell me about a time you disagreed with your supervisor or manager.",
+          "answer": "Same path, more respectfully: bring data, propose instead of complain, accept their decision once heard, and show what happened. Example: suggesting automated tests for a flaky module, backed by the number of bugs it caused."
+        }
+      ],
+      "related": [
+        "most-challenging-project-star",
+        "working-under-pressure-and-deadlines",
+        "a-time-you-failed-or-made-a-mistake"
+      ]
+    },
+    {
+      "slug": "a-time-you-failed-or-made-a-mistake",
+      "title": "Tell me about a time you failed or made a mistake",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "high",
+      "tags": [
+        "failure",
+        "ownership",
+        "accountability",
+        "star-method"
+      ],
+      "prompt": "\"Tell me about a time you failed.\" or \"Tell me about a mistake you made and what you did about it.\"\n\nWhy do interviewers ask this, which story should you pick, and how do you tell it so that it builds trust instead of hurting you?",
+      "hints": [
+        "They are testing ownership and learning, not looking for someone who never fails.",
+        "Pick a real mistake with real but limited impact, where you can show what you did next.",
+        "Own it fast -> limit the damage -> find the root cause -> prevent it from happening again -> share the lesson."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Picks a fake failure (\"I failed to sleep because I worked too hard\"), or blames others or circumstances, or tells a story with no fix and no lesson.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "A real mistake told with STAR: clear ownership early in the story, quick damage control, root-cause analysis, a concrete prevention step (process, test, automation), and a lesson that changed how you work.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Choose a real mistake with limited impact, own it plainly, then spend most of the answer on what you did: how fast you raised it, how you limited the damage, the root cause you found, the change you made so it cannot happen again, and what you learned.",
+        "explanation": "### Why they ask\nEveryone makes mistakes in production systems. Teams want people who **surface problems quickly** and **fix the system**, not people who hide errors. For banks and fintechs, this honesty matters even more.\n\n### Picking the story\n- **Real**: a genuine error you made, not a disguised strength.\n- **Limited impact**: not a catastrophe that suggests poor judgement, not so trivial that nothing was at stake.\n- **Yours**: you made it, you fixed it.\n- **Resolved**: with a prevention step and a lesson.\nGood sources: an internship bug, a missed deadline in a team project, a failed exam or contest you then prepared differently for, a deployment mistake.\n\n### The response loop\n1. **Own it fast**: tell the right person within minutes.\n2. **Limit the damage**: roll back, inform the people affected.\n3. **Root cause**: ask \"why\" until you reach something you can change.\n4. **Prevent it**: a checklist, a test, an automated check.\n5. **Share the lesson** so others benefit.\n\n### Sample answer (the timeline walks through it)\n> During my internship I deployed a configuration change to the shared staging server using a payment-gateway URL I had copied from an old wiki page. It was wrong, and for about 15 minutes every payment test the QA team ran failed. When I saw the errors, I checked my change and told my lead right away that it was probably mine, rolled it back, and confirmed the tests passed again. The root cause was the outdated wiki page and the fact that nothing validated config values before deployment. I fixed the page, and the next day I added a CI check that validates gateway URLs before any deploy. Since then I always verify config against the source of truth, and I try to make a mistake impossible to repeat, not just fix it once.\n\n### Also prepared: a \"failure\" (not a mistake)\nExample: not qualifying in a programming contest, then changing your preparation (topic-wise practice, timed mock contests) and the result next time.",
+        "keyPoints": [
+          "A real mistake with limited impact, owned without excuses",
+          "Raise it fast and limit the damage",
+          "Root cause plus a concrete prevention step",
+          "A lesson that changed how you work"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "diagram",
+          "title": "The mistake response loop",
+          "frames": [
+            {
+              "note": "What a strong answer demonstrates, in order. Interviewers listen especially for \"Own it fast\" and \"Prevent it\".",
+              "mermaid": "flowchart LR\n  m[\"Mistake happens\"] --> own[\"Own it fast<br/>tell the lead within minutes\"]\n  own --> fix[\"Limit the damage<br/>roll back, inform people\"]\n  fix --> rc[\"Find the root cause<br/>not just the symptom\"]\n  rc --> prev[\"Prevent it<br/>checklist, test, automation\"]\n  prev --> share[\"Share the lesson<br/>short note for the team\"]"
+            }
+          ]
+        },
+        {
+          "type": "timeline",
+          "title": "Example story: a bad config on staging",
+          "caption": "Minutes from the deploy. The prevention step (a CI check) was merged the next day.",
+          "unit": "min",
+          "steps": [
+            {
+              "note": "**Minute 0.** During my internship I deployed a configuration change to the shared staging server. I had copied the payment-gateway sandbox URL from an old document, and it was wrong.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Minutes 5-20.** Every payment test the QA team ran started failing. For 15 minutes they assumed it was their test data.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "QA tests failing",
+                  "start": 5,
+                  "end": 20,
+                  "lane": "What happened",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Minute 20.** When I saw the errors in the team channel, I checked my change, realised it was mine, and **told my lead immediately**: \"This is probably my config change, I'm rolling it back now.\" Owning it fast is the most important part of the story.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "QA tests failing",
+                  "start": 5,
+                  "end": 20,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "Tell lead",
+                  "start": 20,
+                  "end": 26,
+                  "lane": "My response",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Minutes 26-32.** I rolled back to the previous configuration, confirmed the payment tests passed again, and told QA they could continue.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "QA tests failing",
+                  "start": 5,
+                  "end": 20,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "Tell lead",
+                  "start": 20,
+                  "end": 26,
+                  "lane": "My response",
+                  "color": "info"
+                },
+                {
+                  "label": "Roll back",
+                  "start": 26,
+                  "end": 32,
+                  "lane": "My response",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Minutes 32-42.** Root cause, not just symptom: the URL came from an outdated wiki page, and nothing validated config values before deploying.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "QA tests failing",
+                  "start": 5,
+                  "end": 20,
+                  "lane": "What happened",
+                  "color": "info"
+                },
+                {
+                  "label": "Tell lead",
+                  "start": 20,
+                  "end": 26,
+                  "lane": "My response",
+                  "color": "info"
+                },
+                {
+                  "label": "Roll back",
+                  "start": 26,
+                  "end": 32,
+                  "lane": "My response",
+                  "color": "info"
+                },
+                {
+                  "label": "Root cause",
+                  "start": 32,
+                  "end": 42,
+                  "lane": "My response",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Prevention and lesson.** I wrote a short note for the team, fixed the wiki page, and the next day added a check to the CI pipeline that validates gateway URLs before deployment. Lesson: verify config against the source of truth, and make mistakes impossible to repeat, not just fixed once.",
+              "segments": [
+                {
+                  "label": "Deploy",
+                  "start": 0,
+                  "end": 5,
+                  "lane": "What happened",
+                  "color": "success"
+                },
+                {
+                  "label": "QA tests failing",
+                  "start": 5,
+                  "end": 20,
+                  "lane": "What happened",
+                  "color": "success"
+                },
+                {
+                  "label": "Tell lead",
+                  "start": 20,
+                  "end": 26,
+                  "lane": "My response",
+                  "color": "success"
+                },
+                {
+                  "label": "Roll back",
+                  "start": 26,
+                  "end": 32,
+                  "lane": "My response",
+                  "color": "success"
+                },
+                {
+                  "label": "Root cause",
+                  "start": 32,
+                  "end": 42,
+                  "lane": "My response",
+                  "color": "success"
+                },
+                {
+                  "label": "Write-up",
+                  "start": 42,
+                  "end": 50,
+                  "lane": "Prevention",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Choosing a fake failure that is really a strength",
+        "Blaming teammates, tools or the university",
+        "A story so severe it raises doubts about your judgement",
+        "No prevention step and no lesson"
+      ],
+      "followUps": [
+        {
+          "question": "What would you do if you found a bug you introduced in production?",
+          "answer": "Tell the team immediately, assess the impact, roll back or hotfix depending on severity, communicate to the affected people, then do a blameless root-cause review and add a test or check so it cannot recur."
+        },
+        {
+          "question": "Tell me about a time you received critical feedback.",
+          "answer": "Describe the feedback without defensiveness, what you changed, and a later result that shows the change worked. Thank the person in the story; it shows you value feedback."
+        }
+      ],
+      "related": [
+        "strengths-and-weaknesses",
+        "most-challenging-project-star",
+        "working-under-pressure-and-deadlines"
+      ]
+    },
+    {
+      "slug": "where-do-you-see-yourself-in-five-years",
+      "title": "Where do you see yourself in five years?",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "behavioral",
+      "frequency": "high",
+      "tags": [
+        "hr-round",
+        "career-goals",
+        "motivation"
+      ],
+      "prompt": "\"Where do you see yourself in five years?\"\n\nWhat is the interviewer really checking, and how do you answer honestly if you are unsure, want to move into management or a specialisation, or are thinking about higher studies abroad?",
+      "hints": [
+        "They want to know whether your goals fit what this job can offer, and whether you are likely to stay and grow.",
+        "Talk about skills and responsibilities you want to grow into, not job titles or salary.",
+        "Year 1: learn and deliver. Years 2-3: own something. Years 4-5: design and mentor. Connect it to this role."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"I want your job\", \"I will have my own startup\", \"I will be abroad doing a master's\", or \"I have not thought about it.\"",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "An ambitious but realistic growth path in skills and responsibility (deliver -> own -> design and mentor), aligned with what the company offers, honest without volunteering plans that make you look short-term.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Describe a realistic growth path in skills and responsibility: in year one, learn the systems and deliver reliably; in two to three years, own a module or service; by five years, design features and mentor juniors, and explain why this role is a good place to grow that way.",
+        "explanation": "### What they are checking\n1. **Ambition**: do you want to grow?\n2. **Fit**: can this company offer the growth you want?\n3. **Retention**: hiring and training a junior costs money; will you stay long enough?\n\n### A strong structure (see the timeline)\n- **Year 1**: learn the codebase, practices and domain; ship features reliably.\n- **Years 2-3**: own a module or service end to end, review code, join on-call.\n- **Years 4-5**: design features, make technical decisions, mentor juniors; possibly specialise (backend, mobile, data, security) or start leading a small team.\nThen connect it: \"This role is a good place for that because...\"\n\n### If you are unsure about the long term\nThat is normal. Talk about the direction (strong backend engineer, broad full-stack skills) rather than a title: *\"I am still discovering whether I enjoy distributed systems or product engineering more, but either way I want to be the person the team trusts with hard problems.\"*\n\n### If you are considering higher studies abroad\nMany CSE graduates in Bangladesh think about a master's abroad, and interviewers know it. Do not lie, but do not lead with it either. Focus on the skills you want to build in this role. If they ask directly, answer honestly and positively: what you want to learn first, and that you are committed to contributing while you are there. A false promise damages trust far more.\n\n### Avoid\n- \"I want your job\" (sounds arrogant or like a cliché).\n- Titles and salary as the main goal.\n- Plans unrelated to the role (a different career, your own startup next year).",
+        "keyPoints": [
+          "Growth in skills and responsibility, not titles or salary",
+          "Year 1 deliver -> years 2-3 own -> years 4-5 design and mentor",
+          "Connect your path to what this company offers",
+          "Honest without volunteering short-term plans"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "A five-year growth path",
+          "caption": "Lanes are stages of your career; the axis is years in the role.",
+          "unit": "years",
+          "steps": [
+            {
+              "note": "**Year 1: learn and deliver.** *\"In my first year I want to learn your systems and engineering practices well and become someone who ships features reliably with good tests.\"*",
+              "segments": [
+                {
+                  "label": "Learn + ship",
+                  "start": 0,
+                  "end": 1,
+                  "lane": "Year 1",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Years 2-3: ownership.** *\"After that I'd like to own a part of the system, say a service or module, end to end...\"*",
+              "segments": [
+                {
+                  "label": "Learn + ship",
+                  "start": 0,
+                  "end": 1,
+                  "lane": "Year 1",
+                  "color": "info"
+                },
+                {
+                  "label": "Own a module",
+                  "start": 1,
+                  "end": 2,
+                  "lane": "Years 2-3",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "*\"...and take part in code reviews and on-call, so I understand how things behave in production.\"*",
+              "segments": [
+                {
+                  "label": "Learn + ship",
+                  "start": 0,
+                  "end": 1,
+                  "lane": "Year 1",
+                  "color": "info"
+                },
+                {
+                  "label": "Own a module",
+                  "start": 1,
+                  "end": 2,
+                  "lane": "Years 2-3",
+                  "color": "info"
+                },
+                {
+                  "label": "Review + on-call",
+                  "start": 2,
+                  "end": 3,
+                  "lane": "Years 2-3",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Years 4-5: wider impact.** *\"In five years I see myself as a strong engineer who designs features, not just implements them...\"*",
+              "segments": [
+                {
+                  "label": "Learn + ship",
+                  "start": 0,
+                  "end": 1,
+                  "lane": "Year 1",
+                  "color": "info"
+                },
+                {
+                  "label": "Own a module",
+                  "start": 1,
+                  "end": 2,
+                  "lane": "Years 2-3",
+                  "color": "info"
+                },
+                {
+                  "label": "Review + on-call",
+                  "start": 2,
+                  "end": 3,
+                  "lane": "Years 2-3",
+                  "color": "info"
+                },
+                {
+                  "label": "Design features",
+                  "start": 3,
+                  "end": 4,
+                  "lane": "Years 4-5",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "*\"...and helps new juniors the way seniors will have helped me.\"* Then tie it back: *\"This role, with your mentoring culture and production scale, is a great place to build that.\"* Ambitious, realistic, and growth inside the company.",
+              "segments": [
+                {
+                  "label": "Learn + ship",
+                  "start": 0,
+                  "end": 1,
+                  "lane": "Year 1",
+                  "color": "success"
+                },
+                {
+                  "label": "Own a module",
+                  "start": 1,
+                  "end": 2,
+                  "lane": "Years 2-3",
+                  "color": "success"
+                },
+                {
+                  "label": "Review + on-call",
+                  "start": 2,
+                  "end": 3,
+                  "lane": "Years 2-3",
+                  "color": "success"
+                },
+                {
+                  "label": "Design features",
+                  "start": 3,
+                  "end": 4,
+                  "lane": "Years 4-5",
+                  "color": "success"
+                },
+                {
+                  "label": "Mentor juniors",
+                  "start": 4,
+                  "end": 5,
+                  "lane": "Years 4-5",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Risky answers and better versions",
+          "columns": [
+            "Answer",
+            "How it sounds",
+            "Better version"
+          ],
+          "rows": [
+            [
+              "\"In your position.\"",
+              "Cliché, or a little arrogant",
+              "\"Leading the design of features and mentoring juniors.\""
+            ],
+            [
+              "\"Running my own startup.\"",
+              "You will leave soon",
+              "\"Building products end to end; I enjoy owning outcomes.\""
+            ],
+            [
+              "\"Doing a master's abroad.\"",
+              "Short-term hire (if volunteered first)",
+              "Focus on skills you will build here; answer honestly if asked directly"
+            ],
+            [
+              "\"I don't plan that far.\"",
+              "No direction",
+              "\"I'm still choosing a specialisation, but I want to be trusted with hard problems.\""
+            ],
+            [
+              "\"Earning a high salary.\"",
+              "Motivated only by money",
+              "Talk about responsibility and impact; salary follows"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Naming a title or salary as the main goal",
+        "Saying you will be somewhere else (another company, abroad, your startup) as the first thing",
+        "Having no answer at all",
+        "Promising things you do not intend (for example, staying \"forever\")"
+      ],
+      "followUps": [
+        {
+          "question": "Do you want to go into management?",
+          "answer": "Answer honestly; for a junior, the safe and genuine answer is usually \"I want to become a strong engineer first; later I will see whether I enjoy leading people or going deeper technically, and I like that both paths exist here\" (if they do)."
+        },
+        {
+          "question": "How long do you plan to stay with us?",
+          "answer": "Do not promise a number you cannot keep. Say you are looking for a place to grow for the long term, and that as long as you are learning and contributing, you see no reason to leave."
+        }
+      ],
+      "related": [
+        "why-do-you-want-to-join-this-company",
+        "tell-me-about-yourself",
+        "questions-to-ask-the-interviewer"
+      ]
+    },
+    {
+      "slug": "working-under-pressure-and-deadlines",
+      "title": "How do you handle pressure and tight deadlines?",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "high",
+      "tags": [
+        "pressure",
+        "prioritization",
+        "time-management",
+        "communication"
+      ],
+      "prompt": "\"How do you work under pressure?\" or \"Tell me about a time you had a tight deadline.\"\n\nWhat does a convincing answer show beyond \"I stay calm and work hard\", and what does a good example from a student project or internship look like?",
+      "hints": [
+        "\"I work late\" is not a strategy. What do you do *before* working late?",
+        "Prioritise (must / should / could), protect focus time, and ask for help when blocked.",
+        "The key behaviour: tell people early, with options, when the plan is at risk."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"I work well under pressure; I just stay calm and work overnight until it is done.\" No method, a burnout signal, and no communication.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "A STAR story showing a method: break down and prioritise, focus on must-haves, detect risk early, communicate options to the lead, cut or defer scope deliberately, deliver what was promised, and reflect on what to do differently.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "I stay calm by having a method: I break the work down and prioritise what must be delivered, protect focus time for it, ask for help quickly when blocked, and when the deadline is at risk I tell my lead early with options, so we cut or defer scope deliberately instead of missing the deadline by surprise.",
+        "explanation": "### The method behind the calm\n1. **Break down and estimate** the work.\n2. **Prioritise** with MoSCoW: Must, Should, Could, Won't (this time).\n3. **Do the must-haves first**, in focused blocks.\n4. **Unblock fast**: if stuck for about an hour, ask with what you tried.\n5. **Communicate early, with options**, as soon as a deadline looks at risk.\n6. **Cut or defer scope deliberately**, agreed with the lead, rather than lowering quality everywhere.\n7. **Reflect** afterwards: what would prevent this next time?\n\n### Sample STAR answer (the visual follows the same week)\n> **Situation**: In my internship we had a client demo on Friday for a transaction export feature.\n> **Task**: I owned the feature: CSV export, date filters, PDF export and emailing the report.\n> **Action**: On Monday I ranked the parts: CSV and filters were must-haves, PDF should, email could wait. On Wednesday morning I found that our PDF library rendered Bangla text incorrectly and fixing it would take two more days. That afternoon I told my lead, with two options: demo CSV and filters on Friday and deliver PDF on Tuesday, or rush everything. We chose the first, and email moved to the next sprint. I spent Thursday finishing filters with tests.\n> **Result**: The demo went smoothly with exactly what we promised, PDF shipped on Tuesday, and the client was happy because nothing was a surprise. I learned that early communication is worth more than overtime.\n\n### Variations to prepare\n- **Exam week + project deadline** (student): planning, splitting the work with teammates, starting early.\n- **Production issue** (internship): stay calm, follow the runbook, communicate status regularly.\n\n### Avoid\nGlorifying all-nighters, saying you never feel pressure, or stories where you missed the deadline without warning anyone.",
+        "keyPoints": [
+          "Break down and prioritise: must, should, could",
+          "Focus on must-haves; ask for help quickly when blocked",
+          "Flag risk early, with options, to the lead",
+          "Cut or defer scope deliberately; keep quality on what ships",
+          "Reflect and improve the process"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "state",
+          "title": "A deadline week, handled well",
+          "caption": "Example from an internship: transaction export for a Friday client demo.",
+          "steps": [
+            {
+              "note": "**Monday.** Feature for a client demo on Friday: transaction export. First, split it and rank it: what *must* be in the demo, what should, what could wait.",
+              "vars": {
+                "day": "Mon",
+                "days left": 5
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export",
+                    "COULD: email the report"
+                  ],
+                  "highlight": [
+                    0,
+                    1
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": []
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": []
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Tuesday.** Start with the must-haves. CSV export is done and tested; date filters are in progress.",
+              "vars": {
+                "day": "Tue",
+                "days left": 4
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export",
+                    "COULD: email the report"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": [
+                    "date filters"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export"
+                  ],
+                  "highlight": [
+                    0
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Wednesday morning.** A quick spike on the PDF part reveals a blocker: the PDF library renders Bangla text incorrectly. Fixing it properly (a font and library setup that shapes Bangla correctly, then testing) will take about two more days.",
+              "vars": {
+                "day": "Wed",
+                "days left": 3,
+                "risk": "PDF +2 days"
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export",
+                    "COULD: email the report"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": [
+                    "date filters",
+                    "PDF export (blocked)"
+                  ],
+                  "highlight": [
+                    1
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Wednesday 3 pm.** Tell the lead **early, with options**, not on Friday morning: A) demo CSV + filters on Friday and deliver PDF next Tuesday, or B) work late and risk quality on everything. The lead picks A and moves the email feature to the next sprint.",
+              "vars": {
+                "day": "Wed",
+                "days left": 3,
+                "decision": "option A"
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export (Tue)",
+                    "LATER: email the report"
+                  ],
+                  "highlight": [
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": [
+                    "date filters"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": [
+                    "Wed: PDF risk + 2 options"
+                  ],
+                  "highlight": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "**Thursday.** Must-haves first: filters finished and covered by tests in a focused block. Only then does PDF work resume, now without deadline panic.",
+              "vars": {
+                "day": "Thu",
+                "days left": 2
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export (Tue)",
+                    "LATER: email the report"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": [
+                    "PDF export"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export",
+                    "date filters",
+                    "tests"
+                  ],
+                  "highlight": [
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": [
+                    "Wed: PDF risk + 2 options"
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "**Friday.** The demo shows CSV export and filters, exactly as agreed. A short update confirms the PDF date.",
+              "vars": {
+                "day": "Fri",
+                "days left": 0
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export (Tue)",
+                    "LATER: email the report"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": [
+                    "PDF export"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export",
+                    "date filters",
+                    "tests",
+                    "demo"
+                  ],
+                  "highlight": [
+                    3
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": [
+                    "Wed: PDF risk + 2 options",
+                    "Fri: demo done, PDF on Tue"
+                  ],
+                  "highlight": [
+                    1
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "**Next Tuesday.** PDF export ships with correct Bangla text, as promised. Under pressure the plan changed, but **nobody was surprised**: that is the story the interviewer wants to hear.",
+              "vars": {
+                "day": "Tue",
+                "result": "all commitments kept"
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "plan (MoSCoW)",
+                  "items": [
+                    "MUST: CSV export",
+                    "MUST: date filters",
+                    "SHOULD: PDF export (Tue)",
+                    "LATER: email the report"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "in progress",
+                  "items": []
+                },
+                {
+                  "kind": "output",
+                  "title": "done",
+                  "items": [
+                    "CSV export",
+                    "date filters",
+                    "tests",
+                    "demo",
+                    "PDF export"
+                  ],
+                  "highlight": [
+                    0,
+                    1,
+                    2,
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "updates to the lead",
+                  "items": [
+                    "Wed: PDF risk + 2 options",
+                    "Fri: demo done, PDF on Tue",
+                    "Tue: PDF delivered"
+                  ],
+                  "highlight": [
+                    2
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "diagram",
+          "title": "Pressure playbook",
+          "frames": [
+            {
+              "note": "The decisions behind a calm answer: prioritise, protect the must-haves, unblock quickly, and communicate a new plan early.",
+              "mermaid": "flowchart TD\n  d[\"Deadline at risk\"] --> list[\"List remaining work<br/>estimate each item\"]\n  list --> pri{\"Must-have for this deadline?\"}\n  pri -->|\"yes\"| focus[\"Do it first<br/>protect focus time\"]\n  pri -->|\"no\"| cut[\"Defer or cut<br/>agree with the lead\"]\n  focus --> blk{\"Stuck for about an hour?\"}\n  blk -->|\"yes\"| ask[\"Ask for help<br/>share what you tried\"]\n  blk -->|\"no\"| ship[\"Deliver what was promised\"]\n  ask --> ship\n  cut --> comm[\"Communicate early<br/>new plan with dates\"]\n  comm --> ship"
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "\"I just work all night\" as the whole strategy",
+        "Saying you never feel pressure",
+        "Telling the team about a problem only on the deadline day",
+        "Silently lowering quality everywhere instead of agreeing on scope"
+      ],
+      "followUps": [
+        {
+          "question": "What do you do when two people give you urgent tasks at the same time?",
+          "answer": "Do not guess: make the conflict visible, explain the effort for each, and ask the person who sets priorities (usually the lead) to decide. Then tell both requesters what will happen when."
+        },
+        {
+          "question": "How do you avoid burnout?",
+          "answer": "Sustainable pace: realistic estimates, early communication instead of overtime, focus blocks, and real breaks. Occasional crunch happens, but it should be the exception, not the plan."
+        }
+      ],
+      "related": [
+        "conflict-with-a-teammate",
+        "a-time-you-failed-or-made-a-mistake",
+        "strengths-and-weaknesses"
+      ]
+    },
+    {
+      "slug": "questions-to-ask-the-interviewer",
+      "title": "What questions should you ask the interviewer?",
+      "topic": "behavioral",
+      "difficulty": "easy",
+      "kind": "concept",
+      "frequency": "very-high",
+      "tags": [
+        "interview-strategy",
+        "questions",
+        "company-research"
+      ],
+      "prompt": "At the end of almost every round you will hear: *\"Do you have any questions for us?\"*\n\nWhy does this matter, which questions leave a good impression (and which do not), and how should the questions differ for an engineer, a manager and HR?",
+      "hints": [
+        "\"No, I think you covered everything\" is a missed opportunity.",
+        "Ask about the work, the team, how people grow, and next steps, tailored to who is in front of you.",
+        "Prepare 5, ask 2-3, and ideally refer to something said earlier in the interview."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "\"No questions.\" Or questions whose answers are on the careers page, or only about leave, salary and promotions in the first technical round.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Two or three thoughtful, prepared questions matched to the interviewer's role, about the team's work, expectations for a new joiner, how quality is ensured and how juniors grow, plus a question about next steps.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Always ask two or three prepared questions tailored to the person: ask engineers about the work and how the team builds software, managers about expectations and growth, and HR about the process and next steps. It shows genuine interest and helps you decide whether you want the job.",
+        "explanation": "### Why it matters\n- It signals **interest and preparation**, and it is often the last impression you leave.\n- It is **your** interview too: you learn whether the team will help you grow.\n- A question that refers to something said earlier shows you were listening.\n\n### Questions that work well\n**About the role**\n- \"What would a new junior engineer typically work on in the first three months?\"\n- \"What does success look like for this role after six months?\"\n\n**About the team and engineering**\n- \"How does the team review code and test changes before release?\"\n- \"How is work planned: sprints, Kanban, something else?\"\n- \"What is the biggest technical challenge the team is facing right now?\"\n\n**About growth**\n- \"How are juniors mentored or onboarded?\"\n- \"Is there time or budget for learning, such as courses or conferences?\"\n\n**About next steps**\n- \"What are the next steps in the process, and when can I expect to hear back?\"\n\n### Tailor to the person (see the comparison)\nEngineers can tell you about daily work; managers about expectations; HR about process, policies and benefits.\n\n### Questions to avoid (or to time well)\n- Anything answered on the first page of their website.\n- Salary, leave and benefits in an early technical round (save them for HR or the offer stage, unless they raise it).\n- \"How soon can I be promoted?\" in the first interview.\n- Negative framing: \"Is your company going to have layoffs?\" (if you need to know, ask about stability more neutrally later).\n\n### Practical tips\nWrite your questions down and bring them; it is fine to look at your notes. If all your questions were answered, say so and mention one: \"You already explained how code review works, which was my main question. Could you tell me more about how the team handles production incidents?\"",
+        "keyPoints": [
+          "Always ask two or three questions; prepare about five",
+          "Tailor them to the interviewer's role",
+          "Ask about the work, quality practices, growth and next steps",
+          "Avoid questions answered on the website and premature salary/leave questions"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "diagram",
+          "title": "A bank of questions to prepare",
+          "frames": [
+            {
+              "note": "Five categories; pick two or three questions that fit the person in front of you.",
+              "mermaid": "mindmap\n  root((Your questions))\n    The role\n      First three months\n      What success looks like\n    The team\n      How code is reviewed\n      How work is planned\n    Growth\n      Mentoring for juniors\n      Learning time or budget\n    Engineering\n      Biggest current challenge\n      How releases happen\n    Next steps\n      Timeline for a decision"
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Tailor your questions to the interviewer",
+          "columns": [
+            "Interviewer",
+            "Good questions",
+            "Better saved for later"
+          ],
+          "rows": [
+            [
+              "Engineer (technical round)",
+              "How do you review and test code? What did a recent interesting bug look like?",
+              "Salary, leave policy"
+            ],
+            [
+              "Team lead / engineering manager",
+              "What makes someone successful here in six months? How are juniors mentored?",
+              "\"How fast can I be promoted?\""
+            ],
+            [
+              "HR / recruiter",
+              "What are the next steps and the timeline? How are performance reviews done?",
+              "Deep technical questions they cannot answer"
+            ],
+            [
+              "Founder / CTO (startup)",
+              "What is the biggest challenge for the product this year? How will the team grow?",
+              "Questions that sound like you doubt the company will survive"
+            ],
+            [
+              "Bank / fintech IT",
+              "Which systems would I work on? How are releases approved and tested?",
+              "Questions about bending security or compliance rules"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Saying \"No, I don't have any questions\"",
+        "Asking things clearly answered on the company website",
+        "Leading with salary, leave or promotion questions in a technical round",
+        "Asking ten questions when time is almost up"
+      ],
+      "followUps": [
+        {
+          "question": "What if the interviewer cannot answer your question?",
+          "answer": "That is fine: thank them, and say you will ask it in a later round. Choose questions that fit their role so it rarely happens."
+        },
+        {
+          "question": "Is it OK to ask about work hours or remote work?",
+          "answer": "Yes, but at the right time and in neutral wording, usually with HR: \"How does the team usually work: in office, hybrid or remote? What are typical working hours?\""
+        }
+      ],
+      "related": [
+        "why-do-you-want-to-join-this-company",
+        "salary-expectations",
+        "how-to-approach-a-coding-interview"
+      ]
+    },
+    {
+      "slug": "salary-expectations",
+      "title": "What are your salary expectations?",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "behavioral",
+      "frequency": "high",
+      "tags": [
+        "salary",
+        "negotiation",
+        "offer",
+        "hr-round",
+        "bangladesh"
+      ],
+      "prompt": "\"What are your salary expectations?\" or \"How much are you expecting?\"\n\nHow do you research a fair range as a fresh graduate (in Bangladesh or for remote roles), when should you give a number, how do you state a range, and how do you negotiate politely once an offer arrives?",
+      "hints": [
+        "Never answer with a number you invented on the spot. Where would you find real data?",
+        "Know three numbers before the call: your walk-away, your target and your stretch.",
+        "Ask for their budgeted range first if you can; if pressed, give a researched range whose bottom is near your target, and discuss the total package, not only the base."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Says \"anything is fine\", or names a random number, or a figure far above the market, then accepts the first offer without asking what is included.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Has researched the market for this role, company type and city, knows walk-away/target/stretch, tries to learn their range first, gives a range anchored at the target, asks about the whole package, negotiates politely with reasons, and gets the final terms in writing.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "Research the market range for this role and company type, decide your walk-away, target and stretch numbers, try to learn the company's budget first, and if asked, give a range whose lower end is close to your target, saying it depends on the total package. At the offer stage, negotiate politely with reasons and get the final terms in writing.",
+        "explanation": "### 1. Research before the call\nSalaries vary widely in Bangladesh by company type (local product company, software service company, multinational, bank, startup), city, and the role's stack. Sources:\n- **Seniors, alumni and friends** working at similar companies (the most reliable source for freshers).\n- **Job postings** that show a salary range (some local job boards and company posts include one).\n- **Developer communities** and online salary surveys, used carefully (small samples, often self-reported).\n- For international or remote roles, sites such as Glassdoor or Levels.fyi, adjusted for the role's location and level.\nWrite down a range for *this* kind of company, not the highest number you heard.\n\n### 2. Know your three numbers\n- **Walk-away**: the minimum you would accept (cost of living, other offers).\n- **Target**: a fair market number for you.\n- **Stretch**: the top of a realistic range.\n\n### 3. If they ask early (screening call)\nTry to learn their range first:\n> \"I'm still learning about the role. Could you share the budgeted range for this position?\"\nIf they insist, give a **range** based on research, not a single number, with the bottom near your target, and leave room:\n> \"Based on my research for junior backend roles at similar companies, I'm looking at roughly X to Y, depending on the total package.\"\nMany application forms (including on local job sites) ask for an \"expected salary\" field: fill it with your researched number or range, not a random guess.\n\n### 4. At the offer stage: look at the whole package\nAsk what the figure includes (see the checklist visual): gross vs take-home, festival bonuses, provident fund, increments, probation, insurance, other benefits, any service bond.\n\n### 5. Negotiate politely\n- Start with appreciation and enthusiasm.\n- Ask, with a reason: \"Is there flexibility on the base? Based on my research and the internship experience I bring, I was hoping for closer to X.\"\n- If the base is fixed, ask about other levers: the first review after probation, a joining bonus, a learning budget.\n- Never invent competing offers. If you have a real one, mention it factually.\n- Get the final agreement **in writing** (offer letter).\n\n### Tone\nNegotiation is normal and expected; doing it respectfully does not cost you the offer at reasonable companies. Freshers usually have less leverage, so focus on a fair base, a clear review date, and learning opportunities.",
+        "keyPoints": [
+          "Research a market range for this role and company type; know walk-away, target and stretch",
+          "Try to learn their budget first; if pressed, give a range anchored at your target",
+          "Evaluate the total package, not only the base",
+          "Negotiate politely with reasons; never invent offers",
+          "Get the final terms in writing"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "diagram",
+          "title": "From research to a written offer",
+          "frames": [
+            {
+              "note": "The process: research and numbers before the call, their range or yours when asked, then the whole package, a polite negotiation and written terms.",
+              "mermaid": "flowchart LR\n  r[\"Research<br/>seniors, alumni, job posts with pay\"] --> band[\"Set your numbers<br/>walk-away, target, stretch\"]\n  band --> early{\"Asked early in the process?\"}\n  early -->|\"yes\"| ask[\"Ask for their budgeted range\"]\n  early -->|\"no, final HR round\"| range[\"Give a range<br/>bottom near your target\"]\n  ask -->|\"they insist\"| range\n  ask -->|\"they share it\"| cmp[\"Compare it with your numbers\"]\n  range --> total[\"Offer: check the total package<br/>bonus, PF, increments, benefits\"]\n  cmp --> total\n  total --> neg[\"Negotiate politely, with reasons\"]\n  neg --> write[\"Get the final offer in writing\"]"
+            },
+            {
+              "note": "How a polite negotiation sounds. X and Y stand for your researched numbers.",
+              "mermaid": "sequenceDiagram\n  participant HR as Recruiter\n  participant Y as You\n  HR->>Y: What are your salary expectations?\n  Y-->>HR: Could you share the budgeted range for this role?\n  HR->>Y: We would like to hear your expectation first\n  Y-->>HR: For junior backend roles like this I am looking at X to Y, depending on the package\n  HR->>Y: Our offer is a little below X\n  Y-->>HR: Thank you, I am excited about the role. Is there flexibility on the base, or an earlier review?\n  HR->>Y: We can review after probation\n  Y-->>HR: Great - could the review date and criteria be in the offer letter?\n  Note over HR,Y: appreciative, specific, and confirmed in writing"
+            }
+          ]
+        },
+        {
+          "type": "comparison",
+          "title": "Offer checklist: what to ask about",
+          "columns": [
+            "Item",
+            "What to ask",
+            "Why it matters"
+          ],
+          "rows": [
+            [
+              "Gross vs take-home",
+              "Is this the gross figure? What is deducted (tax, provident fund)?",
+              "Offers are often quoted gross; monthly cash in hand is lower"
+            ],
+            [
+              "Festival bonuses",
+              "How many per year, how much, and from when are you eligible?",
+              "Common in Bangladesh, usually around major festivals; it changes the yearly total"
+            ],
+            [
+              "Provident fund / gratuity",
+              "Employer contribution and the rules for leaving early",
+              "Long-term savings; the employer's share often vests only after a minimum period of service"
+            ],
+            [
+              "Probation and confirmation",
+              "How long is probation? Does pay change on confirmation?",
+              "Often 3-6 months; affects your first raise"
+            ],
+            [
+              "Increments and reviews",
+              "When is the first review, and what decides it?",
+              "Your growth over the next few years"
+            ],
+            [
+              "Benefits",
+              "Health insurance, lunch, transport, equipment, learning budget",
+              "Can add a lot of value beyond the base"
+            ],
+            [
+              "Bond and notice period",
+              "Is there a service bond or training agreement? What is the notice period?",
+              "Leaving early under a bond can cost money"
+            ],
+            [
+              "Work model and hours",
+              "Office, hybrid or remote? Typical hours, on-call?",
+              "Affects commute cost and quality of life"
+            ]
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Naming a number without research, either far too low or far too high",
+        "Giving a range whose bottom is below what you would really accept",
+        "Comparing only the base salary and ignoring bonuses, provident fund, probation and bonds",
+        "Inventing a competing offer, or accepting verbal promises without writing them down"
+      ],
+      "followUps": [
+        {
+          "question": "What is your current salary?",
+          "answer": "For a fresh graduate, you can say this is your first full-time role and share your internship stipend only if relevant. If you are employed, it is reasonable to focus on your expectation for this role based on market research rather than your current figure."
+        },
+        {
+          "question": "What if they say the offer is final?",
+          "answer": "Thank them, then decide calmly: compare the total package with your walk-away number and the learning opportunity. You can still ask for non-salary items, such as an early review or a learning budget, and ask for a day or two to decide."
+        }
+      ],
+      "related": [
+        "questions-to-ask-the-interviewer",
+        "why-do-you-want-to-join-this-company",
+        "where-do-you-see-yourself-in-five-years"
+      ]
+    },
+    {
+      "slug": "how-to-approach-a-coding-interview",
+      "title": "How to approach a coding interview (thinking aloud)",
+      "topic": "behavioral",
+      "difficulty": "medium",
+      "kind": "concept",
+      "frequency": "very-high",
+      "tags": [
+        "interview-strategy",
+        "problem-solving",
+        "communication",
+        "dsa"
+      ],
+      "prompt": "You are given a coding problem in a live interview (on a whiteboard, a shared editor or a call). What exactly do you do from the moment you read the problem until time runs out?\n\nDescribe the steps (clarify -> examples -> brute force -> optimise -> code -> test), how you **think aloud**, how you manage time, and what to do when you get stuck.",
+      "hints": [
+        "Interviewers grade the process as much as the final code. What can they see if you code in silence?",
+        "Never start coding before you have clarified the problem, worked an example, and agreed on an approach.",
+        "Clarify -> examples -> brute force with complexity -> optimise -> confirm -> code while narrating -> dry-run and edge cases -> complexity."
+      ],
+      "approaches": [
+        {
+          "name": "Weak answer",
+          "idea": "Reads the problem, goes silent, starts coding immediately, gets stuck on an edge case at minute 30, and says \"I think it works\" without testing.",
+          "time": "—",
+          "space": "—"
+        },
+        {
+          "name": "Strong answer",
+          "idea": "Clarifies constraints and edge cases, works examples, states a brute force with its complexity, improves it and confirms the plan, codes cleanly while narrating, dry-runs the code on an example and edge cases, and states the final complexity, asking for a hint after a few minutes of being stuck.",
+          "time": "—",
+          "space": "—"
+        }
+      ],
+      "solution": {
+        "summary": "I follow a fixed routine and think aloud throughout: clarify the problem and constraints, work through examples, state a brute-force solution with its complexity, optimise it and confirm the approach with the interviewer, code it while narrating, then test it by dry-running examples and edge cases and finish with the time and space complexity.",
+        "explanation": "### What interviewers score\n1. **Problem solving**: can you get from a vague problem to a working approach?\n2. **Communication**: can they follow your thinking?\n3. **Coding**: is the code correct, clean and readable?\n4. **Testing**: do you verify your own work?\nSilence hides 1, 2 and 4. That is why thinking aloud matters.\n\n### The routine (the visuals show the time plan and a full example)\n1. **Clarify**: restate the problem; ask about input size, value ranges, duplicates, negatives, empty input, what to return when there is no answer.\n2. **Examples**: one normal, one tricky; check your understanding.\n3. **Brute force**: state it with its complexity. Use the constraints: n up to 10^5 means O(n²) (about 10^10 steps) is too slow; aim for O(n log n) or O(n).\n4. **Optimise**: find the repeated or wasted work; think through common patterns (hash map, two pointers, sliding window, sorting, binary search, heap, BFS/DFS, DP). **Confirm** the plan before coding.\n5. **Code**: meaningful names, small helper functions, narrate the important lines.\n6. **Test**: dry-run line by line with real values, then edge cases. Fix bugs calmly; finding your own bug is a positive signal.\n7. **Wrap up**: time and space complexity, trade-offs, what you would improve.\n\n### When you are stuck\n- Say what you are thinking: \"I know I need to find pairs faster than O(n²)...\"\n- Go back to a small example and solve it by hand, watching what you do.\n- After 3-5 minutes without progress, **ask for a hint**, explaining what you tried. Taking a hint well is better than freezing.\n\n### Online assessments (no interviewer)\nThe same routine, silently: read constraints first, solve the easiest question first, test with your own edge cases before submitting, and watch the time per question.\n\n### Practice the habit\nPractise problems out loud, with a timer, ideally with a friend acting as interviewer. Record yourself once; it is uncomfortable but very effective.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "// After clarifying: return indices, exactly one answer, or [] if none\nfunction twoSum(nums, target) {\n  const seen = new Map(); // value -> index of numbers already passed\n  for (let i = 0; i < nums.length; i++) {\n    const need = target - nums[i];\n    if (seen.has(need)) return [seen.get(need), i];\n    seen.set(nums[i], i);\n  }\n  return [];\n}\n\n// Test out loud: normal case, duplicates, negatives, no answer\nconsole.log(twoSum([2, 7, 11, 15], 9)); // [0, 1]\nconsole.log(twoSum([3, 3], 6)); // [0, 1]\nconsole.log(twoSum([-4, 1, 9], 5)); // [0, 2]\nconsole.log(twoSum([1, 2], 7)); // []"
+          },
+          {
+            "language": "python",
+            "code": "def two_sum(nums: list[int], target: int) -> list[int]:\n    seen = {}  # value -> index of numbers already passed\n    for i, x in enumerate(nums):\n        need = target - x\n        if need in seen:\n            return [seen[need], i]\n        seen[x] = i\n    return []\n\n\n# Test out loud: normal case, duplicates, negatives, no answer\nprint(two_sum([2, 7, 11, 15], 9))  # [0, 1]\nprint(two_sum([3, 3], 6))  # [0, 1]\nprint(two_sum([-4, 1, 9], 5))  # [0, 2]\nprint(two_sum([1, 2], 7))  # []"
+          },
+          {
+            "language": "java",
+            "code": "import java.util.Arrays;\nimport java.util.HashMap;\nimport java.util.Map;\n\nclass Solution {\n    // After clarifying: return indices, exactly one answer, or an empty array if none\n    static int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> seen = new HashMap<>(); // value -> index\n        for (int i = 0; i < nums.length; i++) {\n            int need = target - nums[i];\n            if (seen.containsKey(need)) return new int[] { seen.get(need), i };\n            seen.put(nums[i], i);\n        }\n        return new int[0];\n    }\n\n    public static void main(String[] args) { // test out loud\n        System.out.println(Arrays.toString(twoSum(new int[] { 2, 7, 11, 15 }, 9))); // [0, 1]\n        System.out.println(Arrays.toString(twoSum(new int[] { 3, 3 }, 6))); // [0, 1]\n        System.out.println(Arrays.toString(twoSum(new int[] { -4, 1, 9 }, 5))); // [0, 2]\n        System.out.println(Arrays.toString(twoSum(new int[] { 1, 2 }, 7))); // []\n    }\n}"
+          }
+        ],
+        "keyPoints": [
+          "Clarify inputs, outputs, constraints and edge cases before coding",
+          "Brute force with complexity first, then optimise and confirm the plan",
+          "Think aloud while coding; keep the code clean",
+          "Test by dry-running examples and edge cases; state final complexity",
+          "Ask for a hint after a few minutes stuck, explaining what you tried"
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "Time plan for a 45-minute coding round",
+          "caption": "One lane per phase; labels are the minutes. Real interviews vary, but the order rarely does.",
+          "unit": "min",
+          "steps": [
+            {
+              "note": "**Clarify (about 4 min).** Restate the problem and ask about inputs, outputs, constraints and edge cases before writing anything.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Examples (about 3 min).** Work one normal and one tricky example by hand; it often reveals the pattern.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "info"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Brute force (about 3 min).** Say the simplest correct idea and its complexity, even if you will not code it.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "info"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "info"
+                },
+                {
+                  "label": "7-10",
+                  "start": 7,
+                  "end": 10,
+                  "lane": "3. Brute force",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Optimize (about 7 min).** Find the bottleneck in the brute force and pick a better approach; confirm the plan with the interviewer.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "info"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "info"
+                },
+                {
+                  "label": "7-10",
+                  "start": 7,
+                  "end": 10,
+                  "lane": "3. Brute force",
+                  "color": "info"
+                },
+                {
+                  "label": "10-17",
+                  "start": 10,
+                  "end": 17,
+                  "lane": "4. Optimize",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Code (about 15 min).** Write clean, readable code while narrating what each part does.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "info"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "info"
+                },
+                {
+                  "label": "7-10",
+                  "start": 7,
+                  "end": 10,
+                  "lane": "3. Brute force",
+                  "color": "info"
+                },
+                {
+                  "label": "10-17",
+                  "start": 10,
+                  "end": 17,
+                  "lane": "4. Optimize",
+                  "color": "info"
+                },
+                {
+                  "label": "17-32",
+                  "start": 17,
+                  "end": 32,
+                  "lane": "5. Code",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Test (about 8 min).** Dry-run your code on the example, then edge cases; fix bugs calmly.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "info"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "info"
+                },
+                {
+                  "label": "7-10",
+                  "start": 7,
+                  "end": 10,
+                  "lane": "3. Brute force",
+                  "color": "info"
+                },
+                {
+                  "label": "10-17",
+                  "start": 10,
+                  "end": 17,
+                  "lane": "4. Optimize",
+                  "color": "info"
+                },
+                {
+                  "label": "17-32",
+                  "start": 17,
+                  "end": 32,
+                  "lane": "5. Code",
+                  "color": "info"
+                },
+                {
+                  "label": "32-40",
+                  "start": 32,
+                  "end": 40,
+                  "lane": "6. Test",
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "**Wrap up (about 5 min).** State time and space complexity and mention possible improvements or trade-offs.",
+              "segments": [
+                {
+                  "label": "0-4",
+                  "start": 0,
+                  "end": 4,
+                  "lane": "1. Clarify",
+                  "color": "success"
+                },
+                {
+                  "label": "4-7",
+                  "start": 4,
+                  "end": 7,
+                  "lane": "2. Examples",
+                  "color": "success"
+                },
+                {
+                  "label": "7-10",
+                  "start": 7,
+                  "end": 10,
+                  "lane": "3. Brute force",
+                  "color": "success"
+                },
+                {
+                  "label": "10-17",
+                  "start": 10,
+                  "end": 17,
+                  "lane": "4. Optimize",
+                  "color": "success"
+                },
+                {
+                  "label": "17-32",
+                  "start": 17,
+                  "end": 32,
+                  "lane": "5. Code",
+                  "color": "success"
+                },
+                {
+                  "label": "32-40",
+                  "start": 32,
+                  "end": 40,
+                  "lane": "6. Test",
+                  "color": "success"
+                },
+                {
+                  "label": "40-45",
+                  "start": 40,
+                  "end": 45,
+                  "lane": "7. Wrap-up",
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "state",
+          "title": "One problem, start to finish, out loud (Two Sum)",
+          "caption": "The note is what you say; the panels are what you write down. Code lines refer to the JavaScript solution.",
+          "steps": [
+            {
+              "note": "**Clarify.** Problem: \"Given an array and a target, find two numbers that add up to the target.\" You say: *\"Should I return the indices or the values? Is there always exactly one answer? Can numbers be negative or repeated? How large can the array be?\"*",
+              "vars": {
+                "phase": "clarify",
+                "minute": 2
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ],
+                  "highlight": [
+                    0,
+                    1,
+                    2,
+                    3
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000"
+                  ],
+                  "highlight": [
+                    0,
+                    1,
+                    2
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Examples.** *\"Let me check my understanding: for [2, 7, 11, 15] and target 9 the answer is [0, 1]. A tricky one: [3, 3] with target 6 must return [0, 1], so I can't use the same element twice.\"*",
+              "vars": {
+                "phase": "examples",
+                "minute": 6
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]"
+                  ],
+                  "highlight": [
+                    3,
+                    4
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Brute force.** *\"The simplest correct approach checks every pair: O(n²) time, O(1) space. With n up to 100,000 that is about 10^10 operations, too slow, so I'd like to optimise before coding.\"*",
+              "vars": {
+                "phase": "brute force",
+                "minute": 9
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)"
+                  ],
+                  "highlight": [
+                    5
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Optimise and agree.** *\"For each number x I need target − x. If I store the numbers I have already seen in a hash map from value to index, I can check that in O(1). That gives O(n) time and O(n) space. Does that sound good before I code it?\"*",
+              "vars": {
+                "phase": "optimise",
+                "minute": 15
+              },
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)",
+                    "map value -> index: O(n) time, O(n) space"
+                  ],
+                  "highlight": [
+                    6
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Code, narrating.** *\"I loop once. For each index I compute need; if need is already in the map I return both indices, otherwise I store the current value. Checking before inserting means I never pair an element with itself.\"*",
+              "vars": {
+                "phase": "code",
+                "minute": 25
+              },
+              "codeLine": 4,
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)",
+                    "map value -> index: O(n) time, O(n) space"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": []
+                }
+              ]
+            },
+            {
+              "note": "**Test by dry-running.** *\"For [2, 7, 11, 15]: i = 0, need 7, not seen, store 2. i = 1, need 2, found at index 0, return [0, 1].\"* Walk the code line by line with real values, out loud.",
+              "vars": {
+                "phase": "test",
+                "minute": 34,
+                "i": 1,
+                "need": 2
+              },
+              "codeLine": 6,
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)",
+                    "map value -> index: O(n) time, O(n) space"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": [
+                    "[2,7,11,15], 9 -> [0,1] ok"
+                  ],
+                  "highlight": [
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "**Edge cases.** Duplicates [3, 3] -> [0, 1]; negatives [-4, 1, 9] with target 5 -> [0, 2]; no answer [1, 2] with target 7 -> [] (agreed during clarification). All pass.",
+              "vars": {
+                "phase": "test",
+                "minute": 38
+              },
+              "codeLine": 16,
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)",
+                    "map value -> index: O(n) time, O(n) space"
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": [
+                    "[2,7,11,15], 9 -> [0,1] ok",
+                    "[3,3], 6 -> [0,1] ok",
+                    "[-4,1,9], 5 -> [0,2] ok",
+                    "[1,2], 7 -> [] ok"
+                  ],
+                  "highlight": [
+                    1,
+                    2,
+                    3
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "**Wrap up.** *\"Time O(n), one pass with O(1) average map operations; space O(n) for the map. If the array were sorted, two pointers would give O(1) extra space.\"* Every step was visible to the interviewer: that is what they grade.",
+              "vars": {
+                "phase": "wrap-up",
+                "minute": 42,
+                "time": "O(n)",
+                "space": "O(n)"
+              },
+              "codeLine": 2,
+              "panels": [
+                {
+                  "kind": "list",
+                  "title": "questions you asked",
+                  "items": [
+                    "indices or values?",
+                    "always one answer?",
+                    "negatives / duplicates?",
+                    "max n?"
+                  ]
+                },
+                {
+                  "kind": "list",
+                  "title": "whiteboard notes",
+                  "items": [
+                    "return indices",
+                    "exactly one answer",
+                    "n up to 100,000",
+                    "[2,7,11,15], 9 -> [0,1]",
+                    "[3,3], 6 -> [0,1]",
+                    "brute force: all pairs, O(n²)",
+                    "map value -> index: O(n) time, O(n) space",
+                    "time O(n), space O(n)",
+                    "sorted input -> two pointers"
+                  ],
+                  "highlight": [
+                    7,
+                    8
+                  ]
+                },
+                {
+                  "kind": "output",
+                  "title": "tests run",
+                  "items": [
+                    "[2,7,11,15], 9 -> [0,1] ok",
+                    "[3,3], 6 -> [0,1] ok",
+                    "[-4,1,9], 5 -> [0,2] ok",
+                    "[1,2], 7 -> [] ok"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "diagram",
+          "title": "The routine, including what to do when stuck",
+          "frames": [
+            {
+              "note": "The main loop: keep improving until the approach fits the constraints, then confirm, code and test. The dotted path is your way out when stuck.",
+              "mermaid": "flowchart TD\n  read[\"Read and restate the problem\"] --> clar[\"Clarify inputs, outputs, constraints\"]\n  clar --> ex[\"Work 1-2 examples by hand\"]\n  ex --> bf[\"State the brute force and its complexity\"]\n  bf --> fast{\"Fast enough for the constraints?\"}\n  fast -->|\"no\"| better[\"Find the bottleneck<br/>try a pattern: hash map, two pointers, sort, heap, BFS\"]\n  better --> fast\n  fast -->|\"yes\"| agree[\"Confirm the plan with the interviewer\"]\n  agree --> code[\"Code it, narrating\"]\n  code --> test[\"Dry-run and edge cases\"]\n  test --> cx[\"State time and space complexity\"]\n  better -.->|\"stuck 3-5 min\"| hint[\"Say what you tried, ask for a hint\"]\n  hint -.-> better"
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Starting to code before clarifying the problem and agreeing on an approach",
+        "Long silences: the interviewer cannot give credit for thinking they cannot hear",
+        "Skipping testing, or \"testing\" by saying \"I think it works\"",
+        "Refusing hints or freezing instead of asking"
+      ],
+      "followUps": [
+        {
+          "question": "What if you cannot find the optimal solution?",
+          "answer": "Implement the best correct solution you have (a clean brute force beats broken optimal code), state its complexity honestly, and explain what you would try next. Partial credit for a working, well-tested solution is real."
+        },
+        {
+          "question": "Which language should you use?",
+          "answer": "The one you are fastest and most accurate in, usually the one you used for problem solving (C++, Java, Python or JavaScript). Know its standard library for maps, sets, sorting, heaps and queues well."
+        }
+      ],
+      "related": [
+        "walk-me-through-your-resume-and-projects",
+        "questions-to-ask-the-interviewer",
+        "working-under-pressure-and-deadlines",
+        "two-sum"
+      ]
+    }
+  ],
+  "quiz": [
+    {
+      "id": "behavioral-q1",
+      "question": "In the STAR method, what do the letters stand for?",
+      "options": [
+        "Strategy, Timeline, Analysis, Review",
+        "Situation, Teamwork, Approach, Reflection",
+        "Situation, Task, Action, Result",
+        "Skills, Talent, Attitude, Reliability"
+      ],
+      "answer": 2,
+      "explanation": "STAR = Situation, Task, Action, Result: a structure for \"Tell me about a time...\" answers that keeps them concrete and short.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q2",
+      "question": "Which part of a STAR answer should take the most time?",
+      "options": [
+        "Situation",
+        "Action",
+        "Task",
+        "Result"
+      ],
+      "answer": 1,
+      "explanation": "The interviewer is scoring what you did and why, so Action should be roughly half the answer. Long situations are the most common mistake.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q3",
+      "question": "What is the best structure for \"Tell me about yourself\" as a fresh graduate?",
+      "options": [
+        "Present -> past -> future, tailored to the role, in 60-90 seconds",
+        "Your CV in order: education, CGPA, courses, projects, then skills",
+        "A chronological story from school to graduation, so they see your background",
+        "Two or three sentences, so the interviewer can move on to technical questions"
+      ],
+      "answer": 0,
+      "explanation": "Present-past-future gives a short, relevant pitch with proof points and a link to the role. A CV recital or a life story is long and unfocused (they already have your CV), and two or three sentences waste the chance to steer the interview towards your strongest material.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q4",
+      "question": "Which weakness answer is the strongest?",
+      "options": [
+        "\"I'm a perfectionist, so I sometimes spend too long polishing my work.\"",
+        "\"I don't have a major weakness that affects my work.\"",
+        "\"I find teamwork hard, so I prefer to take tasks I can do on my own.\"",
+        "\"I used to underestimate tasks; now I split work into pieces under a day and track estimate vs actual.\""
+      ],
+      "answer": 3,
+      "explanation": "It is real, not core to the job, and shows a concrete improvement system. The perfectionist line is a cliché, \"no weaknesses\" shows low self-awareness, and avoiding teamwork is disqualifying for most roles.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q5",
+      "question": "Early in a screening call the recruiter asks for your salary expectation, before you know much about the role. What is the best first response?",
+      "options": [
+        "Ask whether they can share the budgeted range for the role",
+        "Say \"anything is fine\", since a fresher should not negotiate",
+        "Name the highest figure you have heard from a friend, to leave room to come down",
+        "Decline to discuss salary at all until you have a written offer"
+      ],
+      "answer": 0,
+      "explanation": "Asking for their range first gives you information without weakening your position; if they insist, give a researched range. \"Anything is fine\" invites a low offer, an unresearched number can price you out or undersell you, and refusing to discuss it at all can come across as evasive.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "behavioral-q6",
+      "question": "If you must give a salary range, where should your real target sit?",
+      "options": [
+        "At the top of the range",
+        "Exactly in the middle of the range",
+        "At or near the bottom of the range",
+        "Above the range, so the numbers you say sound modest"
+      ],
+      "answer": 2,
+      "explanation": "Employers tend to anchor on the lower end of a range, so its bottom should be a number you would be happy with. With the target at the top or in the middle, the likely offer lands below it; a target above the whole range means you are underselling yourself from the start.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "behavioral-q7",
+      "question": "At the end of a technical round with an engineer, which question leaves the best impression?",
+      "options": [
+        "How many days of annual leave will I get?",
+        "How soon can someone in this role be promoted?",
+        "No questions, you covered everything clearly.",
+        "What would a new junior typically work on in the first three months?"
+      ],
+      "answer": 3,
+      "explanation": "It shows interest in the actual work and is something an engineer can answer. Leave and promotion questions fit better with HR later; having no questions is a missed opportunity.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q8",
+      "question": "In a coding interview, what should you do right after reading the problem?",
+      "options": [
+        "Start coding the brute force right away so you have something working",
+        "Restate it and clarify inputs, outputs, constraints and edge cases",
+        "Ask for a hint so you do not waste time going in the wrong direction",
+        "Write the function signature and a full set of unit tests first"
+      ],
+      "answer": 1,
+      "explanation": "Clarifying first prevents solving the wrong problem and shows structured thinking. Coding before agreeing on an approach is the classic mistake, hints are for when you are stuck after trying, and testing comes after you have code.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q9",
+      "question": "n can be up to 100,000 and your first idea is O(n²). What should you do?",
+      "options": [
+        "Say it is about 10^10 steps, too slow, and look for an O(n log n) or O(n) approach before coding",
+        "Code it anyway, since a working O(n²) solution is all the interviewer needs to see",
+        "Stay quiet while you search for a faster idea, so you do not reveal a weak approach",
+        "Ask the interviewer to lower the limit on n so that the O(n²) idea will pass"
+      ],
+      "answer": 0,
+      "explanation": "Stating the brute force and why it is too slow, out loud, shows you use the constraints to guide the design; then optimise and confirm the plan before coding. Silence hides exactly the reasoning the interviewer is grading, and the constraints are part of the problem, not something to negotiate away.",
+      "difficulty": "medium"
+    },
+    {
+      "id": "behavioral-q10",
+      "question": "In a \"conflict with a teammate\" story, which is a red flag?",
+      "options": [
+        "Talking to the teammate privately first",
+        "Agreeing on the shared goal before choosing an option",
+        "Committing to the final decision even though it was not yours",
+        "Proving you were right and reporting them to the supervisor"
+      ],
+      "answer": 3,
+      "explanation": "Blame and escalating first suggest you are hard to work with. The other three are exactly the behaviours interviewers want to hear.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q11",
+      "question": "Which story best answers \"Tell me about a time you failed or made a mistake\"?",
+      "options": [
+        "\"I worked so hard on our final-year project that I forgot to rest and burned out before the demo.\"",
+        "\"I deployed a wrong config to staging; I flagged it within minutes, rolled back, and added a CI check so it cannot happen again.\"",
+        "\"A teammate broke the build before our demo, and I stayed up all night to fix it for the team.\"",
+        "\"I have never really failed, because I always plan carefully and double-check my work.\""
+      ],
+      "answer": 1,
+      "explanation": "It is a real mistake of your own, with fast ownership, a fix, prevention and a lesson. The others are a disguised strength, someone else's mistake, or a lack of self-awareness.",
+      "difficulty": "easy"
+    },
+    {
+      "id": "behavioral-q12",
+      "question": "You plan to apply for a master's abroad in about two years. Asked \"Where do you see yourself in five years?\", what is the best approach?",
+      "options": [
+        "Lead with your plan to leave for a master's in two years, so they hear it from you first",
+        "Promise to stay with the company for at least five years so you look committed",
+        "Focus on the skills and responsibilities you want to grow into, and answer honestly if asked directly about higher studies",
+        "Say you have not thought that far ahead and prefer to take it one year at a time"
+      ],
+      "answer": 2,
+      "explanation": "Be truthful without volunteering plans that make you look like a short-term hire. False promises damage trust; having no plan suggests no direction.",
+      "difficulty": "medium"
+    }
+  ]
+}

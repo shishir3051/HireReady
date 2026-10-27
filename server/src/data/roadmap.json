@@ -1,0 +1,622 @@
+{
+  "title": "30-Day Interview Roadmap",
+  "description": "A day-by-day plan for new graduates: about 3 focused hours a day covering the DSA patterns, CS fundamentals, web stack and behavioral answers that come up most in junior software engineer interviews. Solve each question yourself first, then study its visual walkthrough.",
+  "days": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Big-O and how to attack a problem",
+      "topics": [
+        "big-o",
+        "behavioral"
+      ],
+      "goals": [
+        "Read and estimate the complexity of any loop or recursion",
+        "Use input limits to pick a target complexity",
+        "Learn the clarify → brute force → optimise → test interview loop"
+      ],
+      "questionSlugs": [
+        "what-is-big-o-notation",
+        "complexity-classes-ranking",
+        "analyze-nested-loops",
+        "how-to-approach-a-coding-interview"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "Arrays & hashing I",
+      "topics": [
+        "arrays-hashing"
+      ],
+      "goals": [
+        "Understand how a hash map gives O(1) lookups",
+        "Solve \"seen before?\" problems with a set or map"
+      ],
+      "questionSlugs": [
+        "two-sum",
+        "contains-duplicate",
+        "valid-anagram",
+        "how-hash-map-works"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "Arrays & hashing II",
+      "topics": [
+        "arrays-hashing"
+      ],
+      "goals": [
+        "Group and count with maps",
+        "Use prefix sums and Kadane for subarray problems"
+      ],
+      "questionSlugs": [
+        "group-anagrams",
+        "top-k-frequent-elements",
+        "product-of-array-except-self",
+        "longest-consecutive-sequence",
+        "subarray-sum-equals-k",
+        "maximum-subarray"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Two pointers",
+      "topics": [
+        "two-pointers"
+      ],
+      "goals": [
+        "Recognise sorted-input and in-place problems",
+        "Move the pointer that can still improve the answer"
+      ],
+      "questionSlugs": [
+        "valid-palindrome",
+        "two-sum-ii-sorted-array",
+        "three-sum",
+        "container-with-most-water",
+        "move-zeroes",
+        "sort-colors"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Sliding window",
+      "topics": [
+        "sliding-window"
+      ],
+      "goals": [
+        "Fixed vs variable windows",
+        "Know exactly when to grow and when to shrink"
+      ],
+      "questionSlugs": [
+        "max-sum-subarray-size-k",
+        "best-time-to-buy-sell-stock",
+        "longest-substring-without-repeating-characters",
+        "longest-repeating-character-replacement",
+        "minimum-window-substring"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Stack & queue",
+      "topics": [
+        "stack-queue"
+      ],
+      "goals": [
+        "Match brackets and evaluate expressions with a stack",
+        "Use a monotonic stack for \"next greater\" problems"
+      ],
+      "questionSlugs": [
+        "valid-parentheses",
+        "min-stack",
+        "evaluate-reverse-polish-notation",
+        "daily-temperatures",
+        "stack-vs-queue",
+        "implement-queue-using-stacks"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "OOP basics + week 1 review",
+      "topics": [
+        "oop"
+      ],
+      "goals": [
+        "Explain the four pillars with your own examples",
+        "Re-solve any week-1 question you rated below 3"
+      ],
+      "questionSlugs": [
+        "four-pillars-of-oop",
+        "class-vs-object",
+        "encapsulation",
+        "abstraction-vs-encapsulation"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "Binary search",
+      "topics": [
+        "binary-search"
+      ],
+      "goals": [
+        "Write a bug-free lower-bound template",
+        "Binary search on the answer space"
+      ],
+      "questionSlugs": [
+        "binary-search",
+        "search-insert-position",
+        "first-and-last-position-sorted-array",
+        "search-in-rotated-sorted-array",
+        "koko-eating-bananas"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "Linked list I",
+      "topics": [
+        "linked-list"
+      ],
+      "goals": [
+        "Reverse and merge lists with pointer diagrams",
+        "Fast/slow pointers for cycles and middles"
+      ],
+      "questionSlugs": [
+        "reverse-linked-list",
+        "merge-two-sorted-lists",
+        "linked-list-cycle",
+        "middle-of-linked-list",
+        "array-vs-linked-list"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "Linked list II + LRU cache",
+      "topics": [
+        "linked-list"
+      ],
+      "goals": [
+        "Use a dummy head to simplify edge cases",
+        "Design an O(1) LRU cache"
+      ],
+      "questionSlugs": [
+        "remove-nth-node-from-end",
+        "reorder-list",
+        "add-two-numbers",
+        "lru-cache"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "Sorting algorithms",
+      "topics": [
+        "sorting"
+      ],
+      "goals": [
+        "Implement merge sort and quick sort from memory",
+        "Explain stability and which sort a language uses"
+      ],
+      "questionSlugs": [
+        "insertion-sort",
+        "merge-sort",
+        "quick-sort",
+        "counting-sort",
+        "sorting-algorithms-comparison",
+        "stable-vs-unstable-sorting"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Recursion & backtracking I",
+      "topics": [
+        "recursion-backtracking"
+      ],
+      "goals": [
+        "Draw the recursion tree before coding",
+        "Choose → explore → un-choose"
+      ],
+      "questionSlugs": [
+        "recursion-basics-call-stack",
+        "subsets",
+        "permutations",
+        "combination-sum"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Backtracking II + bit tricks",
+      "topics": [
+        "recursion-backtracking",
+        "math-bits"
+      ],
+      "goals": [
+        "Prune invalid branches early",
+        "Know the XOR and n & (n − 1) tricks"
+      ],
+      "questionSlugs": [
+        "generate-parentheses",
+        "n-queens",
+        "word-search",
+        "single-number-xor",
+        "bitwise-operators-basics"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "OOP deep dive + SOLID",
+      "topics": [
+        "oop",
+        "design-patterns"
+      ],
+      "goals": [
+        "Contrast overloading/overriding and abstract class/interface",
+        "Explain each SOLID principle with a before/after"
+      ],
+      "questionSlugs": [
+        "inheritance-types-and-diamond-problem",
+        "polymorphism-overloading-vs-overriding",
+        "abstract-class-vs-interface",
+        "composition-vs-inheritance",
+        "solid-principles"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "Binary trees",
+      "topics": [
+        "trees"
+      ],
+      "goals": [
+        "All four traversals, recursive and iterative",
+        "Think in terms of what each subtree returns"
+      ],
+      "questionSlugs": [
+        "binary-tree-traversals",
+        "level-order-traversal",
+        "maximum-depth-binary-tree",
+        "invert-binary-tree",
+        "symmetric-tree"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "BST + trie",
+      "topics": [
+        "trees"
+      ],
+      "goals": [
+        "Use the BST ordering property to prune",
+        "Build a trie for prefix search"
+      ],
+      "questionSlugs": [
+        "validate-bst",
+        "lowest-common-ancestor-bst",
+        "kth-smallest-in-bst",
+        "delete-node-in-bst",
+        "implement-trie"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "Heaps / priority queues",
+      "topics": [
+        "heap"
+      ],
+      "goals": [
+        "Sift up / sift down by hand",
+        "Top-k and streaming-median patterns"
+      ],
+      "questionSlugs": [
+        "heap-basics-sift-up-sift-down",
+        "kth-largest-element-in-array",
+        "merge-k-sorted-lists",
+        "find-median-from-data-stream"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "Graphs I — traversal",
+      "topics": [
+        "graphs"
+      ],
+      "goals": [
+        "Build adjacency lists",
+        "BFS for shortest steps, DFS for exploring components"
+      ],
+      "questionSlugs": [
+        "graph-representations",
+        "bfs-and-dfs-traversal",
+        "number-of-islands",
+        "rotting-oranges",
+        "clone-graph"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "Graphs II — ordering & shortest paths",
+      "topics": [
+        "graphs"
+      ],
+      "goals": [
+        "Detect cycles and topologically sort",
+        "Run Dijkstra with a min-heap",
+        "Union-find with path compression"
+      ],
+      "questionSlugs": [
+        "course-schedule",
+        "course-schedule-ii-topological-sort",
+        "network-delay-time-dijkstra",
+        "number-of-connected-components-union-find"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Dynamic programming I",
+      "topics": [
+        "dynamic-programming"
+      ],
+      "goals": [
+        "Define state, transition, base case",
+        "Go from memoization to tabulation"
+      ],
+      "questionSlugs": [
+        "what-is-dynamic-programming",
+        "climbing-stairs",
+        "house-robber",
+        "coin-change",
+        "unique-paths"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Dynamic programming II + intervals",
+      "topics": [
+        "dynamic-programming",
+        "greedy-intervals"
+      ],
+      "goals": [
+        "Fill 2D DP tables confidently",
+        "Sort intervals and sweep"
+      ],
+      "questionSlugs": [
+        "longest-common-subsequence",
+        "longest-increasing-subsequence",
+        "knapsack-0-1",
+        "merge-intervals",
+        "meeting-rooms-ii"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 22,
+      "week": 4,
+      "title": "Databases",
+      "topics": [
+        "dbms"
+      ],
+      "goals": [
+        "ACID with a bank-transfer example",
+        "Normalise a table to 3NF",
+        "Explain indexes and isolation levels"
+      ],
+      "questionSlugs": [
+        "acid-properties",
+        "database-keys",
+        "normalization-1nf-2nf-3nf-bcnf",
+        "database-indexing-b-tree",
+        "transaction-isolation-levels",
+        "sql-vs-nosql"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 23,
+      "week": 4,
+      "title": "SQL",
+      "topics": [
+        "sql"
+      ],
+      "goals": [
+        "Write every join type from memory",
+        "Use window functions for ranking problems"
+      ],
+      "questionSlugs": [
+        "sql-joins-explained",
+        "second-highest-salary",
+        "department-top-three-salaries",
+        "where-vs-having",
+        "sql-query-execution-order",
+        "duplicate-emails"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 24,
+      "week": 4,
+      "title": "Operating systems",
+      "topics": [
+        "operating-systems"
+      ],
+      "goals": [
+        "Process vs thread, scheduling, deadlock",
+        "Paging and page replacement by hand"
+      ],
+      "questionSlugs": [
+        "process-vs-thread",
+        "cpu-scheduling-algorithms",
+        "deadlock-conditions-and-handling",
+        "mutex-vs-semaphore",
+        "paging-and-virtual-memory",
+        "page-replacement-algorithms"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 25,
+      "week": 4,
+      "title": "Computer networks",
+      "topics": [
+        "computer-networks"
+      ],
+      "goals": [
+        "Walk through the URL → page journey",
+        "TCP vs UDP, DNS and TLS"
+      ],
+      "questionSlugs": [
+        "osi-vs-tcp-ip-model",
+        "tcp-vs-udp",
+        "what-happens-when-you-type-a-url",
+        "how-dns-works",
+        "https-and-tls-handshake"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 26,
+      "week": 4,
+      "title": "JavaScript & React",
+      "topics": [
+        "javascript",
+        "react-nextjs"
+      ],
+      "goals": [
+        "Predict event-loop output orders",
+        "Explain reconciliation, effects and server components"
+      ],
+      "questionSlugs": [
+        "closures",
+        "event-loop",
+        "promises-and-async-await",
+        "this-keyword",
+        "virtual-dom-and-reconciliation",
+        "useeffect-dependency-array-and-cleanup",
+        "server-vs-client-components"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 27,
+      "week": 4,
+      "title": "Backend & web fundamentals",
+      "topics": [
+        "nodejs-express",
+        "web-fundamentals"
+      ],
+      "goals": [
+        "Middleware, auth flows and REST design",
+        "CORS, cookies and status codes"
+      ],
+      "questionSlugs": [
+        "express-middleware-flow",
+        "jwt-authentication-flow",
+        "http-status-codes",
+        "rest-api-design-best-practices",
+        "session-vs-jwt-authentication",
+        "cors-explained"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 28,
+      "week": 4,
+      "title": "Java & Spring Boot",
+      "topics": [
+        "java-spring"
+      ],
+      "goals": [
+        "JVM memory, equals/hashCode and HashMap internals",
+        "Spring IoC, REST controllers and @Transactional"
+      ],
+      "questionSlugs": [
+        "jdk-vs-jre-vs-jvm",
+        "equals-and-hashcode-contract",
+        "hashmap-internals",
+        "spring-ioc-and-dependency-injection",
+        "spring-boot-rest-controller",
+        "spring-transactional"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 29,
+      "week": 5,
+      "title": "System design + Git",
+      "topics": [
+        "system-design",
+        "git"
+      ],
+      "goals": [
+        "Follow the design framework end to end",
+        "Caching and load balancing trade-offs",
+        "Merge vs rebase, reset vs revert"
+      ],
+      "questionSlugs": [
+        "system-design-interview-framework",
+        "caching-strategies",
+        "load-balancing",
+        "design-a-url-shortener",
+        "merge-vs-rebase",
+        "reset-vs-revert-vs-restore"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 30,
+      "week": 5,
+      "title": "Behavioral + full mock interview",
+      "topics": [
+        "behavioral"
+      ],
+      "goals": [
+        "Prepare 4 STAR stories from your projects",
+        "Run a timed mock interview and review your weakest answers"
+      ],
+      "questionSlugs": [
+        "tell-me-about-yourself",
+        "most-challenging-project-star",
+        "strengths-and-weaknesses",
+        "conflict-with-a-teammate",
+        "questions-to-ask-the-interviewer"
+      ],
+      "estimatedHours": 2.5
+    }
+  ]
+}
