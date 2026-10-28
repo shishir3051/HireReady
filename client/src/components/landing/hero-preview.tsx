@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, MotionConfig } from "motion/react";
 import { MessageSquareQuote, Play, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useIsClient } from "@/lib/storage";
 
 const NUMS = [3, 8, 4, 1, 6];
 const TARGET = 10;
@@ -13,25 +12,21 @@ const STEPS = NUMS.length;
 
 /** Animated mini trace of Two Sum for the hero (decorative; the real player is further down the page). */
 export function HeroPreview() {
-  // Only honour reduced motion after hydration so server and client render the same first frame.
-  const isClient = useIsClient();
-  const prefersReduced = useReducedMotion();
-  const reduce = isClient && prefersReduced === true;
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (reduce) return;
     const id = setInterval(() => setTick((t) => (t + 1) % (STEPS + 2)), 1300);
     return () => clearInterval(id);
-  }, [reduce]);
+  }, []);
 
-  const i = reduce ? STEPS - 1 : Math.min(tick, STEPS - 1);
+  const i = Math.min(tick, STEPS - 1);
   const found = i === STEPS - 1;
   const need = TARGET - NUMS[i]!;
   const seen = NUMS.slice(0, found ? i : i + 1).map((v, idx) => ({ v, idx }));
 
   return (
-    <div className="relative mx-auto w-full max-w-lg xl:max-w-xl 2xl:max-w-2xl" aria-hidden>
+    <MotionConfig reducedMotion="never">
+      <div className="relative mx-auto w-full max-w-lg xl:max-w-xl 2xl:max-w-2xl" aria-hidden>
       <div
         className="absolute -inset-6 -z-10 rounded-[2rem] opacity-80 blur-2xl"
         style={{
@@ -172,5 +167,6 @@ export function HeroPreview() {
         </div>
       </div>
     </div>
+    </MotionConfig>
   );
 }

@@ -183,3 +183,4 @@ export function MockAiEvaluator({ question, notes, lang = "en", onApplyRating }:
     </div>
   );
 }
+

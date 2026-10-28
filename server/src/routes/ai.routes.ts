@@ -16,3 +16,4 @@ aiRouter.post('/evaluate', authRateLimiter(25), validate({ body: aiEvaluateBody 
 
 // Socratic AI Tutor on question pages (30 requests / 15 min per IP)
 aiRouter.post('/chat', authRateLimiter(35), validate({ body: aiChatBody }), c.chat);
+

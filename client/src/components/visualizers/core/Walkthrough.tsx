@@ -93,7 +93,7 @@ export function Walkthrough({ visuals, code, className }: { visuals: Visual[]; c
   }
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionConfig reducedMotion="never">
       <div className={cn("flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-surface p-3 shadow-sm sm:p-4", className)}>
         {list.length > 1 ? <Tabs visuals={list} active={active} onSelect={setActive} idBase={idBase} /> : null}
         <div

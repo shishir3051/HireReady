@@ -19,3 +19,4 @@ export const chat: RequestHandler = async (req, res) => {
   const result = await aiService.askQuestionTutor(body);
   res.json(result);
 };
+
