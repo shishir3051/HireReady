@@ -1,3 +1,4 @@
+import os from "node:os";
 import path from "node:path";
 import type { NextConfig } from "next";
 
@@ -5,12 +6,27 @@ import type { NextConfig } from "next";
 // server components call `${API_URL}/api/*` directly.
 const API_URL = process.env.API_URL ?? "http://localhost:4000";
 
+function getMachineIps(): string[] {
+  const nets = os.networkInterfaces();
+  const ips: string[] = [];
+  for (const name of Object.keys(nets)) {
+    for (const net of nets[name] ?? []) {
+      if (net.family === "IPv4" && !net.internal) {
+        ips.push(net.address);
+      }
+    }
+  }
+  return ips;
+}
+
 // Extra hostnames (no scheme/port) allowed to use dev-only resources such as hot reload, e.g. your LAN IP when
 // opening the "Network" URL from another device. Comma-separated in client/.env.local: DEV_ALLOWED_ORIGINS=192.168.1.20
-const allowedDevOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
+const envAllowedOrigins = (process.env.DEV_ALLOWED_ORIGINS ?? "")
   .split(",")
   .map((s) => s.trim())
   .filter(Boolean);
+
+const allowedDevOrigins = Array.from(new Set([...getMachineIps(), ...envAllowedOrigins]));
 
 const nextConfig: NextConfig = {
   allowedDevOrigins,
