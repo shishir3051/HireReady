@@ -1,7 +1,7 @@
 import type { Server } from 'node:http';
 import { env } from './config/env';
 import { createApp } from './app';
-import { connectDb, disconnectDb, redactUri } from './db/connect';
+import { connectDb, disconnectDb, redactUri, scheduleDbReconnect } from './db/connect';
 import { verifyMailer } from './lib/mailer';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
@@ -11,7 +11,8 @@ async function main() {
     await connectDb(env.MONGODB_URI);
   } catch (err) {
     console.error(`[db] could not connect to ${redactUri(env.MONGODB_URI)}: ${(err as Error).message}`);
-    process.exit(1);
+    console.log('[db] server will operate with resilient local content fallback and retry DB in background');
+    scheduleDbReconnect(env.MONGODB_URI);
   }
 
   const app = createApp();

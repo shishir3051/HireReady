@@ -2,6 +2,8 @@ import { notFound } from '../lib/errors';
 import { QuestionModel, QuizQuestionModel, TopicModel, type TopicDoc } from '../models';
 import type { CategoryT, DifficultyT, TopicDetailResponse, TopicStats, TopicSummary } from '../types/api';
 import { QUESTION_SUMMARY_PROJECTION, toQuestionSummary, toTopic, type QuestionSummarySource } from './mappers';
+import { dbState } from '../db/connect';
+import { getLocalTopicDetail, getLocalTopicRefs, getLocalTopics } from '../content/localContent';
 
 export interface TopicRef {
   slug: string;
@@ -12,8 +14,16 @@ export interface TopicRef {
 
 /** slug → {slug, title, category, order} for every topic, in display order. */
 export async function getTopicRefs(): Promise<Map<string, TopicRef>> {
-  const docs = await TopicModel.find({}, { _id: 0, slug: 1, title: 1, category: 1, order: 1 }).sort({ order: 1 }).lean<TopicRef[]>();
-  return new Map(docs.map((t) => [t.slug, { slug: t.slug, title: t.title, category: t.category, order: t.order }]));
+  if (dbState() !== 'connected') {
+    return getLocalTopicRefs();
+  }
+  try {
+    const docs = await TopicModel.find({}, { _id: 0, slug: 1, title: 1, category: 1, order: 1 }).sort({ order: 1 }).lean<TopicRef[]>();
+    return new Map(docs.map((t) => [t.slug, { slug: t.slug, title: t.title, category: t.category, order: t.order }]));
+  } catch (err) {
+    console.warn(`[db] getTopicRefs fallback to local files: ${(err as Error).message}`);
+    return getLocalTopicRefs();
+  }
 }
 
 const emptyStats = (): TopicStats => ({ questionCount: 0, difficultyCounts: { easy: 0, medium: 0, hard: 0 }, quizCount: 0 });
@@ -44,32 +54,49 @@ async function getTopicStats(topic?: string): Promise<Map<string, TopicStats>> {
 }
 
 export async function listTopics(): Promise<TopicSummary[]> {
-  const [topics, stats] = await Promise.all([
-    TopicModel.find({}, { _id: 0, slug: 1, title: 1, category: 1, order: 1, summary: 1, estimatedHours: 1 })
-      .sort({ order: 1 })
-      .lean<Pick<TopicDoc, 'slug' | 'title' | 'category' | 'order' | 'summary' | 'estimatedHours'>[]>(),
-    getTopicStats(),
-  ]);
-  return topics.map((t) => ({
-    slug: t.slug,
-    title: t.title,
-    category: t.category,
-    order: t.order,
-    summary: t.summary,
-    estimatedHours: t.estimatedHours,
-    ...(stats.get(t.slug) ?? emptyStats()),
-  }));
+  if (dbState() !== 'connected') {
+    return getLocalTopics();
+  }
+  try {
+    const [topics, stats] = await Promise.all([
+      TopicModel.find({}, { _id: 0, slug: 1, title: 1, category: 1, order: 1, summary: 1, estimatedHours: 1 })
+        .sort({ order: 1 })
+        .lean<Pick<TopicDoc, 'slug' | 'title' | 'category' | 'order' | 'summary' | 'estimatedHours'>[]>(),
+      getTopicStats(),
+    ]);
+    return topics.map((t) => ({
+      slug: t.slug,
+      title: t.title,
+      category: t.category,
+      order: t.order,
+      summary: t.summary,
+      estimatedHours: t.estimatedHours,
+      ...(stats.get(t.slug) ?? emptyStats()),
+    }));
+  } catch (err) {
+    console.warn(`[db] listTopics fallback to local files: ${(err as Error).message}`);
+    return getLocalTopics();
+  }
 }
 
 export async function getTopicDetail(slug: string): Promise<TopicDetailResponse> {
-  const topic = await TopicModel.findOne({ slug }).lean<TopicDoc>();
-  if (!topic) throw notFound(`Topic "${slug}" not found`);
-  const [stats, questions] = await Promise.all([
-    getTopicStats(slug),
-    QuestionModel.find({ topic: slug }, QUESTION_SUMMARY_PROJECTION).sort({ order: 1 }).lean<QuestionSummarySource[]>(),
-  ]);
-  return {
-    topic: { ...toTopic(topic), ...(stats.get(slug) ?? emptyStats()) },
-    questions: questions.map((q) => toQuestionSummary(q, topic.title)),
-  };
+  if (dbState() !== 'connected') {
+    return getLocalTopicDetail(slug);
+  }
+  try {
+    const topic = await TopicModel.findOne({ slug }).lean<TopicDoc>();
+    if (!topic) throw notFound(`Topic "${slug}" not found`);
+    const [stats, questions] = await Promise.all([
+      getTopicStats(slug),
+      QuestionModel.find({ topic: slug }, QUESTION_SUMMARY_PROJECTION).sort({ order: 1 }).lean<QuestionSummarySource[]>(),
+    ]);
+    return {
+      topic: { ...toTopic(topic), ...(stats.get(slug) ?? emptyStats()) },
+      questions: questions.map((q) => toQuestionSummary(q, topic.title)),
+    };
+  } catch (err) {
+    if ((err as { status?: number }).status === 404) throw err;
+    console.warn(`[db] getTopicDetail fallback to local files: ${(err as Error).message}`);
+    return getLocalTopicDetail(slug);
+  }
 }

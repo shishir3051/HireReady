@@ -1,0 +1,1237 @@
+{
+  "topic": {
+    "title": "Database Concepts (DBMS)",
+    "summary": "ACID, কী, নর্মালাইজেশন, ইনডেক্সিং, আইসোলেশন লেভেল, লকিং এবং স্কিমা ডিজাইন — ডাটাবেস থিওরি প্রত্যেক জুনিয়র ইন্টারভিউ চেক করে, ব্যাঙ্ক ট্রান্সফার এবং অর্ডার টেবিল দিয়ে ব্যাখ্যা করা হয়।",
+    "overview": "প্রায় প্রতিটি জুনিয়র সফ্টওয়্যার-ইঞ্জিনিয়ার ইন্টারভিউতে ডেটাবেস প্রশ্নগুলি উপস্থিত হয় এবং **ব্যাঙ্ক এবং ফিনটেকগুলি তাদের গভীরভাবে জিজ্ঞাসা করে** — অর্থ কখনই হারিয়ে যাবে না, দ্বিগুণ গণনা করা যাবে না বা অর্ধেক স্থানান্তরিত দেখানো হবে না। একটি ধারণা সংজ্ঞায়িত করার আশা করুন *এবং একটি উদাহরণ দিয়ে ব্যাখ্যা করুন*। **সাক্ষাত্কারকারীরা কী পরীক্ষা করে** - আপনি কি সুনির্দিষ্ট কিছু দিয়ে ব্যাখ্যা করতে পারেন — একটি ৳500 ব্যাঙ্ক ট্রান্সফার, একটি অর্ডার টেবিল, দুটি ক্যাশিয়ার একটি অ্যাকাউন্ট আপডেট করছেন?\n\n- আপনি কি জানেন **কীভাবে** ইঞ্জিন এটির গ্যারান্টি দেয়: পূর্বাবস্থায় ফেরান/পুনরায় করুন (আগে লিখুন) লগ, B+ গাছ, লক, MVCC স্ন্যাপশট?\n\n- আপনি কি **ট্রেড-অফস** জানেন: নর্মালাইজ বনাম ডিনরমালাইজ, ইনডেক্স পড়ার গতি বনাম লেখার খরচ, হতাশাবাদী বনাম আশাবাদী লকিং, SQL বনাম NoSQL? **মূল গল্পটি আয়ত্ত করতে (এই ক্রমে)** 1. ব্যাঙ্ক ট্রান্সফার সহ একটি DBMS /RDBMS কী → **ACID** । 2. **কী** →**স্বাভাবিককরণ** (1NF → BCNF) → **ER ডিজাইন** একটি ই-কমার্স স্টোরের জন্য। 3. **সূচীপত্র** (B+ গাছ, ক্লাস্টার বনাম নন-ক্লাস্টারড, যখন তারা আঘাত করে)। 4. **আইসোলেশন লেভেল** এবং **লকিং** — কনকারেন্সি T1/T2 টাইমলাইন হিসাবে বলা হয়েছে।\n\n5. ব্যবহারিক কমান্ড: ভিউ, পদ্ধতি, ট্রিগার, ডিলিট বনাম ট্রাঙ্কেট বনাম ড্রপ। **কীভাবে অধ্যয়ন করবেন**: প্রতিটি প্রশ্নের জন্য, 30-সেকেন্ডের সারাংশ জোরে বলুন, তারপরে ভিজ্যুয়ালটি দিয়ে ধাপ করুন যতক্ষণ না আপনি এটি একটি হোয়াইটবোর্ডে পুনরায় আঁকতে পারেন। তারপরে **SQL** বিষয়ে যান এবং প্রকৃত প্রশ্ন লিখুন।",
+    "cheatsheet": [
+      {
+        "title": "এসিআইডি",
+        "points": [
+          "পরমাণু\n\n- সব বা কিছুই না (লগ / রোলব্যাক পূর্বাবস্থায়)",
+          "সামঞ্জস্য — সীমাবদ্ধতা এবং অপ্রতিরোধ্যতা প্রতিটি প্রতিশ্রুতির পরে ধরে রাখে",
+          "বিচ্ছিন্নতা\n\n- সমসাময়িক লেনদেন আংশিক কাজ দেখতে পায় না (লক / MVCC)",
+          "স্থায়িত্ব — কমিট রিটার্ন করার আগে লিখতে-আগে লগ ফ্লাশ (fsync)"
+        ]
+      },
+      {
+        "title": "চাবি",
+        "points": [
+          "সুপার কী ⊇ প্রার্থী কী (ন্যূনতম) ⊇ প্রাথমিক কী (নির্বাচিত, শূন্য নয়, প্রতি টেবিলে একটি)",
+          "বিকল্প কী = প্রার্থীকে PK হিসাবে নির্বাচিত করা হয়নি",
+          "UNIQUE NULL এর অনুমতি দেয় ( SQL সার্ভার: শুধুমাত্র একটি)",
+          "বিদেশী কী রেফারেন্স একটি PK/UNIQUE কী; কম্পোজিট কী = 2+ কলাম"
+        ]
+      },
+      {
+        "title": "সাধারণ ফর্ম",
+        "points": [
+          "1NF: পারমাণবিক মান, কোন পুনরাবৃত্ত গ্রুপ",
+          "2NF: একটি যৌগিক কী অংশের উপর কোন আংশিক নির্ভরতা নেই",
+          "3NF: কোন ট্রানজিটিভ নির্ভরতা নেই (নন-কী → নন-কী)",
+          "BCNF: প্রত্যেক নির্ধারক একজন প্রার্থীর চাবিকাঠি",
+          "অসঙ্গতিগুলি সরানো হয়েছে: আপডেট করুন, সন্নিবেশ করুন, মুছুন"
+        ]
+      },
+      {
+        "title": "সূচক",
+        "points": [
+          "B+ গাছ: উচ্চ ফ্যান-আউট পৃষ্ঠা, 3-4 স্তর, ব্যাপ্তির জন্য লিঙ্কযুক্ত পাতা",
+          "ক্লাস্টারড = কী ক্রমে সংরক্ষিত সারি (প্রতি টেবিলে সর্বোচ্চ একটি); নন-ক্লাস্টারড = কী + pointer (অনেক)",
+          "Composite index: leftmost prefix; equality columns first, then range/sort",
+          "কলামের ফাংশন দ্বারা পরাজিত, অগ্রণী %, কম নির্বাচনীতা",
+          "প্রতিটি সূচক INSERT/UPDATE/DELETE ধীর করে দেয়"
+        ]
+      },
+      {
+        "title": "বিচ্ছিন্নতার মাত্রা",
+        "points": [
+          "অনির্দিষ্টভাবে পড়ুন: নোংরা পড়া সম্ভব",
+          "প্রতিশ্রুতিবদ্ধ পড়ুন: কোন নোংরা পড়া নেই (ডিফল্ট: PostgreSQL, Oracle, SQL সার্ভার)",
+          "পুনরাবৃত্তিযোগ্য পঠন: কোন অ-পুনরাবৃত্তিযোগ্য পঠন নেই (ডিফল্ট: MySQL InnoDB)",
+          "ক্রমিক: কোন ফ্যান্টম; অবরোধ বা পুনঃপ্রচারের আশা করুন"
+        ]
+      },
+      {
+        "title": "লকিং",
+        "points": [
+          "হারিয়ে যাওয়া আপডেট = দুটি পঠন-সংশোধন-লেখা চক্র একে অপরকে ওভাররাইট করে",
+          "হতাশাবাদী: আপডেটের জন্য নির্বাচন করুন (অন্যরা অপেক্ষা করুন)",
+          "আশাবাদী: আপডেট … কোথায় সংস্করণ = ? → 0 সারি মানে আবার চেষ্টা করুন",
+          "অচলাবস্থা: ইঞ্জিন একজন শিকারকে বাতিল করে; একটি সামঞ্জস্যপূর্ণ ক্রমে লক"
+        ]
+      },
+      {
+        "title": "SQL কমান্ড পরিবার",
+        "points": [
+          "DDL: তৈরি করুন, পরিবর্তন করুন, ড্রপ করুন, ট্রাঙ্কেট করুন",
+          "DML: INSERT, UPDATE, DELETE (নির্বাচনকে কখনও কখনও DQL বলা হয়)",
+          "DCL: অনুদান, প্রত্যাহার করুন",
+          "TCL: কমিট, রোলব্যাক, সেভপয়েন্ট"
+        ]
+      }
+    ],
+    "patterns": [
+      {
+        "name": "সব বা কিছুই টাকা আন্দোলন",
+        "whenToUse": "যেকোন মাল্টি-স্টেপ লেখা যা অবশ্যই একটি ইউনিট হিসাবে সফল বা ব্যর্থ হবে: স্থানান্তর, অর্ডার + স্টক হ্রাস, লেজার এন্ট্রি।"
+      },
+      {
+        "name": "Optimistic update with a version column",
+        "whenToUse": "কম বিতর্ক সহ ব্যবহারকারী-মুখী সম্পাদনা, বা ETag / If-Match ব্যবহার করে REST API।"
+      },
+      {
+        "name": "সর্গযোগ্য তারিখ পরিসর",
+        "whenToUse": "একটি সূচীকৃত তারিখ/সময় কলাম ফিল্টার করা\n\n- কখনই একটি ফাংশনে কলাম মোড়ানো হবে না।"
+      },
+      {
+        "name": "Junction table for M:N",
+        "whenToUse": "দুটি সত্তা বহু-থেকে-অনেক সম্পর্কিত (অর্ডার ↔ পণ্য, শিক্ষার্থী ↔ কোর্স), বিশেষ করে যখন সম্পর্কের নিজস্ব ডেটা থাকে৷"
+      }
+    ]
+  },
+  "questions": {
+    "what-is-dbms-vs-rdbms": {
+      "title": "What is a DBMS? How is an RDBMS different?",
+      "prompt": "একটি **DBMS** (ডাটাবেস ম্যানেজমেন্ট সিস্টেম) কি? কিভাবে একটি **RDBMS** এর থেকে আলাদা? প্রতিটির বাস্তব উদাহরণ দিন, এবং ব্যাখ্যা করুন যে DBMS কোন সমস্যাগুলিকে সাধারণ ফাইলে ডেটা রাখার তুলনায় সমাধান করে।",
+      "hints": [
+        "দুটি অ্যাপ্লিকেশন যখন সাধারণ CSV ফাইলগুলি ভাগ করে তখন যে সমস্যাগুলি আঘাত করে তা দিয়ে শুরু করুন৷",
+        "RDBMS DBMS এর বিপরীত নয় — মনে করুন \"একটি বিশেষ ধরনের\"।",
+        "একটি RDBMS হল একটি DBMS যা রিলেশনাল মডেল ব্যবহার করে: টেবিল, কী, সীমাবদ্ধতা, SQL এবং ACID লেনদেন।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\" DBMS ফাইলগুলিতে ডেটা সঞ্চয় করে, RDBMS টেবিলে ডেটা সঞ্চয় করে।\" এটি একটি DBMS আসলে কী করে বা একটি RDBMS এক ধরনের DBMS তা না বলে একটি পুরানো পাঠ্যপুস্তকের ছক আবৃত্তি করে।"
+        },
+        {
+          "idea": "এটি যে পরিষেবাগুলি প্রদান করে তার দ্বারা একটি DBMS সংজ্ঞায়িত করে (স্টোরেজ, ক্যোয়ারী, কনকারেন্সি, ক্র্যাশ রিকভারি, সিকিউরিটি, ইন্টিগ্রিটি), তারপর একটি RDBMS কে রিলেশনাল মডেলের উপর নির্মিত DBMS হিসাবে সংজ্ঞায়িত করে, রিলেশনাল এবং অ-রিলেশনাল সিস্টেমের উদাহরণ সহ।"
+        }
+      ],
+      "solution": {
+        "summary": "একটি DBMS হল সফ্টওয়্যার স্তর যা অ্যাপ্লিকেশনগুলির জন্য ডেটা সঞ্চয় করে, পুনরুদ্ধার করে এবং সুরক্ষিত করে — এটি প্রশ্নগুলি পরিচালনা করে, একসাথে অনেক ব্যবহারকারী, ক্র্যাশ পুনরুদ্ধার এবং অ্যাক্সেস নিয়ন্ত্রণ। একটি RDBMS হল একটি DBMS যা রিলেশনাল মডেলের উপর তৈরি: ডেটা কী দ্বারা সংযুক্ত টেবিলে থাকে, নিয়মগুলি সীমাবদ্ধতার সাথে প্রয়োগ করা হয়, এটি SQL দিয়ে জিজ্ঞাসা করা হয়, এবং পরিবর্তনগুলি ACID লেনদেনে চলে৷ প্রতিটি RDBMS হল একটি DBMS; মঙ্গোডিবি বা রেডিস হল ডিবিএমএস যা সম্পর্কযুক্ত নয়।",
+        "explanation": "## Why a DBMS exists Imagine a bank's **accounts app** and **loan app** each keeping customer data in their own CSV files:\n- **Redundancy and inconsistency** — the customer's phone number is stored twice and the copies drift apart.\n- **Concurrent access** — two tellers update the same file at the same moment and one change is lost.\n- **No crash recovery** — power fails halfway through writing and the file is corrupt.\n- **No security** — anyone who can read the file sees every column, including salaries.\n- **No query language** — every new question (\"customers in Dhaka with a loan above ৳5 lakh\") needs a new program. A **DBMS** solves these once, for every application.\n\n### What a DBMS provides\n\n1. **Data definition and manipulation languages** (DDL / DML) — e.g. SQL .\n\n2. **Query processor** — parses a query and an **optimizer** picks an efficient plan (which index, which join order).\n\n3. **Storage manager** — files, pages, a buffer pool in RAM, indexes.\n\n4. **Transaction manager** — concurrency control (locks / MVCC) and recovery (write-ahead log).\n\n5. **Security** — users, roles, `GRANT` / `REVOKE` .\n\n6. **Catalog (data dictionary)** — metadata about tables, columns, indexes and users.\n\n7. **Data independence** — you can add an index or move files without rewriting application queries.\n\n### What makes it *relational* (RDBMS) Edgar F. Codd's **relational model** (1970):\n- Data is stored in **relations (tables)** made of **rows (tuples)** and **columns (attributes)**.\n- Each row is identified by a **primary key**; relationships are expressed with **foreign keys**, not pointers.\n- Integrity rules are declared and enforced: entity integrity (PK not null/unique), referential integrity (FK), domain rules (types, `CHECK` ).\n- Data is queried declaratively with **SQL**; tables are combined at query time with **joins**.\n- Changes run in **ACID transactions**. Examples: **PostgreSQL, MySQL, Oracle Database, Microsoft SQL Server, SQLite, MariaDB**.\n\n### Non-relational DBMSs Document (**MongoDB**), key-value (**Redis**, DynamoDB), wide-column (**Cassandra**), graph (**Neo4j**), and historically hierarchical (IBM IMS). They are DBMSs — they store, query and protect data — but not relational.\n\n### About the textbook \" DBMS vs RDBMS\" table Many notes claim \" DBMS is single-user, has no normalization, stores data as files\". That describes early file-based systems, not the category. In an interview say it precisely: **the difference is the data model** — RDBMS is the relational subtype of DBMS .",
+        "keyPoints": [
+          "একটি DBMS প্রতিটি অ্যাপের জন্য রিডানডেন্সি, সমসাময়িক অ্যাক্সেস, ক্র্যাশ পুনরুদ্ধার, নিরাপত্তা এবং অনুসন্ধানের সমাধান করে",
+          "RDBMS = DBMS + রিলেশনাল মডেল: টেবিল, প্রাথমিক/বিদেশী কী, সীমাবদ্ধতা, SQL , ACID",
+          "প্রতিটি RDBMS হল একটি DBMS; MongoDB, Redis, Cassandra এবং Neo4j হল DBMSs কিন্তু সম্পর্কীয় নয়",
+          "আসল সিস্টেমের নাম: PostgreSQL, MySQL, Oracle, SQL সার্ভার, SQLite",
+          "গভীরতা দেখানোর জন্য ক্যোয়ারী অপ্টিমাইজার, ক্যাটালগ এবং ডেটা স্বাধীনতা উল্লেখ করুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "ভাগ করা ফাইল থেকে একটি DBMS",
+          "caption": "প্রতিটি ফ্রেম টুকরো যোগ করে একটি DBMS প্রতিটি অ্যাপ্লিকেশন বিনামূল্যে দেয়।",
+          "frames": [
+            {
+              "note": "একটি DBMS ছাড়া প্রতিটি অ্যাপ্লিকেশন তার নিজস্ব ফাইল পড়ে এবং লেখে। গ্রাহক ডেটা অনুলিপি করা হয়, কিছুই দুই লেখকের সমন্বয় করে না, এবং একটি ক্র্যাশ মিড-রাইট ফাইলটিকে দূষিত করে।"
+            },
+            {
+              "note": "একটি DBMS ডেটার সামনে একটি ইঞ্জিন রাখে। অ্যাপস পাঠায় SQL ; ক্যোয়ারী প্রসেসর এটি পার্স করে এবং অপ্টিমাইজার একটি প্ল্যান বাছাই করে; স্টোরেজ ম্যানেজার একটি বাফার পুলের মাধ্যমে পৃষ্ঠাগুলি পড়ে।"
+            },
+            {
+              "note": "ইঞ্জিনের rest: প্রমাণীকরণ এবং সুযোগ-সুবিধা, প্রতিটি টেবিলের বর্ণনা করে একটি ক্যাটালগ, এবং একটি লেনদেন ব্যবস্থাপক যার লক/MVCC এবং লেখা-আগামী লগ বিচ্ছিন্নতা এবং ক্র্যাশ পুনরুদ্ধার দেয়।"
+            }
+          ]
+        },
+        {
+          "title": "প্লেইন ফাইল বনাম নন-রিলেশনাল DBMS বনাম RDBMS",
+          "caption": "দুটি ডান হাতের কলাম উভয়ই ডিবিএমএস; RDBMS হল রিলেশনাল ধরনের।"
+        }
+      ],
+      "pitfalls": [
+        "একটি RDBMS বলা DBMS নয়\n\n- এটি DBMS এর একটি উপপ্রকার",
+        "একটি সর্বজনীন সত্য হিসাবে \" DBMS একক-ব্যবহারকারী এবং এর কোন স্বাভাবিককরণ নেই\" পাঠ করা; এটি শুধুমাত্র পুরানো ফাইল-ভিত্তিক সিস্টেম বর্ণনা করে",
+        "MongoDB একটি RDBMS কল করা হচ্ছে (এটি একটি নথি ডাটাবেস)",
+        "কনকারেন্সি কন্ট্রোল এবং ক্র্যাশ রিকভারি ভুলে যাওয়া\n\n- সবচেয়ে কঠিন সমস্যা একটি DBMS সমাধান করে"
+      ],
+      "followUps": [
+        {
+          "question": "তথ্য স্বাধীনতা কি?",
+          "answer": "শারীরিক স্বাধীনতা: আপনি ক্যোয়ারী পরিবর্তন না করে স্টোরেজ পরিবর্তন করতে পারেন (একটি সূচক যোগ করুন, ফাইল সরান, পৃষ্ঠার বিন্যাস পরিবর্তন করুন)। যৌক্তিক স্বাধীনতা: আপনি বিদ্যমান অ্যাপ্লিকেশান বা ভিউ না ভেঙে ধারণাগত স্কিমা পরিবর্তন করতে পারেন (একটি কলাম বা টেবিল যোগ করুন)।"
+        },
+        {
+          "question": "SQLite কি একটি RDBMS?",
+          "answer": "হ্যাঁ — এটি সম্পর্কযুক্ত, SQL বলে এবং ACID লেনদেন করে। এটি পোস্টগ্রেএসকিউএল-এর মতো ক্লায়েন্ট-সার্ভার ডাটাবেসের পরিবর্তে এমবেড করা (আপনার প্রক্রিয়ার ভিতরে একটি লাইব্রেরি, একটি ফাইল সংরক্ষণ করা)।"
+        }
+      ]
+    },
+    "acid-properties": {
+      "title": "What are the ACID properties? (bank transfer example)",
+      "prompt": "Explain the **ACID** properties of a database transaction. Use a bank transfer of **৳500 from account A to account B** to show what each property guarantees, what goes wrong without it, and how a database actually implements it.",
+      "hints": [
+        "Write the transfer as two UPDATE statements. What can go wrong between them?",
+        "Think of four failures: a crash halfway, a broken rule (negative balance), another user peeking mid-transfer, and a power cut right after \"Success\".",
+        "Atomicity = all-or-nothing (undo), Consistency = rules hold, Isolation = no one sees half-done work (locks/MVCC), Durability = committed data survives crashes (write-ahead log)."
+      ],
+      "approaches": [
+        {
+          "idea": "Lists the four words with one-line definitions (\"A = atomic, D = saved permanently\") and stops."
+        },
+        {
+          "idea": "Defines each property with the bank transfer, names the failure it prevents, and explains the mechanism (undo log, constraints, locks/MVCC, write-ahead log + fsync)."
+        }
+      ],
+      "solution": {
+        "summary": "ACID is the set of guarantees a transaction gives. Atomicity: all its statements take effect or none do. Consistency: every commit leaves the data satisfying all rules. Isolation: concurrent transactions do not see each other's half-done work. Durability: once COMMIT returns, the change survives crashes. In a ৳500 transfer, the debit and credit happen together or not at all, the total money is unchanged, no one sees A debited before B is credited, and a confirmed transfer never disappears.",
+        "explanation": "A **transaction** is a group of statements treated as one unit of work:\n\n```sql\nSTART TRANSACTION;\nUPDATE accounts SET balance = balance\n- 500 WHERE id = 'A';\nUPDATE accounts SET balance = balance + 500 WHERE id = 'B';\nCOMMIT;\n```\n\n### A — Atomicity (all or nothing)\nIf the server crashes after the debit, the debit must be undone. The engine records **undo information** (InnoDB undo logs) and rolls back on error, on `ROLLBACK`, or during crash recovery. PostgreSQL reaches the same result by never marking an aborted transaction's row versions as committed.\n\n### C — Consistency (rules always hold)\nA transaction moves the database from one valid state to another. \"Valid\" means every declared constraint — `PRIMARY KEY`, `FOREIGN KEY`, `UNIQUE`, `NOT NULL`, `CHECK (balance >= 0)` — plus business invariants such as \"total money is unchanged\". The database enforces the declared constraints; invariants you did not declare are the **application's** job. That is why the transfer uses `WHERE balance >= 500` and checks the affected-row count.\n\n### I — Isolation (no peeking at half-done work)\nConcurrent transactions must not interfere; ideally the result equals running them one after another (**serializable**). Engines use **locks** and/or **MVCC snapshots**, and let you trade safety for speed with **isolation levels**. Without isolation an auditor could count the ৳500 twice — or not at all.\n\n### D — Durability (committed means permanent)\nWhen `COMMIT` returns, the change survives power loss. Engines use **write-ahead logging (WAL)**: the log record is flushed to disk (fsync) *before* the commit is acknowledged; data pages are written later and the log is replayed after a crash. Replicas protect against losing the disk itself.\n\n### How to say it in the interview\n\"I'll use a transfer of ৳500 from A to B…\" then walk through A, C, I, D with the failure each prevents and one implementation detail each. Finish with: \"In a bank, autocommit-per-statement is not acceptable — both updates go in one transaction.\"",
+        "keyPoints": [
+          "Use one concrete example (the transfer) for all four properties",
+          "Atomicity via undo/rollback, Durability via write-ahead log flushed before COMMIT returns",
+          "Consistency = declared constraints + business invariants the app must protect",
+          "Isolation via locks/MVCC, tunable with isolation levels",
+          "Group related statements in one transaction — never rely on autocommit for multi-step money movement"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "Happy path: transfer ৳500 from A to B",
+          "caption": "Committed data, the transaction's private changes and the write-ahead log at each step.",
+          "steps": [
+            {
+              "note": "Start: A = 1000, B =\n\n200. The business invariant is **A + B = 1200** and the constraint `CHECK (balance >= 0)` must always hold."
+            },
+            {
+              "note": "`START TRANSACTION` — T1 begins. From now on its changes are invisible to others until COMMIT."
+            },
+            {
+              "note": "Debit: `UPDATE … balance\n- 500 WHERE id = 'A' AND balance >= 500` affects 1 row. The log records old and new values (undo + redo information)."
+            },
+            {
+              "note": "**Isolation**: an auditor T2 sums all balances right now. It sees only committed data — A = 1000, B = 200, total 1200 — never the half-done state A = 500, B = 200."
+            },
+            {
+              "note": "Credit: `UPDATE … balance + 500 WHERE id = 'B'`. Both changes now exist only inside T1."
+            },
+            {
+              "note": "`COMMIT`: the COMMIT record is flushed (fsync) to the log **before** the app gets \"OK\". Data pages can be written later — the log is what makes it **durable**. Both changes become visible together (**atomic**), and A + B is still 1200 (**consistent**)."
+            },
+            {
+              "note": "Power fails a second later, before the data pages reached disk. On restart the engine **replays (redoes)** the log: T1 has a COMMIT record, so A = 500 and B = 700 are restored. A committed transfer never disappears."
+            }
+          ]
+        },
+        {
+          "title": "Crash before COMMIT → atomic rollback",
+          "caption": "Why the log keeps undo information even for pages already written to disk.",
+          "steps": [
+            {
+              "note": "Same start: A = 1000, B = 200 on disk, log empty."
+            },
+            {
+              "note": "T1 begins and debits A. To free memory, the buffer manager may write this **dirty, uncommitted** page to disk early (the data file now says A = 500) — but only after the log record holding the old value 1000 is on disk (the **write-ahead rule**)."
+            },
+            {
+              "note": "**Crash** before the credit to B and before COMMIT. On disk the money looks half-moved: ৳500 has vanished."
+            },
+            {
+              "note": "Recovery scans the log: T1 has **no COMMIT record**, so it is a loser. The engine applies the undo information (old value 1000) and logs that T1 aborted. (PostgreSQL gets the same effect differently: T1 is never marked committed, so its row versions stay invisible.)"
+            },
+            {
+              "note": "Result: as if the transfer never started — **atomicity**. The app received an error (no \"OK\" was ever sent), so it can safely retry."
+            }
+          ]
+        },
+        {
+          "title": "ACID: guarantee, mechanism, and the transfer bug it prevents"
+        }
+      ],
+      "pitfalls": [
+        "Confusing ACID Consistency with the C in CAP (all replicas returning the latest write) — different ideas",
+        "Claiming COMMIT writes every data page to disk — only the log must be flushed; pages are written later",
+        "Assuming the database enforces business rules you never declared as constraints",
+        "Running each UPDATE in autocommit mode (the default in JDBC and most Node.js drivers), which silently drops atomicity"
+      ],
+      "followUps": [
+        {
+          "question": "What is BASE?",
+          "answer": "Basically Available, Soft state, Eventually consistent — the trade-off many distributed NoSQL stores make, favouring availability and partition tolerance over immediate consistency."
+        },
+        {
+          "question": "How do you keep a transfer atomic across two services or databases?",
+          "answer": "A single local transaction cannot span them. Use two-phase commit (2PC), or more commonly a saga: each step has a compensating action, with an outbox table and idempotency keys so retries are safe."
+        },
+        {
+          "question": "What is a savepoint?",
+          "answer": "A marker inside a transaction (SAVEPOINT s1) that lets you ROLLBACK TO s1 — undoing part of the work without abandoning the whole transaction."
+        }
+      ]
+    },
+    "database-keys": {
+      "title": "Explain database keys: super, candidate, primary, foreign, composite and unique",
+      "prompt": "একটি রিলেশনাল ডাটাবেসে বিভিন্ন ধরনের কী ব্যাখ্যা করুন — **সুপার কী, ক্যান্ডিডেট কী, প্রাথমিক কী, বিকল্প কী, অনন্য কী, বিদেশী কী এবং যৌগিক কী** — একটি ছোট স্কিমা (ছাত্র, বিভাগ, তালিকাভুক্তি) ব্যবহার করে। NULL কোথায় ফিট করে?",
+      "hints": [
+        "লক্ষ্য থেকে শুরু করুন: প্রতিটি সারি স্বতন্ত্রভাবে চিহ্নিত করুন। কোন কলাম যে করতে পারে?",
+        "সুপার কী ⊇ প্রার্থী কী (ন্যূনতম) ⊇ প্রাথমিক কী (নির্বাচিত একটি)।",
+        "বিদেশী কী টেবিল সংযোগ; কম্পোজিট কী কলাম একত্রিত করে; UNIQUE প্রধানত NULL হ্যান্ডলিং এবং গণনায় প্রাথমিক কী থেকে আলাদা।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "একটি উদাহরণ ছাড়া মেমরি থেকে সংজ্ঞা তালিকাভুক্ত করে এবং প্রাথমিক কী-এর সাথে অনন্য কীকে বিভ্রান্ত করে।"
+        },
+        {
+          "idea": "একটি টেবিলে হাইরার্কি সুপার → ক্যান্ডিডেট → প্রাথমিক/বিকল্প তৈরি করে, তারপর কংক্রিট সারি সহ অনন্য, বিদেশী এবং যৌগিক কী দেখায় এবং NULL আচরণ এবং উপভাষা পার্থক্য উল্লেখ করে।"
+        }
+      ],
+      "solution": {
+        "summary": "একটি সুপার কী হল যেকোনো কলাম সেট যা একটি সারিকে স্বতন্ত্রভাবে সনাক্ত করে; একটি প্রার্থী কী একটি ন্যূনতম সুপার কী; প্রাথমিক কী হল আমরা যে প্রার্থীকে বেছে নিয়েছি (প্রতি টেবিলে একটি, কখনোই শূন্য নয়) এবং rest হল বিকল্প কী। একটি অনন্য কী স্বতন্ত্রতা প্রয়োগ করে তবে NULL এর অনুমতি দিতে পারে; একটি বিদেশী কী সম্পর্ক প্রয়োগ করতে অন্য টেবিলের কী উল্লেখ করে; একটি যৌগিক কী হল দুটি বা ততোধিক কলাম দিয়ে তৈরি একটি কী।",
+        "explanation": "সর্বত্র ব্যবহৃত স্কিমা (ভিজ্যুয়াল দেখুন): `students(student_id, nid, email, phone, name, dept_id)` , `departments(dept_id, dept_name)` , `enrollments(student_id, course_code, grade)`। | কী\n| অর্থ | আমাদের স্কিমায় |\n| ---|---|---|\n| **সুপার কী** | কলামের যেকোন সেট যা একটি সারিকে স্বতন্ত্রভাবে সনাক্ত করে (সুপারসেট অনুমোদিত)\n| {student_id}, {student_id, name}, {email, dept_id} | | **প্রার্থী কী** | একটি *মিনিমাম* সুপার কী\n| {student_id}, {nid}, {email} | | **প্রাথমিক কী** | পরিচয় হিসাবে নির্বাচিত প্রার্থী: অনন্য + শূন্য নয়, প্রতি টেবিলে সর্বাধিক একটি\n| ছাত্র_আইডি | | **বিকল্প কী** | প্রার্থীর কীগুলি PK হিসাবে বেছে নেওয়া হয়নি\n| nid, ইমেইল | | **অনন্য কী** | একটি অনন্য সীমাবদ্ধতা; NULL অনুমতি দিতে পারে; টেবিল প্রতি অনেক\n| ফোন | | **বিদেশী কী** | কলাম(গুলি) অন্য একটি (বা একই) টেবিলের একটি PK/অনন্য কী উল্লেখ করছে\n| students.dept_id → Departments.dept_id | | **যৌগিক কী** | 2+ কলাম দিয়ে তৈরি যেকোনো কী\n| (ছাত্র_আইডি, কোর্স_কোড) তালিকাভুক্তিতে |\n\n### কিভাবে একটি প্রাথমিক কী চয়ন করবেন **স্থিতিশীল, সংক্ষিপ্ত, অর্থহীন** মান পছন্দ করুন। একটি **সারোগেট কী** (অটো-ইনক্রিমেন্ট বা UUID) কখনই পরিবর্তন হয় না, যখন **প্রাকৃতিক কী** যেমন ইমেল বা ফোন পরিবর্তন হতে পারে — এবং প্রতিটি বিদেশী কী তাদের দিকে নির্দেশ করে তাও পরিবর্তন করতে হবে। সাধারণ অভ্যাস: সারোগেট পিকে + প্রাকৃতিক কীতে অনন্য সীমাবদ্ধতা।\n\n### NULL নিয়ম\n- প্রাথমিক কী কলাম কখনই NULL (সত্তা অখণ্ডতা) হতে পারে না।\n- অনন্য কলাম NULL ধারণ করতে পারে: PostgreSQL এবং MySQL অনেক NULL এর অনুমতি দেয় (NULL NULL এর সমান নয়); SQL সার্ভার শুধুমাত্র একটিকে অনুমতি দেয়।\n- একটি বাতিলযোগ্য বিদেশী কী মানে \"কোনও অভিভাবক নেই\" (যেমন একজন শিক্ষার্থী এখনও একটি বিভাগে নিয়োগ করা হয়নি)।\n\n### রেফারেন্সিয়াল অ্যাকশন `ON DELETE RESTRICT / NO ACTION` (প্রত্যাখ্যান), `CASCADE` (শিশুদের মুছুন), `SET NULL` , `SET DEFAULT` সিদ্ধান্ত নিন যখন পিতামাতার সারি মুছে ফেলা হয় বা এর কী আপডেট করা হয় তখন শিশুদের কী হবে।",
+        "keyPoints": [
+          "সুপার ⊇ প্রার্থী (ন্যূনতম) ⊇ প্রাথমিক (নির্বাচিত); অন্যান্য প্রার্থীরা বিকল্প কী",
+          "প্রতি টেবিলে সর্বাধিক একটি প্রাথমিক কী (প্রতিটি টেবিলে একটি থাকা উচিত), কখনই শূন্য নয়\n\n- তবে এটি যৌগিক হতে পারে",
+          "UNIQUE NULL এর অনুমতি দেয় এবং আপনার অনেকগুলি থাকতে পারে; NULL হ্যান্ডলিং বিক্রেতা দ্বারা পৃথক",
+          "বিদেশী কীগুলি রেফারেন্সিয়াল অখণ্ডতা প্রয়োগ করে এবং ON DELETE/ON UPDATE আচরণকে সংজ্ঞায়িত করে",
+          "স্থিতিশীল সারোগেট পিকে এবং প্রাকৃতিক কীগুলিতে অনন্য সীমাবদ্ধতা পছন্দ করুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "এক স্কিমা, কি সব ধরনের",
+          "caption": "কলাম শিরোনামগুলি আলোচিত কী সহ টীকা করা হয়েছে: PK, AK (বিকল্প), CK (প্রার্থী), FK, UNIQUE।",
+          "steps": [
+            {
+              "note": "একটি **সুপার কী** হল যেকোনও কলামের সেট যা টেবিলের প্রতিটি সারিতে অনন্য হতে হবে: {student_id}, {student_id, name}, {nid, email, dept_id} … কিন্তু {name} হল **কী** নয় — দুই ছাত্রকে রহিম বলা হয়।"
+            },
+            {
+              "note": "একটি **প্রার্থী কী** হল একটি *মিনিমাম* সুপার কী: {student_id}, {nid} এবং {email}; {student_id, name} একটি সুপার কী কিন্তু কম নয়। কীগুলি ব্যবসার নিয়ম থেকে আসে, আজকের সারি থেকে নয় — {name, dept_id} এখানে অনন্য, তবে দ্বিতীয় রহিম CSE-এ যোগ দিতে পারে।"
+            },
+            {
+              "note": "**প্রাথমিক কী** হল প্রার্থীর কী যা আমরা সারির পরিচয় হিসেবে বেছে নিই: student_id — সংক্ষিপ্ত, স্থিতিশীল, কখনোই শূন্য নয়, কোনো ব্যক্তিগত ডেটা নেই। অন্যান্য প্রার্থীরা (nid, ইমেল) **বিকল্প কী** হয়ে যায়, NOT NULL + UNIQUE দিয়ে প্রয়োগ করা হয়।"
+            },
+            {
+              "note": "একটি **অনন্য কী** হল একটি অনন্য সীমাবদ্ধতা যা PK নয় এবং এটি NULL-এর অনুমতি দিতে পারে: দুই ছাত্রের এখনও কোনো ফোন নেই। PostgreSQL এবং MySQL একটি অনন্য কলামে অনেকগুলি NULL এর অনুমতি দেয়; SQL সার্ভার শুধুমাত্র একটিকে অনুমতি দেয়।"
+            },
+            {
+              "note": "একটি **বিদেশী কী** অন্য টেবিলে একটি প্রাথমিক (বা অনন্য) কীকে নির্দেশ করে: student.dept_id → Departments.dept_id। \"MBA\" বিভাগে একজন শিক্ষার্থীকে ঢোকানো প্রত্যাখ্যান করা হয়েছে কারণ এই ধরনের কোনো অভিভাবক সারি নেই।"
+            },
+            {
+              "note": "একটি **যৌগিক কী** দুই বা তার বেশি কলাম ব্যবহার করে। তালিকাভুক্তিতে, একা student_id অনন্য নয়: 1001 দুবার উপস্থিত হয়।"
+            },
+            {
+              "note": "কোর্স_কোড একাও অনন্য নয়: CSE101 দুবার প্রদর্শিত হয় — একবার 1001 ছাত্রের জন্য এবং একবার 1003-এর জন্য।"
+            },
+            {
+              "note": "জোড়া (স্টুডেন্ট_আইডি, কোর্স_কোড) প্রতিটি সারিতে অনন্য\n\n- একজন ছাত্র একবার একটি কোর্সে ভর্তি হয় — তাই এটি যৌগিক প্রাথমিক কী। student_id ছাত্রদের জন্য একটি বিদেশী কী।"
+            }
+          ]
+        },
+        {
+          "title": "এক নজরে কী"
+        }
+      ],
+      "pitfalls": [
+        "একটি সারণী বলার জন্য বেশ কয়েকটি প্রাথমিক কী থাকতে পারে — এটির একটি আছে, যা যৌগিক হতে পারে",
+        "UNIQUE কে প্রাইমারি কী-এর অনুরূপ হিসাবে বিবেচনা করা: UNIQUE NULL-এর অনুমতি দেয় এবং আপনার কাছে অনেকগুলি থাকতে পারে",
+        "PK হিসাবে একটি পরিবর্তনযোগ্য প্রাকৃতিক কী (ইমেল, ফোন) ব্যবহার করে, প্রতিটি রেফারেন্সিং টেবিলে আপডেটগুলি জোর করে",
+        "একটি বিদেশী কী ভাবলে শুধুমাত্র একটি প্রাথমিক কী উল্লেখ করা যেতে পারে — যেকোনো অনন্য কী কাজ করে"
+      ],
+      "followUps": [
+        {
+          "question": "সারোগেট বা প্রাকৃতিক প্রাথমিক কী?",
+          "answer": "সারোগেট (স্বয়ংক্রিয়-বৃদ্ধি, UUIDv7) স্থিতিশীল, কমপ্যাক্ট এবং অর্থহীন, তাই এটি পরিবর্তন করার প্রয়োজন নেই; একটি প্রাকৃতিক কী ব্যবসার অর্থ বহন করে কিন্তু ব্যক্তিগত ডেটা পরিবর্তন বা ফাঁস করতে পারে। সাধারণ: প্রাকৃতিক কীতে সারোগেট পিকে + ইউনিক।"
+        },
+        {
+          "question": "একটি বিদেশী কী স্বয়ংক্রিয়ভাবে একটি সূচক পায়?",
+          "answer": "MySQL InnoDB এর একটি প্রয়োজন এবং অনুপস্থিত থাকলে এটি তৈরি করে। PostgreSQL এবং SQL সার্ভার করে না — যোগদান এবং অভিভাবক মুছে ফেলার গতি বাড়ানোর জন্য FK কলামে একটি সূচক যোগ করুন।"
+        },
+        {
+          "question": "আপনি একটি অভিভাবক সারি মুছে ফেললে কি হবে?",
+          "answer": "এটি FK অ্যাকশনের উপর নির্ভর করে: RESTRICT/NO ACTION ডিলিট প্রত্যাখ্যান করে, CASCADE বাচ্চাদের মুছে দেয়, SET NULL FK সাফ করে, SET ডিফল্ট ডিফল্ট মান সেট করে।"
+        }
+      ]
+    },
+    "normalization-1nf-2nf-3nf-bcnf": {
+      "title": "Explain normalization: 1NF, 2NF, 3NF and BCNF",
+      "prompt": "**স্বাভাবিককরণ** কি এবং কেন আমরা এটা করি? নিচের অগোছালো অর্ডার টেবিলটিকে ধাপে ধাপে **1NF, 2NF এবং 3NF** -এ সাধারণ করুন, তারপর **BCNF** এবং কীভাবে এটি 3NF থেকে আলাদা তা ব্যাখ্যা করুন। | অর্ডার_আইডি\n| তারিখ | কাস্ট_আইডি | কাস্ট_নাম\n| শহর | আইটেম |\n| ---|---|---|---|---|---|\n| 101 | 2024-03-01\n| C1 | রহিম | ঢাকা\n| P1 পেন (20) x2, P2 নোটবুক (50) x1 |\n| 102 | 2024-03-02\n| C2 | করিম | চট্টগ্রাম\n| P1 পেন (20) x5 |\n| 103 | 2024-03-05\n| C1 | রহিম | ঢাকা\n| P2 নোটবুক (50) x2, P3 ব্যাগ (900) x1 |",
+      "hints": [
+        "তালিকা ধারণকারী কক্ষগুলি এবং অনেক সারিতে পুনরাবৃত্তি করা তথ্যগুলির জন্য দেখুন৷",
+        "প্রতিটি নন-কী কলামের জন্য জিজ্ঞাসা করুন: এটি কি সম্পূর্ণ কী, না শুধুমাত্র এটির অংশের উপর নির্ভর করে?",
+        "তারপর জিজ্ঞাসা করুন: এটি কি সরাসরি কীটির উপর নির্ভর করে বা অন্য নন-কী কলামের উপর নির্ভর করে?",
+        "BCNF: প্রতিটি কার্যকরী নির্ভরতার বাম দিকে একটি প্রার্থী কী হতে হবে।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\"1NF পারমাণবিক, 2NF কোন আংশিক নির্ভরতা নেই, 3NF কোন ট্রানজিটিভ নির্ভরতা\" কাজ করা উদাহরণ বা যত্নের কারণ ছাড়াই আবৃত্তি করে।"
+        },
+        {
+          "idea": "কার্যকরী নির্ভরতা এবং তিনটি অসামঞ্জস্যকে সংজ্ঞায়িত করে, ধাপে ধাপে একটি কংক্রিট টেবিলকে স্বাভাবিক করে তোলে, বিভাজনটি ক্ষতিহীন তা যাচাই করে এবং একটি 3NF টেবিল দেখায় যা এখনও BCNF লঙ্ঘন করে — তারপর কখন থামতে হবে তা উল্লেখ করে (অসাধারণকরণ)।"
+        }
+      ],
+      "solution": {
+        "summary": "সাধারণীকরণ টেবিলের পুনর্গঠন করে যাতে প্রতিটি তথ্য ঠিক একবার সংরক্ষণ করা হয়, আপডেট, সন্নিবেশ এবং অসঙ্গতিগুলি মুছে ফেলা হয়। 1NF: পারমাণবিক মান, কোন পুনরাবৃত্ত গ্রুপ। 2NF: কোন নন-কী কলাম একটি যৌগিক কী-এর শুধুমাত্র অংশের উপর নির্ভর করে না। 3NF: কোন নন-কী কলাম অন্য নন-কী কলামের উপর নির্ভর করে না। BCNF: প্রতিটি অ-তুচ্ছ কার্যকরী নির্ভরতার জন্য X → Y, X একটি সুপার কী হতে হবে (প্রতিটি নির্ধারক একটি প্রার্থী কী)।",
+        "explanation": "## শব্দভাণ্ডার\n- **ফাংশনাল ডিপেন্ডেন্সি (FD)**`X → Y` : X জেনে Y ফিক্স করে। উদাহরণ: `cust_id → city`।\n- **অসংগতি** অপ্রয়োজনীয়তার কারণে:\n- **আপডেট** — রহিম চলে গেছে; আমাদের অবশ্যই প্রতিটি সারিতে তার শহর পরিবর্তন করতে হবে বা ডেটা নিজেই বিরোধিতা করে।\n- **ঢোকান** — কেউ অর্ডার না করা পর্যন্ত আমরা একটি নতুন পণ্য রেকর্ড করতে পারি না।\n- **মুছুন** — করিমের একমাত্র আদেশ মুছে ফেলার ফলে আমরা করিমের সম্পর্কে যা জানতাম তাও মুছে ফেলবে।\n\n### ধাপগুলি (প্রথম ভিজ্যুয়াল অনুসরণ করুন)\n\n1. **1NF** — প্রতিটি কোষের পরমাণু, কোনো পুনরাবৃত্তিকারী গোষ্ঠী নেই, একটি কী দ্বারা চিহ্নিত সারি। প্রতি অর্ডার লাইনে `items` কে এক সারিতে বিভক্ত করুন; key = (order_id, prod_id)।\n\n2. **2NF** — 1NF + **কোন আংশিক নির্ভরতা নেই** (একটি নন-কী কলাম একটি যৌগিক কী এর *অংশ* এর উপর নির্ভর করে)। `order_id → date, cust_*` এবং `prod_id → prod_name, price` আংশিক (এখানে `price` হল পণ্যের বর্তমান তালিকা মূল্য; প্রকৃতপক্ষে যে মূল্য দেওয়া হয়েছে তা একটি পৃথক তথ্য — শেষে নোটটি দেখুন), তাই **অর্ডার**, **পণ্য** এবং **অর্ডার_আইটেম(order_id, prod_id, qty)** এ বিভক্ত করুন।\n\n3. **3NF** — 2NF + **কোন ট্রানজিটিভ নির্ভরতা নেই** (নন-কী → নন-কী)। `order_id → cust_id → city` , তাই গ্রাহকের তথ্যগুলিকে **গ্রাহকদের** মধ্যে স্থানান্তর করুন।\n\n4. **লসলেস চেক** — তাদের কীগুলিতে ফিরে টেবিলে যোগদানের জন্য অবশ্যই মূল সারিগুলি পুনরুত্পাদন করতে হবে। যখন ভাগ করা কলামগুলি একদিকের চাবিকাঠি হয় তখন একটি বিভাজন ক্ষতিহীন হয়৷ স্মৃতিসংক্রান্ত (বিল কেন্ট): প্রতিটি নন-কী কলাম **\"কী, পুরো কী এবং কী ছাড়া আর কিছুই নয়।\"** এর উপর নির্ভর করে।\n\n### BCNF (বয়স-কড নরমাল ফর্ম) প্রতিটি অ-তুচ্ছ FD `X → Y` এর জন্য, X একটি সুপার কী হতে হবে। 3NF একটি ব্যতিক্রমের অনুমতি দেয়: Y একটি প্রার্থীর কী অংশ হতে পারে। এই ব্যতিক্রমটি শুধুমাত্র **ওভারল্যাপিং কম্পোজিট ক্যান্ডিডেট কী** এর ক্ষেত্রে গুরুত্বপূর্ণ, যেমন টিউটরিং উদাহরণে (দ্বিতীয় ভিজ্যুয়াল): `tutor → subject` টেবিলটিকে 3NF এ রাখে কিন্তু BCNF লঙ্ঘন করে। পচন অপ্রয়োজনীয়তাকে ঠিক করে কিন্তু একটি নির্ভরতা হারাতে পারে ( `{student, subject} → tutor` আর একটি কী দ্বারা প্রয়োগ করা হয় না) — BCNF সর্বদা **নির্ভরতা-সংরক্ষণ** হয় না, যখন একটি 3NF পচন সর্বদা হতে পারে।\n\n### ওপারে এবং পিছনে\n- **4NF** একসাথে সংরক্ষিত স্বাধীন বহু-মূল্যবান তথ্যগুলি সরিয়ে দেয় (শিক্ষক × দক্ষতা × ভাষা)।\n- OLTP সিস্টেমে, লক্ষ্য করুন **3NF/BCNF** । পঠন-ভারী পাথের জন্য আপনি ইচ্ছাকৃতভাবে **অসাধারণ** করতে পারেন।\n- দ্রষ্টব্য: `unit_price` ক্রয়ের সময় অর্ডার লাইনে কপি করা *অপ্রয়োজনীয়তা* নয় — এটি একটি ভিন্ন সত্য (ঐতিহাসিক মূল্য), তাই এটি 3NF-তেও থাকে।",
+        "keyPoints": [
+          "কার্যকরী নির্ভরতা সংজ্ঞায়িত করুন এবং প্রথমে অসঙ্গতিগুলি আপডেট / সন্নিবেশ / মুছে দিন",
+          "1NF পারমাণবিক মান; 2NF পুরো কী; 3NF চাবি ছাড়া কিছুই",
+          "BCNF: প্রতিটি নির্ধারক একটি প্রার্থী কী — শুধুমাত্র ওভারল্যাপ করা প্রার্থী কীগুলির সাথে 3NF থেকে আলাদা",
+          "পচন অবশ্যই ক্ষতিহীন হতে হবে; BCNF নির্ভরতা সংরক্ষণ বলি দিতে পারে",
+          "OLTP স্কিমাগুলিকে স্বাভাবিক করুন, তারপর পরিমাপিত হট রিডের জন্য ইচ্ছাকৃতভাবে ডিনরমালাইজ করুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "একটি অগোছালো অর্ডার টেবিলকে স্বাভাবিক করা হচ্ছে: UNF → 1NF → 2NF → 3NF",
+          "caption": "সতর্কতা = অপ্রয়োজনীয়তা যা অসঙ্গতি সৃষ্টি করে, বিপদ = নির্ভরতা সরানো হচ্ছে, সাফল্য = পরিষ্কার ফলাফল।",
+          "steps": [
+            {
+              "note": "**অসাধারণ**: আইটেম কলাম একটি তালিকা একটি কক্ষে প্যাক করে। আপনি সহজে \"কে কলম কিনেছেন?\" জিজ্ঞাসা করতে পারবেন না, এবং একটি পরিমাণ পরিবর্তন মানে স্ট্রিং সার্জারি৷"
+            },
+            {
+              "note": "**1NF**: প্রতিটি কক্ষে একটি পারমাণবিক মান রয়েছে — প্রতি অর্ডার লাইনে একটি সারি, কী (order_id, prod_id)। কিন্তু রহিমের সিটি এখন 4 বার সংরক্ষণ করা হয়েছে (আপডেট অসঙ্গতি), একটি নতুন পণ্য যোগ করা যাবে না যতক্ষণ না কেউ অর্ডার না দেয় (অসংগতি ঢোকান), এবং অর্ডার 102 মুছে দিলে গ্রাহক করিম হারান (অসংগতি মুছুন)।"
+            },
+            {
+              "note": "**2NF** কম্পোজিট কী এর অংশে *আংশিক নির্ভরতা* সরিয়ে দেয়: তারিখ এবং গ্রাহক কলাম শুধুমাত্র অর্ডার_আইডির উপর নির্ভর করে; prod_name এবং মূল্য শুধুমাত্র prod_id এ। শুধুমাত্র qty-এর পুরো কী প্রয়োজন, তাই এটি অর্ডার_আইটেমগুলিতে থাকে।"
+            },
+            {
+              "note": "অর্ডারে এখনও সমস্যা: অর্ডার_আইডি → কাস্ট_আইডি → কাস্ট_নাম, শহর। গ্রাহকের তথ্য শুধুমাত্র কী-এর উপর নির্ভর করে অন্য একটি নন-কী কলামের মাধ্যমে * একটি **ট্রানজিটিভ নির্ভরতা** — তাই রহিমের শহর এখনও পুনরাবৃত্তি করে।"
+            },
+            {
+              "note": "**3NF**: গ্রাহকের তথ্য গ্রাহকদের কাছে নিয়ে যান। এখন প্রতিটি নন-কী কলাম \"কী, পুরো কী, এবং কী ছাড়া কিছুই নয়\" এর উপর নির্ভর করে। রহিমের শহরে একবার জমা হয়।"
+            },
+            {
+              "note": "বিভাজনটি **ক্ষতিহীন** কিনা তা পরীক্ষা করুন: তাদের কীগুলিতে থাকা চারটি টেবিলের সাথে যোগ দিলে ঠিক মূল 5টি অর্ডার লাইন ফিরে আসে — কোনও সারি হারিয়ে যায়নি, কোনও অতিরিক্ত সারি উদ্ভাবিত হয়নি৷"
+            }
+          ]
+        },
+        {
+          "title": "3NF কিন্তু BCNF নয়: টিউটরিং টেবিল",
+          "caption": "ওভারল্যাপিং ক্যান্ডিডেট কী যেখানে BCNF এবং 3NF আলাদা।",
+          "steps": [
+            {
+              "note": "কোচিং সেন্টারের নিয়ম: প্রতিটি গৃহশিক্ষক ঠিক একটি বিষয় পড়ান; একজন শিক্ষার্থী প্রতি বিষয়ের একজন শিক্ষক আছে। FDs: {ছাত্র, বিষয়} → শিক্ষক এবং **শিক্ষক → বিষয়** । \"মিস্টার হাসান গণিত পড়ান\" বারবার বলা হয়।"
+            },
+            {
+              "note": "প্রার্থীর কী: {ছাত্র, বিষয়} এবং {ছাত্র, শিক্ষক}। প্রতিটি কলাম কিছু প্রার্থীর কী-এর অংশ, তাই টেবিলটি **3NF** -এ রয়েছে — তবুও টিউটর → বিষয়ের একটি নির্ধারক (শিক্ষক) আছে যা একটি কী নয়, তাই এটি **BCNF** লঙ্ঘন করে। বিলালের পদার্থবিজ্ঞানের সারি মুছে ফেলার ফলে \"জনাব কবির পদার্থবিদ্যা পড়ান\" এই সত্যটিও হারিয়ে যায়।"
+            },
+            {
+              "note": "**BCNF** আপত্তিকর এফডিতে পচন: টিউটর (শিক্ষক → বিষয়) এবং ছাত্র_শিক্ষক (ছাত্র, গৃহশিক্ষক)। প্রতিটি নির্ধারক এখন একটি চাবিকাঠি; প্রতিটি সত্য একবার সংরক্ষিত হয়."
+            },
+            {
+              "note": "ট্রেড-অফ: {ছাত্র, বিষয়} → টিউটর আর কোনো একক কী দ্বারা প্রয়োগ করা হয় না। ঢোকানো (আনিকা, মিসেস লিপি) সফল হয়েছে, এবং যোগদান এখন আনিকাকে **দুই গণিত শিক্ষক** এর সাথে দেখায়। BCNF সবসময় নির্ভরশীলতা রক্ষা করে না; 3NF সবসময় হতে পারে।"
+            }
+          ]
+        },
+        {
+          "title": "এক নজরে স্বাভাবিক ফর্ম"
+        }
+      ],
+      "pitfalls": [
+        "2NF লঙ্ঘনের জন্য শিকার করা যখন প্রতিটি প্রার্থী কী একটি একক কলাম হয় — যেমন একটি 1NF টেবিল স্বয়ংক্রিয়ভাবে 2NF তে থাকে",
+        "একটি নন-কী কলামে বিভক্ত করা, তাই ফিরে যোগদানের ফলে এমন সারি তৈরি হয় যা কখনও বিদ্যমান ছিল না (ক্ষতিকর পচন)",
+        "অর্ডার লাইনে মূল্য-এ-ক্রয়কে রিডানডেন্সি হিসাবে বিবেচনা করা\n\n- এটি একটি ঐতিহাসিক সত্য এবং সিঙ্ক করা উচিত নয়",
+        "অন্ধভাবে স্বাভাবিককরণ: খুব গভীর বিভাজন গরম পড়ার পথে যোগ যোগ করে"
+      ],
+      "followUps": [
+        {
+          "question": "প্রতি 3NF টেবিল কি BCNF এ আছে?",
+          "answer": "নং। একটি 3NF টেবিল BCNF লঙ্ঘন করতে পারে যখন একজন নন-কী নির্ধারক প্রার্থী কী-এর অংশ নির্ধারণ করে (টিউটরের উদাহরণের মতো কম্পোজিট ক্যান্ডিডেট কীগুলিকে ওভারল্যাপ করে)। প্রতিটি BCNF সারণী 3NF-এ থাকে।"
+        },
+        {
+          "question": "কি একটি পচন ক্ষতিহীন করে তোলে?",
+          "answer": "R1 এবং R2 তে R বিভক্ত করা ক্ষতিহীন যখন R1 ⋈ R2 = R ঠিক; যখন সাধারণ কলামগুলি R1 বা R2-এর একটি কী তৈরি করে তখন এটি নিশ্চিত করা হয়।"
+        },
+        {
+          "question": "আপনি কখন অস্বাভাবিকতা করবেন?",
+          "answer": "যখন একটি পরিমাপ করা হয়, ঘন ঘন পঠিত হয় তখন অনেক যোগ বা সমষ্টির প্রয়োজন হয় — যেমন অর্ডারে অর্ডার_টোটাল সংরক্ষণ করা — অতিরিক্ত লেখার কাজ গ্রহণ করা এবং অনুলিপিটিকে একই লেনদেনের মধ্যে সিঙ্কে রাখা।"
+        }
+      ]
+    },
+    "er-diagram-design": {
+      "title": "Design an ER diagram for a small e-commerce store",
+      "prompt": "একটি ছোট **ই-কমার্স** স্টোরের জন্য ডাটাবেস ডিজাইন করুন:\n\n- গ্রাহকরা বেশ কয়েকটি বিতরণ ঠিকানা সংরক্ষণ করতে পারেন,\n\n- পণ্য একটি বিভাগের অন্তর্গত (বিভাগের উপ-বিভাগ থাকতে পারে),\n\n- একজন গ্রাহক অর্ডার দেয়; একটি অর্ডারে পরিমাণ সহ বেশ কয়েকটি পণ্য রয়েছে,\n\n- একটি অর্ডারে একাধিক অর্থপ্রদানের প্রচেষ্টা থাকতে পারে (ব্যর্থ, সফল, ফেরত)। **ER ডায়াগ্রাম** আঁকুন, প্রতিটি সম্পর্কের **কার্ডিনালিটি** বর্ণনা করুন এবং প্রতিটি সম্পর্ক কীভাবে টেবিল এবং কী হয়ে ওঠে তা ব্যাখ্যা করুন।",
+      "hints": [
+        "প্রথমে বিশেষ্য (সত্তা) তালিকাভুক্ত করুন, তারপর তাদের মধ্যে ক্রিয়াপদ (সম্পর্ক)।",
+        "প্রতিটি সম্পর্কের জন্য জিজ্ঞাসা করুন \"এক বা অনেক?\" উভয় দিকে",
+        "একটি অর্ডারে অনেকগুলি পণ্য থাকে এবং একটি পণ্য অনেকগুলি অর্ডারে উপস্থিত হয় — একটি M:N সম্পর্ক একটি জংশন টেবিলের প্রয়োজন৷",
+        "অর্ডার লাইনে ক্রয়ের সময় দাম সংরক্ষণ করুন, তাই পুরানো অর্ডারগুলি যখন দাম হয় তখন পরিবর্তন হয় না।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "পণ্য_আইডি এবং পরিমাণ সরাসরি অর্ডারে রাখে (অর্ডার প্রতি একটি পণ্য), গ্রাহকের ঠিকানার পাঠ্য সঞ্চয় করে এবং কোন অর্থপ্রদানের টেবিল নেই।"
+        },
+        {
+          "idea": "সত্তা → বৈশিষ্ট্য এবং কী → কার্ডিনালিটিস → সমাধান M:N সহ ORDER_ITEM → 3NF → সীমাবদ্ধতা, অর্থের ধরন এবং সূচক; স্ন্যাপশট (ক্রয়ের সময় মূল্য) এবং অর্থপ্রদান-প্রচেষ্টার নকশা ব্যাখ্যা করে।"
+        }
+      ],
+      "solution": {
+        "summary": "সত্তা: গ্রাহক, ঠিকানা, বিভাগ, পণ্য, অর্ডার, অর্ডার_আইটেম, অর্থপ্রদান। একজন গ্রাহকের অনেক ঠিকানা এবং অনেক অর্ডার আছে (1:N); একটি অর্ডার একটি ঠিকানায় পাঠানো হয়; একটি বিভাগে অনেক পণ্য আছে এবং একটি মূল বিভাগ থাকতে পারে; অর্ডার–পণ্য হল M:N, ORDER_ITEM(order_id, product_id, পরিমাণ, ইউনিট_মূল্য); একটি অর্ডার অনেক পেমেন্ট প্রচেষ্টা আছে. প্রতিটি 1:N \"অনেক\" দিকে একটি বিদেশী কী হয়ে ওঠে এবং প্রতিটি M:N একটি যৌগিক প্রাথমিক কী সহ একটি জংশন টেবিলে পরিণত হয়।",
+        "explanation": "##\n\n1. সত্তা এবং কী CUSTOMER(id PK, ইমেল UNIQUE, full_name), ADDRESS(id, customer_id FK, line1, city), CATEGORY(id, name UNIQUE, parent_id FK), PRODUCT(id, category_id FK, নাম, মূল্য, স্টক), ORDERS(id, customer_id FK, shipping_address, ORDER_ITEM, place_id, ORDER_ITEM, status_id পণ্য_আইডি, পরিমাণ, ইউনিট_মূল্য), পেমেন্ট(আইডি, অর্ডার_আইডি এফকে, পরিমাণ, পদ্ধতি, স্থিতি, অর্থপ্রদান করা_এটি)।\n\n###\n\n2. কার্ডিনালিটি (কাকের পা) মারমেইড/কাকের পায়ের নোটেশনে: `|\n| ` ঠিক এক, `o|` শূন্য বা এক, `|{` এক বা তার বেশি, `o{` শূন্য বা তার বেশি।\n- গ্রাহক `|\n| --o{` অর্ডার — একজন গ্রাহক শূন্য বা তার বেশি অর্ডার দেয়; প্রতিটি অর্ডার ঠিক একজন গ্রাহক আছে.\n- অর্ডার `|\n| --|{` ORDER_ITEM — একটি অর্ডারে কমপক্ষে একটি লাইন থাকে।\n- পণ্য `|\n| --o{` ORDER_ITEM — একটি পণ্য অনেক অর্ডার লাইনে প্রদর্শিত হতে পারে।\n- ক্যাটাগরি `|o--o{` ক্যাটাগরি — ঐচ্ছিক অভিভাবক: একটি স্ব-রেফারেন্সিং 1:N।\n\n###\n\n3. ম্যাপিং নিয়ম\n- **1:N** → \"অনেক\" পাশে বিদেশী কী (orders.customer_id)।\n- **M:N** → জংশন টেবিল যার PK উভয়ই FK: ORDER_ITEM(order_id, product_id)। সম্পর্কের বৈশিষ্ট্য (পরিমাণ, একক_মূল্য) এখানে বাস করে।\n- **1:1** → একপাশে FK + অনন্য (বা একটি ভাগ করা প্রাথমিক কী)।\n\n###\n\n4. ডিজাইনের সিদ্ধান্ত ইন্টারভিউয়াররা শুনতে পছন্দ করে\n- **ORDER_ITEM এ ইউনিট_মূল্য** — মূল্য *ক্রয়ের সময়*; PRODUCT.price আগামীকাল পরিবর্তন হতে পারে।\n- **টাকা দশমিক হিসাবে(10,2)** (বা পূর্ণসংখ্যা পয়সা), কখনই ফ্লোট হবে না।\n- **সারি হিসাবে পেমেন্ট**, অর্ডারে কলাম নয় — পুনরায় চেষ্টা, আংশিক ফেরত এবং একাধিক পদ্ধতি (কার্ড, বিকাশ, ক্যাশ অন ডেলিভারি)।\n- **অর্ডার স্ট্যাটাস** একটি ছোট স্টেট মেশিন হিসেবে (পেন্ডিং → পেইড → শিপড → বিতরণ করা/বাতিল), চেক বা একটি লুকআপ টেবিলের সাথে প্রয়োগ করা হয়েছে।\n- **শিপিং ঠিকানা**: একটি সম্পাদিত ঠিকানা অবশ্যই পুরানো অর্ডারগুলি পুনরায় লিখতে পারবে না — এটিকে অর্ডারে স্ন্যাপশট করুন বা ঠিকানাগুলিকে অপরিবর্তনীয় হিসাবে বিবেচনা করুন৷\n- বিদেশী কীগুলিতে **সূচীপত্র** (orders.customer_id, order_item.product_id); PostgreSQL এবং SQL সার্ভার স্বয়ংক্রিয়ভাবে তাদের তৈরি করে না।\n- `ORDER` হল SQL এ একটি সংরক্ষিত শব্দ, তাই টেবিলের নাম `orders`।",
+        "keyPoints": [
+          "ক্রমানুসারে কাজ করুন: সত্তা → বৈশিষ্ট্য/কী → সম্পর্ক → কার্ডিনালিটি → টেবিল",
+          "1:N = FK অনেক দিকে; M:N = যৌগিক PK সহ জংশন টেবিল; 1:1 = FK + অনন্য",
+          "সম্পর্ক বৈশিষ্ট্য (পরিমাণ, একক_মূল্য) জংশন টেবিলের অন্তর্গত",
+          "স্ন্যাপশট তথ্য যা পরে পরিবর্তন করা উচিত নয় (ক্রয়ের মূল্য, শিপিং ঠিকানা)",
+          "অর্থের জন্য DECIMAL ব্যবহার করুন, নিয়মের জন্য সীমাবদ্ধতা এবং বিদেশী কী সূচী করুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "ই-কমার্স ইআর ডায়াগ্রাম তৈরি করা",
+          "caption": "কাকের পা: |\n| ঠিক এক, o| শূন্য বা এক, |{ এক বা একাধিক, o{ শূন্য বা একাধিক৷",
+          "frames": [
+            {
+              "note": "গ্রাহকের সাথে শুরু করুন: একজন গ্রাহক শূন্য বা তার বেশি ঠিকানা সংরক্ষণ করে এবং শূন্য বা তার বেশি অর্ডার দেয়। উভয়ই 1:N, তাই FK (customer_id) \"অনেক\" দিকে যায়।"
+            },
+            {
+              "note": "অর্ডার এবং পণ্যগুলি হল M:N, তাই আমরা জংশন সত্তা ORDER_ITEM যোগ করি৷ এর PK হল (order_id, product_id), এবং এটি সম্পর্কের নিজস্ব ডেটা বহন করে: ক্রয়ের সময় পরিমাণ এবং ইউনিট_মূল্য।"
+            },
+            {
+              "note": "সম্পূর্ণ মডেল: বিভাগ (উপ-বিভাগের জন্য একটি স্ব-রেফারেন্সিং অভিভাবক সহ), প্রতিটি অর্ডারের শিপিং ঠিকানা, এবং পেমেন্ট সারি যাতে একটি অর্ডার ব্যর্থ, সফল এবং ফেরত প্রচেষ্টা হতে পারে।"
+            }
+          ]
+        },
+        {
+          "title": "সম্পর্ক থেকে টেবিল পর্যন্ত"
+        }
+      ],
+      "pitfalls": [
+        "অর্ডারে প্রোডাক্ট_আইডি রাখা, যাতে একটি অর্ডার শুধুমাত্র একটি পণ্য ধরে রাখতে পারে",
+        "পুরানো অর্ডারের জন্য বর্তমান পণ্যের মূল্য পড়া — অর্ডার লাইনে ইউনিট_মূল্য স্টোর করুন",
+        "অর্থের জন্য ফ্লোট/ডাবল ব্যবহার করা — দশমিক (পি, এস) বা পূর্ণসংখ্যা ছোট একক (পয়সা) ব্যবহার করুন",
+        "উদ্ধৃতি ছাড়াই একটি টেবিল ORDER (একটি সংরক্ষিত শব্দ) নামকরণ"
+      ],
+      "followUps": [
+        {
+          "question": "আপনি কিভাবে আকার এবং রঙের মতো পণ্যের রূপগুলি মডেল করবেন?",
+          "answer": "PRODUCT_VARIANT(id, product_id FK, sku UNIQUE, আকার, রঙ, মূল্য, স্টক) যোগ করুন; ORDER_ITEM তারপর পণ্যের পরিবর্তে বৈকল্পিক উল্লেখ করে।"
+        },
+        {
+          "question": "একজন গ্রাহক অর্ডার করার পরে একটি ঠিকানা সম্পাদনা করেন — পুরানো অর্ডারের কী হবে?",
+          "answer": "কিছুই উচিত নয়. হয় শিপিং ঠিকানার ক্ষেত্রগুলিকে একটি স্ন্যাপশট হিসাবে অর্ডারে অনুলিপি করুন, অথবা ঠিকানাগুলিকে অপরিবর্তনীয় করুন (একটি সম্পাদনা একটি নতুন সারি সন্নিবেশিত করে এবং পুরানোটিকে নরম-মুছে দেয়) যাতে অর্ডারগুলি আসলে কী ব্যবহৃত হয়েছিল তার দিকে নির্দেশ করে৷"
+        },
+        {
+          "question": "আপনি কিভাবে একটি 1:1 সম্পর্ক মডেল করবেন?",
+          "answer": "একটি অনন্য সীমাবদ্ধতার সাথে উভয় পাশে বিদেশী কী রাখুন, অথবা উভয় টেবিলকে একই প্রাথমিক কী মান ভাগ করতে দিন।"
+        }
+      ]
+    },
+    "database-indexing-b-tree": {
+      "title": "How does a database index (B-tree) work? Clustered vs non-clustered",
+      "prompt": "একটি **ডাটাবেস সূচক** কী এবং কীভাবে একটি **B-ট্রি / B+ ট্রি** সূচক `SELECT * FROM orders WHERE id = 35` দ্রুত করে? একটি **গুচ্ছযুক্ত** এবং একটি **গুচ্ছবিহীন** সূচকের মধ্যে পার্থক্য কী? কখন একটি সূচক **না** সাহায্য করে — বা এমনকি আঘাত করে?",
+      "hints": [
+        "একটি সূচী ছাড়া, id = 35 খুঁজে পেতে ডাটাবেসকে কয়টি সারি পড়তে হবে?",
+        "একটি সাজানো ফোন ডিরেক্টরির কথা চিন্তা করুন: কোন কাঠামো কীগুলিকে বাছাই করে রাখে এবং ডিস্কে কেবল কয়েকটি স্তর গভীর রাখে?",
+        "একটি B+ গাছে, অভ্যন্তরীণ পৃষ্ঠাগুলি বিভাজক কীগুলি ধরে রাখে, পাতাগুলি সমস্ত কী + সারি পয়েন্টারগুলি ধরে রাখে এবং রেঞ্জ স্ক্যানের জন্য পাতাগুলি লিঙ্ক করা হয়।",
+        "প্রতিটি সূচী অবশ্যই তার কলামগুলির প্রতিটি INSERT, UPDATE এবং DELETE-এ আপডেট করতে হবে৷"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\"একটি সূচক প্রশ্নগুলিকে দ্রুত করে তোলে, যেমন একটি বইয়ের সূচী।\" কোনো কাঠামো নেই, কোনো খরচ নেই, কোনো ক্লাস্টারড বনাম নন-ক্লাস্টারড।"
+        },
+        {
+          "idea": "B+ ট্রি ব্যাখ্যা করে (পৃষ্ঠার ফ্যান-আউট, উচ্চতা 3-4, লিঙ্কযুক্ত পাতা), লুকআপ এবং রেঞ্জ স্ক্যান খরচ, ক্লাস্টারড বনাম সেকেন্ডারি ইনডেক্স একটি বাস্তব ইঞ্জিনের সাথে (InnoDB / SQL সার্ভার / PostgreSQL), কম্পোজিট-ইনডেক্স অর্ডারিং, এবং যখন সূচীগুলি এড়িয়ে যায় বা ধীর গতিতে লেখা হয়।"
+        }
+      ],
+      "solution": {
+        "summary": "একটি সূচক হল একটি পৃথক, সাজানো ডেটা স্ট্রাকচার — প্রায় সবসময়ই একটি B+ ট্রি — যা ডাটাবেসকে পুরো টেবিলটি স্ক্যান করার পরিবর্তে কয়েকটি পৃষ্ঠায় সারি খুঁজে পেতে দেয় ( O(log n) )। একটি গুচ্ছ সূচক টেবিলের সারিগুলিকে কী ক্রমে সংরক্ষণ করে, তাই প্রতি টেবিলে সর্বাধিক একটি থাকে; একটি নন-ক্লাস্টারড ইনডেক্স সারিগুলিতে কী এবং পয়েন্টার সংরক্ষণ করে এবং আপনার কাছে অনেকগুলি থাকতে পারে। সূচীগুলি পড়ার গতি বাড়ায় কিন্তু সঞ্চয়স্থান খরচ করে এবং প্রতিটি লেখাকে ধীর করে দেয় এবং অপ্টিমাইজার কম-নির্বাচন ফিল্টারের জন্য বা কলামটি একটি ফাংশনে মোড়ানো হলে সেগুলি এড়িয়ে যায়।",
+        "explanation": "## একটি সূচক ছাড়া 10 মিলিয়ন সারিতে `WHERE id = 35` হল একটি **পূর্ণ টেবিল স্ক্যান**: O(n) পৃষ্ঠা পড়া হয়।\n\n### বি+ গাছ\n- প্রতিটি নোড একটি **ডিস্ক পৃষ্ঠা** (InnoDB তে 16 KB, PostgreSQL তে 8 KB), তাই একটি নোড **শতশত কী** (হাই ফ্যান-আউট) ধারণ করে।\n- **অভ্যন্তরীণ পৃষ্ঠা** বিভাজক কী ধরে রাখুন; **লিফ পেজ** একটি সারি pointer (বা সারি নিজেই) সহ প্রতিটি কী ধরে রাখুন এবং পাতাগুলি **লিঙ্কযুক্ত** হয়।\n- গাছটি **সুষম** থাকে: বিভক্ত পৃষ্ঠাগুলি সন্নিবেশ করায়, তাই প্রতিটি পাতা একই গভীরতায় থাকে।\n- কয়েকশোর মধ্যে একটি ফ্যান-আউটের সাথে, **3–4 স্তরগুলি লক্ষ লক্ষ সারিগুলিকে কভার করে**, এবং শীর্ষ স্তরগুলি RAM-তে ক্যাশে থাকে — একটি সন্ধানের জন্য মুষ্টিমেয় পৃষ্ঠা পড়ার খরচ হয়৷\n- কারণ কীগুলি **বাছাই করা** হয়, একই সূচী `=` , রেঞ্জগুলি ( `BETWEEN` , `<` , `>` ), `ORDER BY` , `MIN/MAX` এবং উপসর্গ অনুসন্ধানগুলি ( `LIKE 'Rah%'`) পরিবেশন করে। একটি হ্যাশ সূচক শুধুমাত্র সমতা পরিবেশন করে।\n\n### ক্লাস্টারড বনাম নন-ক্লাস্টারড\n- **গুচ্ছবদ্ধ**: পাতার স্তর হল *টেবিল, সারিগুলি কী দ্বারা শারীরিকভাবে সাজানো — প্রতি টেবিলে সর্বাধিক **এক** । InnoDB সর্বদা প্রাথমিক কী দ্বারা ক্লাস্টার হয়; SQL সার্ভার PK কে ডিফল্টরূপে ক্লাস্টার করে তোলে; PostgreSQL সারণিগুলিকে সাজানো স্তূপ হিসাবে সংরক্ষণ করে (এর `CLUSTER` কমান্ডটি একটি এককালীন পুনর্বিন্যাস)।\n- **নন-ক্লাস্টারড (সেকেন্ডারি)**: স্টোর কী + সারি লোকেটার ছেড়ে দেয় — InnoDB-তে **প্রাথমিক কী মান** (তাই একটি লুকআপ সেকেন্ডারি ইনডেক্স → ক্লাস্টারড ইনডেক্স) বা PostgreSQL-এ একটি ফিজিক্যাল সারি আইডি (TID)। আপনি অনেক তৈরি করতে পারেন.\n- **কভারিং ইনডেক্স**: যদি সূচীতে প্রতিটি কলাম থাকে যে ক্যোয়ারী প্রয়োজন, ইঞ্জিন একা সূচক থেকে উত্তর দেয় (শুধুমাত্র স্ক্যান)। PostgreSQL 11+ এবং SQL সার্ভার সমর্থন `INCLUDE (...)` কলাম এর জন্য।\n\n### যৌগিক সূচী — বাম-প্রিফিক্স নিয়ম `(customer_id, created_at)`-এ একটি সূচক প্রথমে customer_id দ্বারা সাজানো হয়। এটি `WHERE customer_id = ?` এবং `WHERE customer_id = ? AND created_at > ?` (এবং একজন গ্রাহকের মধ্যে `ORDER BY created_at`) পরিবেশন করে, তবে সাধারণত **না**`WHERE created_at > ?` একা (Oracle, MySQL 8.0.13+ বা PostgreSQL 18+ এ একটি স্কিপ স্ক্যান শুধুমাত্র তখনই সাহায্য করে যখন customer_id এর কিছু স্বতন্ত্র মান থাকে)। প্রথমে সমতা কলাম রাখুন, তারপর পরিসর/বাছাই কলাম।\n\n### যখন একটি সূচক সাহায্য করে না বা ব্যাথা করে না\n- **লেখা**: প্রতিটি INSERT/UPDATE/DELETE প্রতিটি সূচী বজায় রাখে — আরও সূচী, ধীরে লেখা এবং আরও RAM।\n- **নিম্ন সিলেক্টিভিটি**: `WHERE status = 'ACTIVE'` বেশির ভাগ সারির সাথে মিলছে — একটি ক্রমিক স্ক্যান হাজার হাজার র্যান্ডম লুকআপের চেয়ে সস্তা।\n- **অ-সার্জেবল ভবিষ্যদ্বাণী**: `WHERE YEAR(created_at) = 2024` , `WHERE UPPER(name) = 'RAHIM'` , `LIKE '%man'` , অন্তর্নিহিত প্রকার কাস্ট। একটি পরিসর হিসাবে পুনরায় লিখুন, বা একটি অভিব্যক্তি সূচক তৈরি করুন।\n- **ছোট টেবিল**: কয়েকটি পৃষ্ঠার একটি স্ক্যান একটি সূচী সন্ধানকে বীট করে।\n- **এলোমেলো প্রাথমিক কী** (UUIDv4) একটি ক্লাস্টারড ইনডেক্সে পৃষ্ঠা বিভক্ত এবং দুর্বল ক্যাশে লোকেলিটির কারণ; অনুক্রমিক বা টাইম অর্ডারকৃত আইডি (UUIDv7) পছন্দ করুন। অনুমান না করে সর্বদা `EXPLAIN` / `EXPLAIN ANALYZE` দিয়ে নিশ্চিত করুন।",
+        "keyPoints": [
+          "B+ গাছ: উচ্চ ফ্যান-আউট পৃষ্ঠা, ভারসাম্যপূর্ণ, 3-4 স্তর, পরিসীমা স্ক্যানের জন্য পাতা সংযুক্ত",
+          "লুকআপ O(log n) পৃষ্ঠা রিডস বনাম O(n) সম্পূর্ণ স্ক্যান; এছাড়াও ORDER BY এবং রেঞ্জ পরিবেশন করে",
+          "ক্লাস্টার = সূচী ক্রমে সংরক্ষিত সারি (সর্বোচ্চ এক); নন-ক্লাস্টারড = কী + pointer (অনেক)",
+          "কম্পোজিট ইনডেক্স কলামের ক্রম গুরুত্বপূর্ণ: বাঁদিকের উপসর্গ, আগে সমতা তারপর পরিসর",
+          "ইনডেক্সের খরচ লেখার সময় এবং স্টোরেজ; কলামের ফাংশন, অগ্রণী ওয়াইল্ডকার্ড এবং কম সিলেক্টিভিটি তাদের পরাজিত করে",
+          "অনুমান করার পরিবর্তে EXPLAIN দিয়ে যাচাই করুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "B+ ট্রি লুকআপ এবং রেঞ্জ স্ক্যান",
+          "caption": "প্রাথমিক = পৃষ্ঠা পড়া হচ্ছে, তথ্য = পৃষ্ঠাগুলি ইতিমধ্যে পঠিত, সাফল্য = পাতা যা ফলাফল দেয়।",
+          "steps": [
+            {
+              "note": "অর্ডারের উপর একটি B+ গাছের সূচক (আইডি): 6টি পাতার পৃষ্ঠায় 12টি কী। অভ্যন্তরীণ পৃষ্ঠাগুলি শুধুমাত্র বিভাজক কী ধারণ করে; পাতা প্রতিটি কী pointer দিয়ে তার সারিতে ধরে রাখে, এবং পাতাগুলি বাম → ডানদিকে সংযুক্ত থাকে। প্রশ্ন: `WHERE id = 35`।"
+            },
+            {
+              "note": "মূল পাতা পড়ুন [30]। 35 ≥ 30, তাই কী শুধুমাত্র ডান সাবট্রিতে থাকতে পারে।"
+            },
+            {
+              "note": "অভ্যন্তরীণ পৃষ্ঠা [40 | 50]: 35 <40, তাই প্রথম সন্তানকে অনুসরণ করুন। প্রতিটি স্তর অন্য সমস্ত শাখাকে শাসন করে।"
+            },
+            {
+              "note": "পাতা [30, 35] তে 35 → এর সারি অনুসরণ করুন pointer (একটি গুচ্ছ সূচকে সারিটি এখানে সংরক্ষিত হয়)। সব 6টি পাতা স্ক্যান করার পরিবর্তে **3 পৃষ্ঠা পড়া** ।"
+            },
+            {
+              "note": "রেঞ্জ ক্যোয়ারী `WHERE id BETWEEN 20 AND 42` : প্রথমে পাতায় নামুন যেখানে 20টি থাকে — মূল (20 <30 → বাম), তারপর [10 | 20] (20 ≥ 20 → তৃতীয় সন্তান)।"
+            },
+            {
+              "note": "এখন **লিঙ্কযুক্ত পাতা বরাবর হাঁটুন — l3 → l4 → l5 — 20, 25, 30, 35, 40 নিঃসরণ করে এবং 45 > 42 এ থামে। আবার গাছে ওঠার দরকার নেই: এই কারণেই B+ গাছগুলি রেঞ্জের জন্য দুর্দান্ত এবং ORDER BY।"
+            }
+          ]
+        },
+        {
+          "title": "ক্লাস্টারড বনাম নন-ক্লাস্টারড সূচক"
+        },
+        {
+          "title": "(last_name, first_name) এর সূচী কি ব্যবহার করা হবে?"
+        }
+      ],
+      "pitfalls": [
+        "প্রতিটি কলামকে সূচীকরণ করা হচ্ছে \"শুধু ক্ষেত্রে\"\n\n- প্রতিটি সূচক লেখার গতি কমায় এবং RAM এর জন্য প্রতিযোগিতা করে",
+        "সূচীকৃত কলামগুলিকে ফাংশন বা কাস্টে মোড়ানো (WHERE DATE(created_at) = …) এবং ভাবছি কেন সূচক উপেক্ষা করা হয়",
+        "কম্পোজিট ইনডেক্স কলামগুলিকে ভুলভাবে ক্রম করা — প্রথমে সমতা কলাম, তারপর পরিসর/বাছাই কলাম",
+        "একটি টেবিল দাবি করার জন্য বেশ কয়েকটি ক্লাস্টার ইনডেক্স থাকতে পারে"
+      ],
+      "followUps": [
+        {
+          "question": "কেন একটি B+ গাছ এবং একটি হ্যাশ সূচক বা একটি binary search গাছ নয়?",
+          "answer": "একটি binary tree ডিস্কের জন্য খুব গভীর (প্রতি স্তরে একটি পৃষ্ঠা পড়া); একটি B+ গাছ প্রতি পৃষ্ঠায় শত শত কী প্যাক করে তাই এটি 3-4 স্তর গভীরে থাকে। হ্যাশ সূচক শুধুমাত্র সমতা উত্তর; B+ গাছগুলিও রেঞ্জ, অর্ডার বাই এবং প্রিফিক্স অনুসন্ধানগুলি পরিচালনা করে।"
+        },
+        {
+          "question": "একটি আচ্ছাদন সূচক কি?",
+          "answer": "একটি সূচী যাতে প্রতিটি কলামে একটি প্রশ্নের প্রয়োজন থাকে, তাই ইঞ্জিনটি টেবিলের সারিগুলি স্পর্শ না করে একা সূচক থেকে (শুধুমাত্র স্ক্যান) উত্তর দেয়৷"
+        },
+        {
+          "question": "মাইএসকিউএল-এ র্যান্ডম UUID প্রাথমিক কীগুলি কেন ধীর?",
+          "answer": "InnoDB ক্লাস্টার সারি PK দ্বারা, তাই র্যান্ডম কীগুলি এলোমেলো পৃষ্ঠাগুলিতে সন্নিবেশিত করে, যার ফলে পৃষ্ঠা বিভাজন, খণ্ডিতকরণ এবং দুর্বল ক্যাশে হিট রেট হয়। স্বয়ংক্রিয়-বৃদ্ধি বা টাইম-অর্ডার আইডি (UUIDv7, ULID) ব্যবহার করুন।"
+        }
+      ]
+    },
+    "transaction-isolation-levels": {
+      "title": "Transaction isolation levels: dirty, non-repeatable and phantom reads",
+      "prompt": "**লেনদেন বিচ্ছিন্নতার মাত্রা** কি কি? দুটি সমসাময়িক লেনদেন T1 এবং T2 সহ **ডার্টি রিড, নন-রিপিটেবল রিড এবং ফ্যান্টম রিড** ব্যাখ্যা করুন এবং বলুন যে চারটি স্ট্যান্ডার্ড লেভেলের কোনটি (রিড আনকমিটেড, রিড কমিটেড, রিপিটেবল রিড, সিরিয়ালাইজেবল) কোনটি বাধা দেয়।",
+      "hints": [
+        "একই অ্যাকাউন্ট সারিতে ছবি T1 এবং T2 ইন্টারলিভিং স্টেটমেন্ট।",
+        "নোংরা = রিডিং uncommitted data; নন-রিপিটেবল = একই সারি মান পরিবর্তন করে; phantom = একই প্রশ্ন সারিগুলির একটি ভিন্ন সেট প্রদান করে।",
+        "প্রতিটি স্তরের উপরে আরও একটি অসঙ্গতি দূর করে, আরও লকিং, ব্লক করা বা বাতিল করা লেনদেনের জন্য অর্থ প্রদান করা হয়।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "প্রতিটিতে কী ভুল হতে পারে তা না দেখিয়ে চারটি স্তরের নামগুলিকে ক্রমানুসারে তালিকাভুক্ত করুন৷"
+        },
+        {
+          "idea": "প্রতিটি অসঙ্গতিকে একটি T1/T2 টাইমলাইন হিসাবে দেখায়, স্তর দেয় × অসঙ্গতি matrix , নামগুলি ডিফল্ট (MySQL পুনরাবৃত্তিযোগ্য READ; PostgreSQL, Oracle, SQL সার্ভার READ COMMITTED) এবং লক বনাম MVCC ব্যাখ্যা করে, এবং স্ককেউ লিখতেও হারিয়ে গেছে।"
+        }
+      ],
+      "solution": {
+        "summary": "বিচ্ছিন্নতা স্তরগুলি একে অপরকে কতটা সমসাময়িক লেনদেন দেখতে পারে তা নিয়ন্ত্রণ করে। READ UNCOMMITTED নোংরা পড়ার অনুমতি দেয়; READ COMMITTED এগুলিকে বাধা দেয় তবে একটি সারি দুটি পাঠের মধ্যে পরিবর্তন হতে পারে (পুনরাবৃত্তিযোগ্য পাঠ); পুনরাবৃত্তিযোগ্য পঠন আপনার পড়া সারিগুলিকে স্থিতিশীল রাখে কিন্তু, SQL মান অনুযায়ী, নতুন মিলে যাওয়া সারি প্রদর্শিত হতে পারে (ফ্যান্টম); সিরিয়ালাইজেবল তিনটিকেই বাধা দেয়, ফলাফলকে কিছু সিরিয়াল অর্ডারের সমান করে। উচ্চতর বিচ্ছিন্নতা মানে কম অসঙ্গতি কিন্তু আরো ব্লক করা বা পুনরায় চেষ্টা করা।",
+        "explanation": "## তিনটি অসঙ্গতি পড়ে\n- **ডার্টি রিড** — T2 ডেটা রিড করে T1 লিখেছে কিন্তু প্রতিশ্রুতিবদ্ধ নয়; যদি T1 ফিরে আসে, T2 এমন একটি মান ব্যবহার করে যা কখনোই ছিল না।\n- **অ-পুনরাবৃত্তিযোগ্য পঠন** — T1 একটি সারি দুবার পড়ে এবং বিভিন্ন মান পায় কারণ T2 এর মধ্যে আপডেট এবং প্রতিশ্রুতিবদ্ধ।\n- **ফ্যান্টম রিড** — T1 একই *কোয়েরি* দুবার চালায় এবং একটি ভিন্ন *সারির সেট* পায় কারণ T2 মিলিত সারিগুলি সন্নিবেশিত/মুছে দিয়েছে।\n\n### SQL -মানক matrix | স্তর\n| নোংরা পড়া | অ-পুনরাবৃত্ত পড়া | ফ্যান্টম পড়া\n|\n| ---|---|---|---|\n| নিঃসন্দেহে পড়ুন\n| সম্ভব | সম্ভব | সম্ভব\n|\n| প্রতিশ্রুতিবদ্ধ পড়ুন | প্রতিরোধ করা\n| সম্ভব | সম্ভব |\n| পুনরাবৃত্তিযোগ্য পঠন\n| প্রতিরোধ করা | প্রতিরোধ করা | সম্ভব\n|\n| ক্রমিক | প্রতিরোধ করা\n| প্রতিরোধ করা | প্রতিরোধ করা |\n\n### কিভাবে ইঞ্জিন এটি বাস্তবায়ন করে\n- **লকিং**: পড়ার জন্য শেয়ার করা লক, লেখার জন্য একচেটিয়া লক, ফ্যান্টমের বিরুদ্ধে রেঞ্জ/নেক্সট-কী লক।\n- **MVCC** (PostgreSQL, InnoDB, Oracle): লেখকরা নতুন সারি সংস্করণ তৈরি করেন; পাঠকরা একটি ধারাবাহিক **স্ন্যাপশট** পড়েন, তাই পাঠকরা লেখকদের অবরুদ্ধ করেন না। READ Committed প্রতি বিবৃতিতে একটি নতুন স্ন্যাপশট নেয়; পুনরাবৃত্তিযোগ্য পাঠ প্রতি লেনদেনে একটি স্ন্যাপশট রাখে।\n\n### বাস্তব ডিফল্ট এবং quirks\n- **MySQL InnoDB**: ডিফল্টরূপে পুনরাবৃত্তিযোগ্য রিড; এর স্ন্যাপশট প্লাস নেক্সট-কী লকগুলি মূলত ফ্যান্টমকেও আটকায়।\n- **PostgreSQL, Oracle, SQL সার্ভার**: পড়ুন ডিফল্টরূপে প্রতিশ্রুতিবদ্ধ। PostgreSQL এর READ UNCOMMITTED READ COMMITTED এর মত আচরণ করে এবং এর পুনরাবৃত্তিযোগ্য READ হল স্ন্যাপশট আইসোলেশন (কোন ফ্যান্টম নয়)। ওরাকল শুধুমাত্র READ কমিটেড এবং সিরিয়ালাইজেবল অফার করে।\n- PostgreSQL (SSI) এ **সিরিয়ালাইজেবল** একটি সিরিয়ালাইজেশন ত্রুটি সহ বিরোধপূর্ণ লেনদেন বাতিল করে — অ্যাপ্লিকেশনটিকে অবশ্যই **পুনরায় চেষ্টা করতে হবে** ।\n\n### অসঙ্গতি matrix দেখায় না\n- **হারানো আপডেট** — দুটি পঠন-সংশোধন-লেখা চক্র; দ্বিতীয়টি প্রথমটিকে ওভাররাইট করে। পারমাণবিক `UPDATE … SET balance = balance\n- 100` , `SELECT … FOR UPDATE` বা আশাবাদী সংস্করণ ব্যবহার করুন।\n- **Skew লিখুন** — দুটি লেনদেন ওভারল্যাপিং ডেটা পড়ে এবং *ভিন্ন* সারি আপডেট করে, একসাথে একটি নিয়ম ভঙ্গ করে (অন-কল ডাক্তার উভয়ই ডিউটি ​​বন্ধ করে)। স্ন্যাপশট বিচ্ছিন্নতা এটি অনুমতি দেয়; সিরিয়ালাইজেবল এটি প্রতিরোধ করে। ```sql -- MySQL: applies to the next transaction in this session SET TRANSACTION ISOLATION LEVEL REPEATABLE READ; START TRANSACTION; SELECT balance FROM accounts WHERE id = 'A'; -- 1000 -- another session updates A to 500 and commits SELECT balance FROM accounts WHERE id = 'A'; -- still 1000 COMMIT; -- PostgreSQL: set it when the transaction starts BEGIN ISOLATION LEVEL SERIALIZABLE; -- ... statements ... COMMIT; ```",
+        "keyPoints": [
+          "নোংরা = uncommitted data; non-repeatable = একই সারি পরিবর্তিত; ফ্যান্টম = সারি সেট পরিবর্তন করা হয়েছে",
+          "4 × 3 matrix জানুন এবং প্রতিটি স্তর আরও একটি অসঙ্গতি দূর করে",
+          "ডিফল্ট: MySQL পুনরাবৃত্তিযোগ্য রিড; PostgreSQL, Oracle এবং SQL সার্ভার রিড কমিটেড",
+          "লক বনাম MVCC স্ন্যাপশট — পাঠকরা MVCC-এর অধীনে লেখকদের অবরুদ্ধ করেন না",
+          "ক্রমাগত খরচ ব্লক করা বা গর্ভপাত; অ্যাপটিকে আবার চেষ্টা করতে হবে",
+          "হারিয়ে যাওয়া আপডেট উল্লেখ করুন এবং গভীরতার জন্য তির্যক লিখুন"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "নোংরা পড়া (পড়ুন অনিশ্চিত)",
+          "caption": "প্রতিটি লেন এক লেনদেন; সময় বাম থেকে ডানে প্রবাহিত হয়।",
+          "steps": [
+            {
+              "note": "অ্যাকাউন্ট A = 1000 (প্রতিশ্রুতিবদ্ধ)। T1 একটি প্রত্যাহার শুরু করে।"
+            },
+            {
+              "note": "T1 A = 500 সেট করে কিন্তু **প্রতিশ্রুতিবদ্ধ নয়** ।"
+            },
+            {
+              "note": "READ UNCOMMITTED এর অধীনে, T2 A পড়ে এবং **500** পায় — এমন একটি মান যা কখনো প্রতিশ্রুতিবদ্ধ ছিল না। এটি একটি **নোংরা পড়া** ।"
+            },
+            {
+              "note": "T1 একটি ত্রুটি হিট করে এবং ফিরে আসে: A আবার 1000।"
+            },
+            {
+              "note": "T2 ইতিমধ্যেই 500-এর উপর কাজ করেছে (যেমন কম ব্যালেন্সের জন্য একটি লোন প্রত্যাখ্যান করেছে) — এমন ডেটার উপর ভিত্তি করে একটি সিদ্ধান্ত যা কখনও বিদ্যমান ছিল না।"
+            },
+            {
+              "note": "ঠিক করুন: **পড়ুন প্রতিশ্রুতিবদ্ধ** (বা উচ্চতর) T2 কখনই অনিয়মিত ডেটা দেখতে পায় না। MVCC ইঞ্জিনগুলি (PostgreSQL, Oracle, InnoDB) একবারে শেষ প্রতিশ্রুতিবদ্ধ মান 1000 ফেরত দেয়; একটি লকিং ইঞ্জিন ( SQL সার্ভারের ডিফল্ট) T2 টি 1 শেষ না হওয়া পর্যন্ত অপেক্ষা করে, তারপর 1000 পড়ে।"
+            }
+          ]
+        },
+        {
+          "title": "অ-পুনরাবৃত্তিযোগ্য পঠন (পড়ুন প্রতিশ্রুতিবদ্ধ)",
+          "steps": [
+            {
+              "note": "T1 শুরু হয় এবং A = 1000 পড়ে।"
+            },
+            {
+              "note": "T2 A থেকে 500 আপডেট করে …"
+            },
+            {
+              "note": "… এবং কমিট এখন পর্যন্ত নোংরা কিছুই নেই\n\n- পরিবর্তনটি প্রতিশ্রুতিবদ্ধ।"
+            },
+            {
+              "note": "T1 আবার **একই সারি** পড়ে, এখনও তার লেনদেনের মধ্যেই, এবং 500 পায়। READ COMMITTED এ প্রতিটি স্টেটমেন্ট সর্বশেষ প্রতিশ্রুতিবদ্ধ ডেটা দেখতে পায়: একটি **পুনরাবৃত্তিযোগ্য পঠিত** ।"
+            },
+            {
+              "note": "ঠিক করুন: **পুনরাবৃত্তিযোগ্য পাঠ** এ, T1 উভয় সময় 1000 দেখে। একটি MVCC ইঞ্জিন তার প্রথম পড়া থেকে স্ন্যাপশটে T1 রাখে; একটি লকিং ইঞ্জিন কমিট না হওয়া পর্যন্ত T1 এর শেয়ার্ড লক ধরে রাখে, তাই T2 এর আপডেটের জন্য অপেক্ষা করতে হবে।"
+            }
+          ]
+        },
+        {
+          "title": "ফ্যান্টম রিড (স্ট্যান্ডার্ড অনুযায়ী পুনরাবৃত্তিযোগ্য পঠন)",
+          "steps": [
+            {
+              "note": "T1 বড় ঋণ গণনা: 2 সারি মেলে."
+            },
+            {
+              "note": "T2 80,000 এর একটি **নতুন** ঋণ সন্নিবেশিত করে — কোনো বিদ্যমান সারি পরিবর্তন করা হয়নি।"
+            },
+            {
+              "note": "T2 কমিট করে, তাই নতুন লোন এখন এই বিন্দুর পরে শুরু হওয়া বিবৃতিতে দৃশ্যমান।"
+            },
+            {
+              "note": "T1 একই প্রশ্নের পুনরাবৃত্তি করে এবং 3 পায়: একটি **ফ্যান্টম** সারি উপস্থিত হয়েছে। 2টি সারি T1-এ সারি-স্তরের লকগুলি এটিকে থামাতে পারেনি — নতুন সারিটি এখনও বিদ্যমান ছিল না।"
+            },
+            {
+              "note": "ফিক্স: **সিরিয়ালাইজেবল** — একটি লকিং ইঞ্জিন রেঞ্জ (কী-রেঞ্জ / পরবর্তী-কী) লক নেয়, তাই T2 এর INSERT T1 কমিট না হওয়া পর্যন্ত অপেক্ষা করে; PostgreSQL তার স্ন্যাপশটে T1 রাখে এবং লেনদেন বাতিল করে শুধুমাত্র তখনই যদি রিড এবং রাইট সিরিয়াল করা না যায়। যেভাবেই হোক T1 দুইবারই 2টি দেখে (InnoDB এবং PostgreSQL পুনরাবৃত্তিযোগ্য রিড স্ন্যাপশটগুলিও এই ফ্যান্টমটিকে প্লেইন সিলেক্ট থেকে লুকিয়ে রাখে)।"
+            }
+          ]
+        },
+        {
+          "title": "বিচ্ছিন্নতা স্তর বনাম অসঙ্গতি"
+        }
+      ],
+      "pitfalls": [
+        "অ-পুনরাবৃত্তিযোগ্য পঠনগুলিকে মিশ্রিত করা (একটি বিদ্যমান সারি পরিবর্তিত) ফ্যান্টমগুলির সাথে (মিলানো সারির সেট পরিবর্তিত হয়েছে)",
+        "SERIALIZable বিনামূল্যে অনুমান করা হচ্ছে\n\n- ব্লক করা, অচলাবস্থা বা সিরিয়ালাইজেশন ত্রুটির আশা করুন যেগুলির জন্য পুনরায় চেষ্টা করা দরকার",
+        "ধরে নিচ্ছি প্রতিটি ডাটাবেসের একই ডিফল্ট বিচ্ছিন্নতা স্তর রয়েছে",
+        "READ COMMITTED বিশ্বাস করা হারানো আপডেট থেকে পঠন-সংশোধন-রাইট কোডকে রক্ষা করে"
+      ],
+      "followUps": [
+        {
+          "question": "একটি হারিয়ে যাওয়া আপডেট কি এবং আপনি কিভাবে এটি প্রতিরোধ করবেন?",
+          "answer": "দুটি লেনদেন একই মান পড়ে, উভয়ই একটি নতুন মান গণনা করে এবং এটি লেখে; দ্বিতীয় লেখাটি নিঃশব্দে প্রথমটিকে ওভাররাইট করে। এটিকে একটি পারমাণবিক আপডেট (ব্যালেন্স = ব্যালেন্স\n\n- x), নির্বাচন করুন … আপডেটের জন্য, বা একটি সংস্করণ কলাম (আশাবাদী লকিং) দিয়ে প্রতিরোধ করুন৷"
+        },
+        {
+          "question": "MVCC কি?",
+          "answer": "মাল্টি-ভার্সন কনকারেন্সি কন্ট্রোল: প্রতিটি লেখা একটি নতুন সারি সংস্করণ তৈরি করে এবং প্রতিটি লেনদেন প্রতিশ্রুতিবদ্ধ সংস্করণগুলির একটি সামঞ্জস্যপূর্ণ স্ন্যাপশট পড়ে, তাই পাঠকরা কখনই লেখকদের অবরুদ্ধ করেন না এবং লেখকরা কখনও পাঠকদের অবরুদ্ধ করেন না। PostgreSQL, InnoDB এবং Oracle দ্বারা ব্যবহৃত।"
+        },
+        {
+          "question": "ব্যাংকিং খাতার জন্য আপনি কোন স্তর ব্যবহার করবেন?",
+          "answer": "সাধারণত প্রতিশ্রুতিবদ্ধ প্লাস স্পষ্ট সারি লকগুলি পড়ুন (আপডেটের জন্য নির্বাচন করুন) বা গরম সারিগুলিতে পরমাণু শর্তাধীন আপডেটগুলি পড়ুন; সিরিয়ালাইজেবল যেখানে ইনভেরিয়েন্ট অনেক সারি বিস্তৃত করে, সিরিয়ালাইজেশন ব্যর্থতার জন্য পুনরায় চেষ্টা করার যুক্তি সহ।"
+        }
+      ]
+    },
+    "optimistic-vs-pessimistic-locking": {
+      "title": "Optimistic vs pessimistic locking",
+      "prompt": "দুই ক্যাশিয়ার একই মুহূর্তে একই অ্যাকাউন্ট থেকে টাকা তুলে নেয়। **হারানো আপডেট** সমস্যাটি ব্যাখ্যা করুন, তারপর দেখান কিভাবে **হতাশাবাদী লকিং** এবং **আশাবাদী লকিং** প্রতিটি একে প্রতিরোধ করে। আপনি যখন প্রতিটি নির্বাচন করবেন?",
+      "hints": [
+        "প্রথমে সমস্যাটি বর্ণনা করুন: একই সারিতে দুটি পঠন-সংশোধন-লিখুন চক্র।",
+        "হতাশাবাদী: আপনি যখন এটি পড়বেন তখন সারিটি লক করুন যাতে অন্য কেউ এটি পরিবর্তন করতে না পারে। কোন SQL ধারাটি করে?",
+        "আশাবাদী: কোন লক নিতে; UPDATE এর WHERE ক্লজে আপনি যে সংস্করণটি পড়েছেন সেটি রেখে লেখার সময় দ্বন্দ্ব সনাক্ত করুন।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\"হতাশাবাদী সারিটিকে আটকে রাখে, আশাবাদী তা করে না।\" কোন হারানো-আপডেট উদাহরণ, দ্বন্দ্ব সনাক্ত করার জন্য কোন ব্যবস্থা নেই, নির্বাচন করার জন্য কোন নির্দেশিকা নেই।"
+        },
+        {
+          "idea": "হারিয়ে যাওয়া আপডেট দেখায়, তারপর সিলেক্ট করুন … ফর আপডেট (ব্লকিং) বনাম একটি সংস্করণ কলাম আপডেটে চেক করা হয়েছে … সংস্করণ = কোথায়? (0 সারিতে পুনরায় চেষ্টা করুন); বিবাদ, অচলাবস্থা এবং চিন্তার সময় তুলনা করে; পারমাণবিক আপডেট, NOWAIT/SKIP LOCKED এবং JPA @Version উল্লেখ করেছে।"
+        }
+      ],
+      "solution": {
+        "summary": "হতাশাবাদী লকিং অনুমান করে যে বিরোধ ঘটবে: এটি পড়ার সময় সারিটি লক করে দেয় (আপডেটের জন্য নির্বাচন করুন), তাই অন্যান্য লেখকরা আপনার প্রতিশ্রুতি না দেওয়া পর্যন্ত অপেক্ষা করুন। আশাবাদী লকিং অনুমান করে যে বিরোধগুলি বিরল: এটি লক ছাড়াই পড়ে এবং শুধুমাত্র একটি সংস্করণ কলাম অপরিবর্তিত থাকলে আপডেট হয় (আপডেট … কোথায় আইডি = ? এবং সংস্করণ =?); যদি 0 সারি আপডেট করা হয় অন্য কেউ জিতেছে, তাই আপনি পুনরায় পড়ুন এবং পুনরায় চেষ্টা করুন। সংক্ষিপ্ত, উচ্চ-বিরোধপূর্ণ সমালোচনামূলক বিভাগগুলির জন্য হতাশাবাদী এবং কম-বিরোধপূর্ণ সম্পাদনাগুলির জন্য আশাবাদী ব্যবহার করুন, বিশেষত যখন ব্যবহারকারীরা পড়ার এবং সংরক্ষণের মধ্যে সময় নেয়।",
+        "explanation": "## সমস্যা: আপডেট হারিয়েছে T1 এবং T2 উভয় রিড ব্যালেন্স 1000। T1 লিখে 900, T2 লিখে 800 (এর বাসি পড়া থেকে)। 700 এর পরিবর্তে চূড়ান্ত 800 — T1 এর প্রত্যাহার হারিয়ে গেছে। একা পড়ুন প্রতিশ্রুতিবদ্ধ এটি প্রতিরোধ করে না।\n\n### হতাশাবাদী লকিং `SELECT balance FROM accounts WHERE id = 1 FOR UPDATE` কমিট/রোলব্যাক না হওয়া পর্যন্ত একটি **একচেটিয়া সারি লক** লাগে। অন্যান্য `FOR UPDATE` পাঠক এবং লেখকরা **অপেক্ষা করুন** ।\n- এমনকি ভারী বিতর্কের মধ্যেও সঠিক।\n- খরচ: ব্লক করা, কম থ্রুপুট, **ডেডলক** যদি দুটি লেনদেন বিভিন্ন অর্ডারে সারি লক করে (ইঞ্জিন একজন শিকারকে বাতিল করে; একটি সামঞ্জস্যপূর্ণ ক্রমে লক করে এবং লেনদেন ছোট রাখে)।\n- বিকল্পগুলি: `NOWAIT` (অবিলম্বে ব্যর্থ), `SKIP LOCKED` (লক করা সারিগুলি এড়িয়ে যান — কাজের সারির জন্য আদর্শ; PostgreSQL 9.5+, MySQL 8.0+)।\n- মানুষের জন্য অপেক্ষা করার সময় কখনই তালা ধরে রাখবেন না।\n\n### আশাবাদী লকিং একটি `version` (বা `updated_at` ) কলাম যোগ করুন। এটি পড়ুন, তারপর শর্তসাপেক্ষে লিখুন: `UPDATE accounts SET balance = 900, version = version + 1 WHERE id = 1 AND version = 7`।\n- 1 সারি প্রভাবিত → সাফল্য। 0 সারি → কেউ এটি প্রথমে পরিবর্তন করেছে → পুনরায় পড়ুন এবং পুনরায় চেষ্টা করুন, অথবা ব্যবহারকারীকে বলুন \"এই রেকর্ডটি সংশোধন করা হয়েছে\"।\n- পড়া এবং লেখার মধ্যে কোন লক নেই, তাই এটি **ব্যবহারকারীর চিন্তা করার সময়** এবং রাষ্ট্রহীন HTTP অনুরোধ জুড়ে কাজ করে।\n- খরচ: নষ্ট কাজ এবং বিতর্ক বেশি হলে পুনরায় চেষ্টা করুন।\n- ফ্রেমওয়ার্কের মধ্যে তৈরি: JPA/Hibernate `@Version` , Mongoose `optimisticConcurrency` , HTTP `ETag` + `If-Match` (412 পূর্বশর্ত ব্যর্থ)।\n\n### প্রায়শই সহজ: একটি পারমাণবিক শর্তাধীন আপডেট কাউন্টার এবং ব্যালেন্সের জন্য, ডাটাবেসটিকে একটি বিবৃতিতে রিড-চেক-রাইট করতে দিন: `UPDATE accounts SET balance = balance\n- 100 WHERE id = 1 AND balance >= 100` , তারপর প্রভাবিত-সারি গণনা পরীক্ষা করুন।\n\n### নির্বাচন করা\n- একই গরম সারিতে অনেক লেখক, ছোট লেনদেন (চেকআউটে আসন বুকিং, ওয়ালেট ডেবিট) → **হতাশাবাদী** বা পরমাণু আপডেট।\n- বেশিরভাগ-পঠিত ডেটা, বিরল দ্বন্দ্ব, দীর্ঘ সম্পাদনা সেশন (প্রোফাইল, পণ্য, CMS পৃষ্ঠা) → **আশাবাদী** ।",
+        "keyPoints": [
+          "হারিয়ে যাওয়া-আপডেট সমস্যা থেকে শুরু করুন\n\n- এটি উভয় কৌশলই সমাধান করে",
+          "হতাশাবাদী = নির্বাচন করুন … আপডেটের জন্য; অন্যরা কমিট না হওয়া পর্যন্ত ব্লক করে",
+          "WHERE clause-এ আশাবাদী = সংস্করণ কলাম; 0 সারি আপডেট মানে দ্বন্দ্ব → পুনরায় চেষ্টা করুন",
+          "ট্রেড-অফ: ব্লকিং এবং অচলাবস্থা বনাম বিতর্কের অধীনে পুনরায় চেষ্টা",
+          "পারমাণবিক শর্তসাপেক্ষ আপডেট উল্লেখ করুন, NOWAIT/ SIP LOCKED, JPA @Version বা ETags"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "সমস্যা: হারানো আপডেট (কোন লকিং নেই)",
+          "steps": [
+            {
+              "note": "Balance =\n\n1000. Cashier A (T1) reads it to process a ৳100 withdrawal."
+            },
+            {
+              "note": "Cashier B (T2) reads the same 1000 to process a ৳200 withdrawal."
+            },
+            {
+              "note": "T1 1000 − 100 = 900 লিখে কমিট করে।"
+            },
+            {
+              "note": "T2 1000 − 200 = 800 লিখে, তার **বাসি** পড়া থেকে গণনা করে, এবং কমিট করে — T1-এর লেখা ওভাররাইট করে।"
+            },
+            {
+              "note": "Final balance 800, but it should be 700: T1's withdrawal is a **lost update**. The bank just paid out ৳100 it never recorded."
+            }
+          ]
+        },
+        {
+          "title": "হতাশাবাদী: আপডেটের জন্য … নির্বাচন করুন",
+          "caption": "সারি-লক লেনটি দেখায় কে একচেটিয়া লকটি ধরে রেখেছে।",
+          "steps": [
+            {
+              "note": "T1: `SELECT balance … FOR UPDATE` 1000 পড়ে এবং একটি **একচেটিয়া সারি লক** নেয়।"
+            },
+            {
+              "note": "T2 একই `SELECT … FOR UPDATE` এবং **ব্লক** চালায় — এটি T1 শেষ না হওয়া পর্যন্ত আপডেটের জন্য পড়তে পারে না।"
+            },
+            {
+              "note": "T1 ব্যালেন্স 900 এ আপডেট করে এবং কমিট করে; তালা মুক্তি হয়।"
+            },
+            {
+              "note": "T2 জেগে ওঠে, লকটি নেয় এবং **তাজা** মান 900 পড়ে।"
+            },
+            {
+              "note": "T2 900 − 200 = 700 লিখে কমিট করে। সঠিক ফলাফল, T2 এর অপেক্ষার সময় দিয়ে পরিশোধ করা হয়েছে।"
+            }
+          ]
+        },
+        {
+          "title": "আশাবাদী: আপডেটে সংস্করণ পরীক্ষা",
+          "caption": "একটি বাস্তব রান থেকে ট্রেস করা হয়েছে: সংস্করণ 7 সহ দ্বিতীয় আপডেট 0 সারি প্রভাবিত করেছে৷",
+          "steps": [
+            {
+              "note": "T1 **সংস্করণ 7** সহ ব্যালেন্স 1000 রিড করে — কোনো লক নেওয়া হয়নি।"
+            },
+            {
+              "note": "T2 এছাড়াও পড়ে (1000, v7)। কেউ অপেক্ষা করে না।"
+            },
+            {
+              "note": "T1: `UPDATE … SET balance = 900, version = 8 WHERE id = 1 AND version = 7` → **1 সারি** আপডেট করা হয়েছে। সফলতা।"
+            },
+            {
+              "note": "T2: `UPDATE … SET balance = 800, version = 8 WHERE id = 1 AND version = 7` → **0 সারি**: সংস্করণটি এখন 8, তাই নিঃশব্দে ওভাররাইট করার পরিবর্তে বিরোধ সনাক্ত করা হয়েছে।"
+            },
+            {
+              "note": "T2 পুনরায় চেষ্টা করে: পুনরায় পড়া (900, v8) এবং পুনরায় গণনা করে।"
+            },
+            {
+              "note": "T2: `UPDATE … SET balance = 700, version = 9 WHERE version = 8` → 1 সারি। পড়া এবং লেখার মধ্যে কোন লক না রেখে সঠিক ফলাফল।"
+            }
+          ]
+        },
+        {
+          "title": "হতাশাবাদী বনাম আশাবাদী"
+        }
+      ],
+      "pitfalls": [
+        "ব্যবহারকারীর ইনপুটের জন্য অপেক্ষা করার সময় একটি হতাশাবাদী লক ধরে রাখা",
+        "আশাবাদী লকিং-এ প্রভাবিত-সারি গণনা উপেক্ষা করা, যা নীরবে আবার আপডেট হারায়",
+        "বিভিন্ন কোড পাথে বিভিন্ন অর্ডারে সারি লক করা, অচলাবস্থা সৃষ্টি করে",
+        "অটোকমিট মোডে আপডেটের জন্য SELECT … চলমান, যেখানে বিবৃতি শেষ হওয়ার সাথে সাথে লকটি প্রকাশ করা হয়"
+      ],
+      "followUps": [
+        {
+          "question": "একটি অচলাবস্থা কি এবং কিভাবে ডাটাবেস এটি পরিচালনা করে?",
+          "answer": "দুটি লেনদেন একটি লকের জন্য অপেক্ষা করে যা অন্যটি ধরে রাখে। ইঞ্জিন চক্রটি সনাক্ত করে এবং একজন শিকারকে বাতিল করে (MySQL ত্রুটি 1213, PostgreSQL SQLSTATE 40P01); অ্যাপ্লিকেশন পুনরায় চেষ্টা করে। সামঞ্জস্যপূর্ণ ক্রমে সারি লক করে এবং লেনদেন সংক্ষিপ্ত রেখে এটি প্রতিরোধ করুন।"
+        },
+        {
+          "question": "NOWAIT এবং SKIP LOCKED কি করে?",
+          "answer": "NOWAIT অপেক্ষা করার পরিবর্তে লকিং রিড অবিলম্বে ব্যর্থ করে তোলে। SKIP LOCKED নিঃশব্দে লক করা সারিগুলি এড়িয়ে যায় — কর্মীদের জন্য উপযুক্ত যে প্রত্যেকে একটি queue টেবিল থেকে পরবর্তী বিনামূল্যের কাজটি গ্রহণ করে।"
+        },
+        {
+          "question": "আপনি কি সম্পূর্ণরূপে স্পষ্ট লকিং এড়াতে পারেন?",
+          "answer": "প্রায়শই, হ্যাঁ: আপডেট অ্যাকাউন্টগুলি সেট ব্যালেন্স = ব্যালেন্স\n- 100 যেখানে আইডি = 1 এবং ব্যালেন্স >= 100 ডাটাবেসের ভিতরে পরমাণুভাবে রিড, চেক এবং রাইট করে; ঠিক 1 সারি আপডেট করা হয়েছে চেক করুন।"
+        }
+      ]
+    },
+    "sql-vs-nosql": {
+      "title": "SQL vs NoSQL databases — what is the difference and when do you choose each?",
+      "prompt": "**SQL (রিলেশনাল)** এবং **NoSQL** ডেটাবেসের মধ্যে পার্থক্য কী? উদাহরণ সহ প্রধান NoSQL পরিবারের নাম দিন, এবং ব্যাখ্যা করুন কিভাবে আপনি একটি বাস্তব সিস্টেমের জন্য তাদের মধ্যে নির্বাচন করবেন।",
+      "hints": [
+        "ডেটা মডেল, স্কিমা, সম্পর্ক, লেনদেন এবং স্কেলিং তুলনা করুন।",
+        "NoSQL হল একটি পরিবার: নথি, কী-মান, প্রশস্ত-কলাম এবং graph স্টোরগুলি বিভিন্ন সমস্যার সমাধান করে।",
+        "ডেটা আকৃতি, সামঞ্জস্যের প্রয়োজন এবং অ্যাক্সেস প্যাটার্ন থেকে চয়ন করুন — এবং বলুন যে অনেক সিস্টেম উভয়ই ব্যবহার করে।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\" SQL কাঠামোবদ্ধ এবং পুরানো, NoSQL অসংগঠিত এবং দ্রুত।\" অস্পষ্ট, আংশিকভাবে ভুল, এবং নির্বাচন করার জন্য কোন মানদণ্ড নেই।"
+        },
+        {
+          "idea": "মডেল, স্কিমা, যোগদান, লেনদেন এবং স্কেলিং তুলনা করে; প্রকৃত পণ্য সহ চারটি NoSQL পরিবারের নাম; আধুনিক ওভারল্যাপ উল্লেখ করে (PostgreSQL JSONB, MongoDB মাল্টি-ডকুমেন্ট লেনদেন); এবং প্রতি ব্যবহারের ক্ষেত্রে বেছে নেয়\n\n- প্রায়শই উভয়ই এক সিস্টেমে।"
+        }
+      ],
+      "solution": {
+        "summary": "SQL ডেটাবেসগুলি একটি সংজ্ঞায়িত স্কিমা সহ টেবিলে ডেটা সঞ্চয় করে, কী এবং যোগদানের সাথে তাদের সম্পর্কযুক্ত করে এবং বহু-সারি ACID লেনদেন দেয় — কাঠামোগত, সম্পর্কিত ডেটা যেমন অর্থপ্রদান এবং অর্ডারগুলির জন্য আদর্শ৷ NoSQL ডাটাবেস (ডকুমেন্ট, কী-মান, ওয়াইড-কলাম, graph ) স্থির স্কিমা শিথিল করে এবং নমনীয় রেকর্ডের বিনিময়ে যোগ দেয়, কী বা সমষ্টি দ্বারা সহজ অ্যাক্সেস এবং সহজ অনুভূমিক স্কেলিং। আমি ডেটা আকৃতি, সামঞ্জস্যের প্রয়োজন এবং অ্যাক্সেস প্যাটার্ন দ্বারা নির্বাচন করি এবং বাস্তব সিস্টেম প্রায়শই উভয়ই ব্যবহার করে।",
+        "explanation": "## রিলেশনাল ( SQL )\n- টেবিল, সারি, কলাম; **স্কিমা-অন-রাইট** (ডেটা লেখার সময় স্কিমা প্রয়োগ করা হয়)।\n- **বিদেশী কী** এর সাথে সম্পর্ক, কোয়েরির সময় **যোগদানের** সাথে মিলিত।\n- **ACID** বহু-সারি লেনদেন; স্ট্যান্ডার্ড SQL এ শক্তিশালী অ্যাড-হক প্রশ্ন।\n- প্রথমে **উল্লম্বভাবে** স্কেল করুন, সাথে প্রতিলিপিগুলি পড়ুন; শার্ডিং সম্ভব (MySQL এর জন্য Vitess, PostgreSQL এর জন্য Citus) কিন্তু আরো কাজ নেয়।\n- উদাহরণ: PostgreSQL, MySQL, Oracle, SQL সার্ভার।\n\n### NoSQL পরিবার | পরিবার\n| মডেল | উদাহরণ | জন্য ভালো\n|\n| ---|---|---|---|\n| দলিল | JSON-এর মতো নথি\n| MongoDB, Couchbase | ক্যাটালগ, ব্যবহারকারীর প্রোফাইল, বিষয়বস্তু |\n| মূল-মান\n| কী → মান | Redis, DynamoDB | ক্যাশিং, সেশন, রেট লিমিট\n|\n| প্রশস্ত-কলাম | ডাইনামিক কলাম পরিবার সহ সারি, বিভাজিত\n| Cassandra, HBase | বিশাল লেখার ভলিউম, টাইম সিরিজ, IoT |\n| Graph\n| নোড + প্রান্ত | Neo4j | সামাজিক গ্রাফ, সুপারিশ, জালিয়াতির রিং |\n- **নমনীয় স্কিমা** (স্কিমা-অন-রিড): রেকর্ড আলাদা হতে পারে; \"স্কিমা\" অ্যাপ্লিকেশন কোডে চলে যায়।\n- **অ্যাক্সেস প্যাটার্ন** এর আশেপাশে মডেল ডেটা: একসাথে যা পড়া হয় তা এম্বেড করুন (একটি নথিতে এর আইটেম সহ একটি অর্ডার)।\n- **অনুভূমিক স্কেলিং** (শার্ডিং/পার্টিশনিং) এর জন্য নির্মিত। অনেকে টিউনেবল বা চূড়ান্ত ধারাবাহিকতা অফার করে; রেকর্ড প্রতি পরমাণু নিশ্চিত করা হয়, এবং মাল্টি-রেকর্ড লেনদেন পরিবর্তিত হয় (মঙ্গোডিবি 4.0 থেকে মাল্টি-ডকুমেন্ট এসিআইডি লেনদেন সমর্থন করে)।\n\n### লাইনগুলো ঝাপসা হয়ে আসছে PostgreSQL এর GIN সূচী সহ **JSONB** আছে; MongoDB এর লেনদেন আছে এবং `$lookup` ; SQL এবং ACID সহ অনুভূমিকভাবে SQL ডেটাবেস (Google Spanner, CockroachDB, YugabyteDB) স্কেল বিতরণ করা হয়েছে।\n\n### কীভাবে নির্বাচন করবেন (সাক্ষাৎকারে এটি বলুন)\n- টাকা, ইনভেন্টরি, বুকিং, অনেক সম্পর্কের সাথে রিপোর্টিং → **রিলেশনাল** ।\n- কী, নমনীয় বৈশিষ্ট্য, ক্যাশিং, ইভেন্ট/IoT স্ট্রীম, গ্রাফ → ম্যাচিং **NoSQL** পরিবার দ্বারা উচ্চ-ভলিউম রিড।\n- **পলিগ্লট অধ্যবসায়** স্বাভাবিক: একটি ব্যাঙ্ক তার খাতা ওরাকল/পোস্টগ্রেএসকিউএল, রেডিস-এ সেশন এবং ওটিপি রেট সীমা এবং মঙ্গোডিবি-তে পণ্যের ক্যাটালগ বা অ্যাপ সামগ্রী রাখে।",
+        "keyPoints": [
+          "কনট্রাস্ট মডেল, স্কিমা, সম্পর্ক, লেনদেন এবং স্কেলিং",
+          "NoSQL হল চারটি পরিবার: নথি, কী-মান, প্রশস্ত-কলাম, graph — বাস্তব উদাহরণ সহ",
+          "এম্বেড বনাম যোগদান: অ্যাক্সেস প্যাটার্নের চারপাশে NoSQL মডেল",
+          "আধুনিক ওভারল্যাপ: PostgreSQL-এ JSONB, MongoDB-তে মাল্টি-ডকুমেন্ট লেনদেন",
+          "প্রতি ব্যবহারের ক্ষেত্রে চয়ন করুন; অনেক সিস্টেম উভয়ই ব্যবহার করে (পলিগ্লট অধ্যবসায়)"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "SQL বনাম NoSQL"
+        },
+        {
+          "title": "একই ক্রম, দুটি মডেল — এবং কিভাবে চয়ন করুন",
+          "frames": [
+            {
+              "note": "রিলেশনাল: একটি অর্ডার চারটি টেবিলে ছড়িয়ে দেওয়া হয় এবং কোয়েরির সময় যোগদানের সাথে একত্রিত হয়। প্রতিটি সত্য একবার সংরক্ষিত হয়."
+            },
+            {
+              "note": "নথি: পুরো অর্ডার — গ্রাহকের স্ন্যাপশট এবং আইটেম — হল একটি নথি, একটি একক লুকআপে পড়া৷ আপনি যখন সর্বদা একটি ইউনিট হিসাবে অর্ডারটি পড়েন তখন দুর্দান্ত।"
+            },
+            {
+              "note": "দ্রুত সিদ্ধান্তের পথ। বাস্তব সিস্টেমগুলি প্রায়শই অনেকগুলিকে একত্রিত করে: খাতার জন্য রিলেশনাল, সেশনের জন্য রেডিস, বিষয়বস্তুর জন্য মঙ্গোডিবি।"
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "NoSQL বলার অর্থ \"নো স্কিমা\"\n\n- স্কিমাটি আপনার অ্যাপ্লিকেশন কোডে চলে যায়৷",
+        "দাবি করা NoSQL ডাটাবেস কখনই লেনদেন সমর্থন করে না (মঙ্গোডিবি-তে মাল্টি-ডকুমেন্ট এসিআইডি লেনদেন রয়েছে)",
+        "অত্যন্ত সম্পর্কযুক্ত ডেটার জন্য একটি নথির দোকান বাছাই করা এবং অ্যাপ্লিকেশন কোডে যোগদান পুনরায় বাস্তবায়ন করা",
+        "SQL ডাটাবেস স্কেল করতে পারে না — রেপ্লিকা, পার্টিশন এবং শার্ডিং (Vitess, Citus) খুব বড় সিস্টেম চালায়"
+      ],
+      "followUps": [
+        {
+          "question": "CAP উপপাদ্য কি?",
+          "answer": "একটি নেটওয়ার্ক পার্টিশনের সময় একটি বিতরণ করা স্টোরকে অবশ্যই ধারাবাহিকতা (প্রতিটি পঠিত সর্বশেষ লেখা দেখা যায়) এবং প্রাপ্যতা (প্রতিটি অনুরোধের একটি প্রতিক্রিয়া পায়) মধ্যে নির্বাচন করতে হবে। ক্যাসান্ড্রা এবং ডায়নামোডিবি টিউনযোগ্য ধারাবাহিকতার সাথে প্রাপ্যতার দিকে ঝুঁকেছে; একক-প্রাথমিক সিস্টেম যেমন একটি MongoDB রেপ্লিকা সেট বা একটি PostgreSQL প্রাথমিক ধারাবাহিকতার দিকে ঝুঁকে পড়ে।"
+        },
+        {
+          "question": "মঙ্গোডিবিতে, আপনি কখন এম্বেড করবেন এবং কখন আপনি উল্লেখ করবেন?",
+          "answer": "এম্বেড ডেটা যা একসাথে পড়া হয় এবং আকারে আবদ্ধ থাকে (একটি অর্ডারের আইটেম)। রেফারেন্স ডেটা যা ভাগ করা, বড় বা সীমা ছাড়াই বৃদ্ধি পায় (পণ্য, মন্তব্য)। 16 MB নথির সীমা মনে রাখবেন।"
+        },
+        {
+          "question": "PostgreSQL একটি ডকুমেন্ট স্টোর হিসাবে কাজ করতে পারে?",
+          "answer": "হ্যাঁ: জিআইএন ইনডেক্স সহ JSONB কলাম SQL যোগদান এবং ACID লেনদেন রাখার সময় নমনীয় ক্ষেত্র এবং দ্রুত কন্টেনমেন্ট কোয়েরি দেয়।"
+        }
+      ]
+    },
+    "denormalization": {
+      "title": "What is denormalization and when should you use it?",
+      "prompt": "**ডিনরমালাইজেশন** কি? কেন আপনি ইচ্ছাকৃতভাবে একটি স্বাভাবিক স্কিমাতে অপ্রয়োজনীয়তা যুক্ত করবেন, এর দাম কত এবং আপনি কীভাবে অপ্রয়োজনীয় ডেটা সঠিক রাখবেন? কংক্রিট কৌশল দিন।",
+      "hints": [
+        "একটি হট পৃষ্ঠা চিত্র করুন যেটিতে প্রতিটি অনুরোধে একাধিক যোগদান এবং একটি সমষ্টি প্রয়োজন।",
+        "যদি আপনি উত্তর পূর্বনির্ধারিত সংরক্ষণ করেন? তাহলে প্রতিটি লেখায় কি হবে?",
+        "অপ্রয়োজনীয় কলাম, কাউন্টার, সংক্ষিপ্ত সারণী, বস্তুগত দৃষ্টিভঙ্গি এবং রিড মডেল (CQRS) সম্পর্কে চিন্তা করুন।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\"ডিনর্মালাইজেশন স্বাভাবিকীকরণের বিপরীত, এটি জিনিসগুলিকে দ্রুত করে তোলে।\" কোন খরচ, কোন কৌশল, কোন ধারাবাহিকতা গল্প."
+        },
+        {
+          "idea": "প্রথমে স্বাভাবিক করুন; একটি নির্দিষ্ট কৌশল (কপি করা কলাম, সংরক্ষিত মোট, সংক্ষিপ্ত সারণী, বস্তুগত দৃশ্য); লেখার খরচ এবং অসঙ্গতি ঝুঁকি ব্যাখ্যা করুন; কপিগুলিকে সিঙ্কে রাখুন (একই লেনদেন, ট্রিগার, রিফ্রেশ, ইভেন্ট); কপি থেকে স্ন্যাপশট আলাদা করুন।"
+        }
+      ],
+      "solution": {
+        "summary": "ডিনরমালাইজেশন ইচ্ছাকৃতভাবে অপ্রয়োজনীয় বা প্রি-কম্পিউটেড ডেটা সঞ্চয় করে — একটি কপি করা কলাম, একটি সংরক্ষিত অর্ডার মোট, একটি লাইক কাউন্টার বা একটি সারাংশ টেবিল — তাই ঘন ঘন পড়া যোগদান এবং একত্রীকরণ এড়ায়। এতে অতিরিক্ত সঞ্চয়স্থান খরচ হয়, ধীরগতির এবং আরও জটিল লেখা, এবং কপিগুলি সিঙ্কের বাইরে চলে যাওয়ার ঝুঁকি, তাই আমি এটি শুধুমাত্র পরিমাপ করা গরম পাথগুলির জন্য করি এবং একই-লেনদেন আপডেট, ট্রিগার, বস্তুগত-দর্শন রিফ্রেশ বা ইভেন্টগুলির সাথে কপিগুলিকে সঠিক রাখি৷",
+        "explanation": "## কেন একটি স্বাভাবিক স্কিমা অর্ডার, গ্রাহক এবং অর্ডার_আইটেম যোগ করে এবং প্রতিটি অনুরোধে যোগ করে \"মোট সহ আমার অর্ডারগুলি দেখান\" উত্তর দেয়। স্কেলে (লক্ষ লক্ষ পৃষ্ঠা দর্শন) যে কাজটি এমন ডেটার জন্য অবিরাম পুনরাবৃত্তি হয় যা খুব কমই পরিবর্তিত হয়।\n\n### কৌশল\n- **অপ্রয়োজনীয় কলাম** — orders.customer_name যোগদান এড়াতে।\n- **ডিরিভড/এগ্রিগেট কলাম** — orders.total_amount, posts.like_count, accounts.balance (প্রতিবার লেজার যোগ করার পরিবর্তে)।\n- **সারাংশ সারণী** — দৈনিক_বিক্রয় (তারিখ, স্টোর_আইডি, রাজস্ব) চাকরির মাধ্যমে রিফ্রেশ করা হয়।\n- **ম্যাটেরিয়ালাইজড ভিউ** — একটি সঞ্চিত ক্যোয়ারী ফলাফল (PostgreSQL `REFRESH MATERIALIZED VIEW [CONCURRENTLY]` , Oracle; SQL সার্ভার ইন্ডেক্সড ভিউ)।\n- **মডেল পড়ুন / CQRS** — একটি পৃথক, ইভেন্ট থেকে আপডেট করা ক্যোয়ারী-আকৃতির অনুলিপি।\n- ডকুমেন্ট ডাটাবেসে **এম্বেডিং**\n- একটি অর্ডার ডকুমেন্ট যার আইটেম রয়েছে।\n- ডেটা গুদামগুলিতে **স্টার স্কিমা** — একটি ফ্যাক্ট টেবিলের চারপাশে অস্বাভাবিক মাত্রা টেবিল।\n\n### খরচ\n- লেখাগুলি আরও কাজ করে (প্রতিটি অনুলিপি আপডেট করুন) এবং লেনদেনের প্রয়োজন৷\n- আরও স্টোরেজ।\n- **অসংগতি ঝুঁকি** — একটি অনুলিপি মিস হলে আপডেটের অসঙ্গতি ফিরে আসে।\n\n### কপিগুলো সঠিক রাখা\n\n1. উৎস হিসাবে **একই লেনদেনে** অনুলিপি আপডেট করুন (মোট এবং ব্যালেন্সের জন্য সেরা)।\n\n2. **ট্রিগার** — স্বয়ংক্রিয়, কিন্তু লুকানো যুক্তি।\n\n3. **নির্ধারিত রিফ্রেশ** — যখন কিছু অচলতা গ্রহণযোগ্য হয় (ড্যাশবোর্ড)।\n\n4. **ইভেন্টস / সিডিসি** (আউটবক্স, ডেবেজিয়াম → কাফকা) — পরিষেবা জুড়ে, অবশেষে সামঞ্জস্যপূর্ণ।\n\n5. পর্যায়ক্রমিক **মিলন** কাজ যা সত্যের উৎস থেকে পুনরায় গণনা করা হয়।\n\n### স্ন্যাপশট ≠ কপি একটি চালানে প্রিন্ট করা একটি গ্রাহকের নাম, বা একটি অর্ডার লাইনে ইউনিট মূল্য, রেকর্ড করে যা সত্য *সেই সময়* ছিল। এটি একটি পৃথক সত্য এবং অবশ্যই **সিঙ্ক করা হবে না।\n\n### অঙ্গুষ্ঠের নিয়ম প্রথমে স্বাভাবিক করুন (3NF)। সূচী যোগ করুন এবং প্রশ্নগুলি ঠিক করুন। শুধুমাত্র নির্দিষ্ট পঠনগুলিকে অস্বাভাবিক করুন যা এখনও খুব ধীর\n- এবং প্রতিটি অনুলিপি কীভাবে সিঙ্কে থাকে তা নথিভুক্ত করুন।",
+        "keyPoints": [
+          "একটি পরিমাপ করা, ঘন ঘন পঠিত সস্তা করতে ইচ্ছাকৃত অপ্রয়োজনীয়তা",
+          "নামের কৌশল: কপি করা কলাম, সঞ্চিত মোট/কাউন্টার, সারাংশ টেবিল, বস্তুগত দৃষ্টিভঙ্গি, CQRS",
+          "খরচ: ধীর, আরও জটিল লেখা এবং প্রবাহের ঝুঁকি",
+          "একই লেনদেনে বা ট্রিগার, রিফ্রেশ বা ইভেন্টের মাধ্যমে কপিগুলি সিঙ্কে রাখুন",
+          "ঐতিহাসিক স্ন্যাপশটগুলিকে (কখনও সিঙ্ক করা হয় না) কপিগুলি থেকে আলাদা করুন (সর্বদা সিঙ্ক করা হয়)"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "নর্মালাইজড বনাম ডিনরমালাইজড অর্ডার",
+          "caption": "সমস্ত ফলাফল টেবিল এই সারিগুলিতে প্রশ্নগুলি চালানো থেকে আসে।",
+          "steps": [
+            {
+              "note": "**সাধারণকৃত** (3NF): প্রতিটি ঘটনা একবার। কিন্তু \"আমার অর্ডার\" পৃষ্ঠায় **প্রতি** পৃষ্ঠা লোডের জন্য অর্ডার_আইটেমগুলির উপর 2টি যোগদান এবং একটি SUM প্রয়োজন৷"
+            },
+            {
+              "note": "**অসাধারণ**: অর্ডার গ্রাহকের নাম এবং মোট_অ্যামাউন্টও সঞ্চয় করে। পৃষ্ঠাটি এখন একটি একক-টেবিল পঠিত — কোনো যোগদান নেই, কোনো সমষ্টি।"
+            },
+            {
+              "note": "The price is paid on **writes**: adding a ৳900 bag to order 101 must insert the line **and** update orders.total_amount (90 → 990) in the same transaction, or the copy drifts."
+            },
+            {
+              "note": "ঝুঁকি: রহিম তার নাম পরিবর্তন করে। গ্রাহকদের মধ্যে একটি সারি পরিবর্তিত হয়, কিন্তু অর্ডারের প্রতিটি অনুলিপি এখন **বাসি** হয় যতক্ষণ না এটি আপডেট করা হয় — আপডেট অসঙ্গতি স্বাভাবিককরণ প্রতিরোধ করার জন্য ডিজাইন করা হয়েছিল।"
+            },
+            {
+              "note": "প্রতি কলামে সিদ্ধান্ত নিন: এটিকে একই লেনদেনে সিঙ্ক করুন (বা একটি ট্রিগার/ইভেন্ট), অথবা এটিকে একটি **স্ন্যাপশট** (\"অর্ডারের সময় নাম\") ঘোষণা করুন যা ইচ্ছাকৃতভাবে আপডেট করা হয় না। মোট সবসময় সিঙ্ক করা আবশ্যক; একটি চালানের একটি নাম প্রায়ই একটি স্ন্যাপশট হয়."
+            }
+          ]
+        },
+        {
+          "title": "স্বাভাবিক বনাম অস্বাভাবিক"
+        }
+      ],
+      "pitfalls": [
+        "পরিমাপ করার আগে ডিনরমালাইজ করা — সূচী যোগ করুন এবং প্রথমে প্রশ্নগুলি ঠিক করুন",
+        "লেনদেনের বাইরে অনুলিপি আপডেট করা যা উত্স পরিবর্তন করে, তাই একটি ক্র্যাশ তাদের অসঙ্গত ছেড়ে দেয়",
+        "একটি ঐতিহাসিক স্ন্যাপশট (ক্রয়ের মূল্য, একটি চালানে নাম) সিঙ্ক করা যা কখনই পরিবর্তন করা উচিত নয়",
+        "ভুলে যাওয়া যে একটি বস্তুগত দৃশ্য তাজা না হওয়া পর্যন্ত বাসি"
+      ],
+      "followUps": [
+        {
+          "question": "দেখুন বনাম বস্তুগত দৃশ্য?",
+          "answer": "একটি ভিউ শুধুমাত্র ক্যোয়ারী সঞ্চয় করে এবং প্রতিবার এটি চালায়। একটি ম্যাটেরিয়ালাইজড ভিউ দ্রুত পড়ার জন্য ডিস্কে ফলাফল সঞ্চয় করে এবং অবশ্যই রিফ্রেশ করতে হবে (PostgreSQL রিফ্রেশ ম্যাটেরিয়ালাইজড ভিউ, ঐচ্ছিকভাবে একযোগে)।"
+        },
+        {
+          "question": "আপনি কিভাবে স্কেলে একটি like_count সঠিক রাখবেন?",
+          "answer": "পারমাণবিক বৃদ্ধি (আপডেট পোস্টগুলি সেট like_count = like_count + 1) ব্যবহার করুন, বা Redis-এ বাফার ইনক্রিমেন্ট করুন এবং পর্যায়ক্রমে সেগুলি ফ্লাশ করুন, এবং একটি পুনর্মিলন কাজ যা লাইক টেবিল থেকে পুনরায় গণনা করে।"
+        },
+        {
+          "question": "একটি তারকা স্কিমা স্বাভাবিক করা হয়?",
+          "answer": "না। ডাইমেনশন টেবিলগুলি ইচ্ছাকৃতভাবে ডিনরমালাইজ করা হয়েছে তাই বিশ্লেষণাত্মক প্রশ্নগুলির জন্য প্রতি মাত্রায় শুধুমাত্র একটি যোগদান প্রয়োজন; ফ্যাক্ট টেবিলে পরিমাপ এবং বিদেশী কী রয়েছে।"
+        }
+      ]
+    },
+    "views-stored-procedures-triggers": {
+      "title": "Views vs stored procedures vs triggers",
+      "prompt": "**দর্শন**, **সঞ্চিত পদ্ধতি** এবং **ট্রিগার** ব্যাখ্যা করুন। প্রতিটি কিভাবে রান করে, এটা কিসের জন্য ভালো, এবং এর অসুবিধাগুলো কি? ব্যাংকিং বা ই-কমার্স সিস্টেম থেকে প্রতিটির একটি উদাহরণ দিন।",
+      "hints": [
+        "প্রত্যেককে জিজ্ঞাসা করুন: এটি কি ডেটা সঞ্চয় করে? কে এটি আহ্বান করে — একটি প্রশ্ন, একটি স্পষ্ট কল, বা একটি ইভেন্ট?",
+        "একটি দৃশ্য একটি সংরক্ষিত SELECT; একটি পদ্ধতি হল একটি সংরক্ষিত প্রোগ্রাম যা আপনি কল করেন; একটি ট্রিগার হল একটি প্রোগ্রাম যা ডাটাবেস আপনার জন্য INSERT/UPDATE/DELETE এ চালায়।",
+        "নিরাপত্তার কথা চিন্তা করুন: একটি ভিউতে গ্রান্ট সিলেক্ট করুন বা বেস টেবিলে অ্যাক্সেসের পরিবর্তে একটি পদ্ধতিতে গ্রান্ট এক্সিকিউট করুন।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "প্রতিটির এক-লাইন সংজ্ঞা কোন উদাহরণ ছাড়াই এবং কখন ব্যবহার করতে হবে সে সম্পর্কে কোন মতামত নেই।"
+        },
+        {
+          "idea": "প্রতিটিকে একটি বাস্তব উদাহরণ সহ দেখায় (গ্রাহক_অর্ডার ভিউ, ট্রান্সফার_মানি পদ্ধতি, অডিট ট্রিগার), আমন্ত্রণ, নিরাপত্তা সুবিধা এবং খরচ ব্যাখ্যা করে এবং ডাটাবেসে যুক্তি রাখার বিষয়ে একটি ভারসাম্যপূর্ণ দৃষ্টিভঙ্গি দেয়।"
+        }
+      ],
+      "solution": {
+        "summary": "একটি ভিউ হল একটি সংরক্ষিত SELECT যা একটি ভার্চুয়াল টেবিলের মতো আচরণ করে — যোগদানকে সহজ করতে এবং শুধুমাত্র নির্দিষ্ট কলাম বা সারিগুলিকে প্রকাশ করতে ব্যবহৃত হয়। একটি সংরক্ষিত পদ্ধতি হল ডাটাবেসে সংরক্ষিত একটি নামযুক্ত প্রোগ্রাম যা প্যারামিটার নেয় এবং আপনি যখন এটিকে কল করেন তখন নিয়ন্ত্রণ প্রবাহ সহ বেশ কয়েকটি বিবৃতি চালায় — ডেটার কাছাকাছি বহু-পদক্ষেপ ক্রিয়াকলাপের জন্য দরকারী। একটি ট্রিগার হল কোড যা ডাটাবেসটি একটি টেবিলে INSERT, UPDATE বা DELETE করার আগে বা পরে স্বয়ংক্রিয়ভাবে চলে — অডিট লগের জন্য দুর্দান্ত, কিন্তু এটি যুক্তি লুকিয়ে রাখে, তাই এটিকে অল্প ব্যবহার করুন৷",
+        "explanation": "## দেখুন\n- একটি সংরক্ষিত **কোয়েরি**, সংরক্ষিত ডেটা নয় (একটি **বস্তুগত দৃষ্টিভঙ্গি** যা ফলাফল সংরক্ষণ করে)।\n- ব্যবহারগুলি: একটি সাধারণ নামের পিছনে যোগদানগুলি লুকান, বেস টেবিল পরিবর্তনের সময় একটি স্থিতিশীল ইন্টারফেস প্রকাশ করুন এবং **নিরাপত্তা** — গ্রাহকের NID কলামটি প্রকাশ না করে `customer_orders`-এ SELECT মঞ্জুর করুন৷\n- সাধারণ একক-টেবিল দৃশ্যগুলি **আপডেটযোগ্য**; `WITH CHECK OPTION` সারিগুলি প্রত্যাখ্যান করে যা দৃশ্যটি দেখতে পায়নি৷ জটিল দৃশ্যের জন্য ট্রিগারের পরিবর্তে প্রয়োজন।\n\n### সংরক্ষিত পদ্ধতি\n- প্যারামিটার সহ নামযুক্ত কোড ( `IN` , `OUT` , `INOUT` ), ভেরিয়েবল, IF/LOOP, ত্রুটি পরিচালনা এবং লেনদেন। `CALL` (MySQL, PostgreSQL 11+) অথবা `EXEC` ( SQL সার্ভার) দিয়ে কল করা হয়েছে।\n- সুবিধা: অনেক বিবৃতির জন্য একটি নেটওয়ার্ক রাউন্ড ট্রিপ, ডেটার পাশে যুক্তি, **শুধুমাত্র** গ্রান্ট এক্সিকিউট**(ব্যবহারকারীরা সরাসরি টেবিল স্পর্শ করতে পারবেন না), প্ল্যান পুনরায় ব্যবহার করা হয়েছে।\n- কনস: বিক্রেতা-নির্দিষ্ট ভাষা (PL/ SQL , T- SQL , PL/pgSQL), সংস্করণে কঠিন, ইউনিট পরীক্ষা এবং ডিবাগ, এবং অ্যাপ সার্ভারের তুলনায় ডেটাবেস CPU স্কেল করা কঠিন।\n- Oracle/ SQL সার্ভারে ব্যাংক এবং ফিনটেকগুলি ব্যাপকভাবে ব্যবহার করে; আধুনিক ওয়েব স্ট্যাকগুলি সাধারণত অ্যাপ্লিকেশনটিতে ব্যবসায়িক যুক্তি রাখে।\n- **ফাংশন বনাম পদ্ধতি**: একটি ফাংশন একটি মান প্রদান করে এবং SELECT/WHERE এর ভিতরে ব্যবহার করা যেতে পারে; একটি পদ্ধতি নিজে থেকে চালু করা হয় এবং লেনদেন পরিচালনা করতে পারে (এর ভিতরে কমিট/রোলব্যাক — PostgreSQL 11+ এ শুধুমাত্র পদ্ধতি, ফাংশন নয়, এটি করতে পারে)।\n\n### ট্রিগার\n- `OLD` এবং `NEW` সারির মানগুলিতে অ্যাক্সেস সহ **আগে** বা **পরে** INSERT/UPDATE/DELETE (বা **দর্শনের পরিবর্তে**), প্রতি সারি বা প্রতি বিবৃতিতে স্বয়ংক্রিয়ভাবে চলে।\n- ব্যবহারগুলি: **অডিট ট্রেইল**, অস্বাভাবিক মোট রক্ষণাবেক্ষণ, সারণী বিস্তৃত নিয়ম প্রয়োগ করা।\n- অসুবিধা: অ্যাপ টিমের জন্য অদৃশ্য পার্শ্বপ্রতিক্রিয়া, ধীরে ধীরে বাল্ক লেখা, ক্যাসকেডিং ট্রিগার যা ডিবাগ করা কঠিন। সীমাবদ্ধতা পছন্দ করুন (NULL, CHECK, FK) যখন তারা নিয়মটি express করতে পারে। নীচের SQL MySQL সিনট্যাক্স ব্যবহার করে ( `DELIMITER` একটি MySQL ক্লায়েন্ট কমান্ড তাই পদ্ধতির অংশে `;` থাকতে পারে)।",
+        "keyPoints": [
+          "দেখুন = সংরক্ষিত SELECT (ভার্চুয়াল টেবিল); বস্তুগত দৃশ্য = সংরক্ষিত ফলাফল",
+          "পদ্ধতি = পরামিতি, নিয়ন্ত্রণ প্রবাহ এবং লেনদেন সহ স্পষ্টভাবে বলা প্রোগ্রাম",
+          "ট্রিগার = INSERT/UPDATE/DELETE-এ পুরানো/নতুন মান সহ স্বয়ংক্রিয় কোড",
+          "সিকিউরিটি: বেস টেবিলের পরিবর্তে ভিউয়ের উপর গ্রান্ট সিলেক্ট করুন / পদ্ধতিতে এক্সিকিউট করুন",
+          "ভারসাম্যপূর্ণ মতামত: দরকারী সরঞ্জাম, কিন্তু লুকানো বা বিক্রেতা-লক যুক্তি বাস্তব খরচ আছে"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "যেভাবে একেকজন দৌড়ায়",
+          "frames": [
+            {
+              "note": "একটি **দর্শন** এর নিজস্ব কোনো ডেটা নেই। এটিকে জিজ্ঞাসা করা তার সঞ্চিত SELECT কে বেস টেবিলের উপর প্রসারিত করে; সংবেদনশীল কলাম যেমন nid শুধুমাত্র দৃশ্যের অংশ নয়।"
+            },
+            {
+              "note": "একটি **সংরক্ষিত পদ্ধতি** কে স্পষ্টভাবে বলা হয়। পুরো স্থানান্তর — চেক, দুটি আপডেট, কমিট বা রোলব্যাক — এক রাউন্ড ট্রিপে ডাটাবেসের ভিতরে চলে।"
+            },
+            {
+              "note": "একটি **ট্রিগার** অ্যাপ দ্বারা কখনই কল করা হয় না। অ্যাকাউন্টের আপডেট এটিকে স্বয়ংক্রিয়ভাবে ফায়ার করে, এবং এটি একই লেনদেনের ভিতরে অডিট সারি লেখে।"
+            }
+          ]
+        },
+        {
+          "title": "দেখুন বনাম সঞ্চিত পদ্ধতি বনাম ট্রিগার"
+        }
+      ],
+      "pitfalls": [
+        "একটি দৃশ্য চিন্তা করা তথ্যের একটি অনুলিপি সঞ্চয় করে — শুধুমাত্র একটি বস্তুগত দৃশ্য তা করে",
+        "ট্রিগারের শৃঙ্খলে মূল ব্যবসায়িক যুক্তি লুকিয়ে রাখা যা অ্যাপ্লিকেশন দল দেখতে পায় না",
+        "একটি নিয়মের জন্য একটি ট্রিগার লিখলে একটি সীমাবদ্ধতা express হতে পারে (নাল নয়, চেক করুন, বিদেশী কী)",
+        "স্ট্রিং কনক্যাটেনেশনের মাধ্যমে একটি পদ্ধতির ভিতরে ডায়নামিক SQL তৈরি করা — এটি অ্যাপ কোডের মতোই ইনজেকশনযোগ্য"
+      ],
+      "followUps": [
+        {
+          "question": "ফাংশন বনাম সঞ্চিত পদ্ধতি?",
+          "answer": "একটি ফাংশন একটি মান প্রদান করে এবং SELECT বা WHERE-এর ভিতরে ব্যবহার করা যেতে পারে এবং এর কোনো পার্শ্বপ্রতিক্রিয়া থাকা উচিত নয়। CALL/EXEC-এর মাধ্যমে একটি পদ্ধতি নিজে থেকেই চালু করা হয়, আউট প্যারামিটার বা ফলাফল সেট ফেরত দিতে পারে এবং PostgreSQL 11+ লেনদেন নিয়ন্ত্রণ করতে পারে।"
+        },
+        {
+          "question": "আপনি একটি ভিউ মধ্যে সন্নিবেশ করতে পারেন?",
+          "answer": "হ্যাঁ, যদি এটি একটি সাধারণ আপডেটযোগ্য দৃশ্য হয় (একটি বেস টেবিল, কোনো সমষ্টি নয়, আলাদা বা GROUP BY)। চেক অপশন সহ সারিগুলিকে প্রত্যাখ্যান করে যে দৃশ্যটি দেখাবে না। জটিল দৃশ্যের জন্য ট্রিগারের পরিবর্তে প্রয়োজন।"
+        },
+        {
+          "question": "আপনি কি সঞ্চিত পদ্ধতিতে ব্যবসায়িক যুক্তি রাখবেন?",
+          "answer": "এটি দল এবং প্ল্যাটফর্মের উপর নির্ভর করে: ডেটা-ভারী ব্যাচের কাজ বা কঠোর DB-স্তরের নিরাপত্তার জন্য (ব্যাঙ্কগুলিতে সাধারণ) পদ্ধতিগুলি উজ্জ্বল হয়; বেশিরভাগ ওয়েব অ্যাপের জন্য যুক্তি পরীক্ষা করা, পর্যালোচনা করা এবং অ্যাপ্লিকেশনটিতে স্কেল করা সহজ, ডাটাবেস প্রয়োগকারী সীমাবদ্ধতার সাথে।"
+        }
+      ]
+    },
+    "delete-vs-truncate-vs-drop": {
+      "title": "DELETE vs TRUNCATE vs DROP",
+      "prompt": "**মুছুন**, **ছাঁটা** এবং **ড্রপ** এর মধ্যে পার্থক্য কী? কোনটি একটি WHERE ক্লজ গ্রহণ করে, ফায়ার ট্রিগার করে, স্বয়ংক্রিয়-বৃদ্ধি কাউন্টারটি পুনরায় সেট করে এবং ফিরিয়ে আনা যায়?",
+      "hints": [
+        "পরে যা থাকে তা জিজ্ঞাসা করুন: কিছু সারি, একটি খালি টেবিল, বা কিছুই নেই।",
+        "একটি হল DML (সারি দ্বারা সারি, লগ করা); অন্য দুটিকে ডিডিএল হিসাবে বিবেচনা করা হয়।",
+        "রোলব্যাক এবং আইডেন্টিটি-রিসেট আচরণ MySQL/Oracle এবং PostgreSQL/ SQL সার্ভারের মধ্যে আলাদা — এটি উল্লেখ করুন।"
+      ],
+      "examples": [],
+      "approaches": [
+        {
+          "idea": "\"DELETE সারি সরিয়ে দেয়, TRUNCATE সমস্ত সারি সরিয়ে দেয়, DROP টেবিলটি সরিয়ে দেয়।\" সঠিক কিন্তু লগিং, ট্রিগার, রোলব্যাক বা পরিচয় সম্পর্কে কিছুই নয়।"
+        },
+        {
+          "idea": "ডিএমএল বনাম ডিডিএল, সারি-বাই-সারি লগিং বনাম পৃষ্ঠা ডিলোকেশন, কোথায় সমর্থন, ট্রিগার, বিক্রেতা প্রতি রোলব্যাক, পরিচয় রিসেট, বিদেশী-কী সীমাবদ্ধতা এবং কর্মক্ষমতা — একটি উত্পাদন উদাহরণ সহ বৈপরীত্য।"
+        }
+      ],
+      "solution": {
+        "summary": "DELETE হল DML: এটি একবারে একটি WHERE ক্লজের সাথে মিলে যাওয়া সারিগুলিকে সরিয়ে দেয়, প্রতিটি সারি লগ করে, DELETE ট্রিগারগুলিকে ফায়ার করে এবং ফিরিয়ে আনা যায়৷ ট্রাঙ্কেট ডেটা পৃষ্ঠাগুলি ডিললোকেটিং করে একবারে প্রতিটি সারি সরিয়ে দেয় — অনেক দ্রুত, কোথায় নেই, কোনও সারি ট্রিগার নেই, এবং এটি MySQL এবং SQL সার্ভারে স্বয়ংক্রিয়-বৃদ্ধি কাউন্টারকে পুনরায় সেট করে (শুধুমাত্র RESTার্ট আইডেন্টিটি সহ PostgreSQL); বেশিরভাগ ডাটাবেস এটিকে ডিডিএল হিসাবে বিবেচনা করে। DROP পুরো টেবিলটি সরিয়ে দেয়: ডেটা, গঠন, সূচী, সীমাবদ্ধতা, ট্রিগার এবং অনুমতি।",
+        "explanation": "## মুছুন (DML)\n- `DELETE FROM employees WHERE dept = 'Sales'` — যেখানে ঐচ্ছিক।\n- সারি সারি: প্রতিটি সারি লগ করা হয় (আনডু/পুনরায় করুন), সারি লক নেওয়া হয়, **মুছে দিন ফায়ার**, বিদেশী কী চেক করা হয় ( `ON DELETE CASCADE` রান)।\n- **একটি লেনদেনের ভিতরে রোল ব্যাক করা যেতে পারে** ।\n- AUTO_INCREMENT/IDENTITY রিসেট করে না**, এবং অবিলম্বে ডিস্ক স্পেস ফেরত দেয় না (PostgreSQL এর ভ্যাকুয়াম প্রয়োজন)।\n- লক্ষ লক্ষ সারি মুছে ফেলা ধীর এবং লগগুলি ফুলিয়ে দেয়৷\n\n### ট্রাঙ্কেট (বেশিরভাগ ডাটাবেসে DDL)\n- `TRUNCATE TABLE employees` — **সমস্ত সারি**, কোথায় নেই।\n- ন্যূনতম লগিং সহ ডেটা পৃষ্ঠাগুলি বরাদ্দ করে — এমনকি বিশাল টেবিলের জন্যও তাত্ক্ষণিক।\n- সারি-স্তরের ডিলিট ট্রিগারগুলি **নয়** ফায়ার করে (PostgreSQL-এর আলাদা ON TRUNCATE ট্রিগার রয়েছে)৷\n- **পরিচয়**: MySQL এবং SQL সার্ভারে পুনরায় সেট করা হয়; PostgreSQL শুধুমাত্র `RESTART IDENTITY` এর সাথে (ডিফল্ট হল CONTINUE IDENTITY)।\n- **রোলব্যাক**: PostgreSQL এবং SQL সার্ভার একটি লেনদেনের মধ্যে এটিকে রোলব্যাক করতে পারে; **MySQL এবং Oracle নিহিতভাবে প্রতিশ্রুতিবদ্ধ হয়**, তাই এটি পূর্বাবস্থায় ফেরানো যাবে না।\n- বিদেশী কী দ্বারা উল্লেখিত একটি টেবিলে ব্যর্থ হয় (PostgreSQL অনুমতি দেয় `TRUNCATE … CASCADE`)।\n- DELETE এর চেয়ে শক্তিশালী বিশেষাধিকার প্রয়োজন (MySQL এ ড্রপ প্রিভিলেজ, SQL সার্ভারে ALTER, PostgreSQL এ ট্রাঙ্কেট)।\n\n### ড্রপ (DDL)\n- `DROP TABLE employees` সংজ্ঞা **এবং** সংযুক্ত সবকিছু সরিয়ে দেয়: ডেটা, সূচী, সীমাবদ্ধতা, ট্রিগার, অনুদান।\n- রোলব্যাক: PostgreSQL এবং SQL সার্ভারে একটি লেনদেনের ভিতরে সম্ভব (লেনদেনমূলক DDL); মাইএসকিউএল এবং ওরাকল নিহিতভাবে প্রতিশ্রুতিবদ্ধ (ওরাকল তার রিসাইকেল বিন থেকে `FLASHBACK TABLE … TO BEFORE DROP` করতে পারে)।\n\n### ইন্টারভিউ ওয়ান-লাইনার \"মুছে ফেলুন = কিছু সারি, লগ করা, পূর্বাবস্থায় নেওয়া যায় না। TRUNCATE = সমস্ত সারি, দ্রুত, টেবিলটি রাখে। ড্রপ = টেবিল চলে গেছে।\"",
+        "keyPoints": [
+          "মুছে ফেলুন: ডিএমএল, কোথায় অনুমোদিত, সারি সারি লগিং, আগুনের সূত্রপাত, রোলব্যাক সম্ভব",
+          "ট্রাঙ্কেট: সমস্ত সারি, পৃষ্ঠা ডিলোকেশন, খুব দ্রুত, পরিচয় পুনরায় সেট করে, টেবিল রাখে",
+          "ড্রপ: টেবিলের সংজ্ঞা এবং সূচী, সীমাবদ্ধতা, ট্রিগার, অনুদান সরিয়ে দেয়",
+          "TRUNCATE/DROP এর রোলব্যাক বিক্রেতার উপর নির্ভর করে (PostgreSQL/ SQL সার্ভার হ্যাঁ, MySQL/Oracle না)",
+          "বিদেশী-কী রেফারেন্স দ্বারা TRUNCATE ব্লক করা হয়েছে"
+        ]
+      },
+      "visuals": [
+        {
+          "title": "মুছুন → ছেঁটে ফেলুন → একই টেবিলে ড্রপ করুন৷",
+          "caption": "DELETE এবং DROP প্রভাবগুলি চালানোর মাধ্যমে যাচাই করা হয়েছিল; TRUNCATE MySQL/ SQL সার্ভার পরিচয় আচরণের সাথে দেখানো হয়েছে।",
+          "steps": [
+            {
+              "note": "শুরু: কর্মচারীদের 5 টি সারি আছে; এর অটো-ইনক্রিমেন্ট কাউন্টার পরবর্তী আইডি 6 হস্তান্তর করবে।"
+            },
+            {
+              "note": "**DELETE** হল DML: এটি WHERE ক্লজের সাথে মিলে যাওয়া সারিগুলি খুঁজে পায় এবং সেগুলিকে **এক এক করে** সরিয়ে দেয়, প্রতিটি সারি লগিং করে এবং যেকোনো ডিলিট ট্রিগার ফায়ার করে। একটি লেনদেনের মধ্যে একটি ROLLBACK তাদের ফিরিয়ে আনে৷"
+            },
+            {
+              "note": "মুছে ফেলার পরে: 3টি সারি অবশিষ্ট রয়েছে। কাউন্টারটি **নই** রিসেট — পরবর্তী সন্নিবেশটি এখনও আইডি 6 পায়৷"
+            },
+            {
+              "note": "**ছাঁটা** টেবিলের ডেটা পৃষ্ঠাগুলিকে ডিললোকেটিং করে **সব** সারি একবারে সরিয়ে দেয় — কোথায় নেই, প্রতি-সারি লগিং নেই, কোনো মুছে ফেলা ট্রিগার নেই৷ খালি টেবিলটি এখনও বিদ্যমান, এবং MySQL/ SQL সার্ভারে স্বয়ংক্রিয়-বৃদ্ধি কাউন্টার রিসেট হয়।"
+            },
+            {
+              "note": "**ড্রপ** ক্যাটালগ থেকে টেবিলটি নিজেই সরিয়ে দেয়: গঠন, ডেটা, সূচী, সীমাবদ্ধতা, ট্রিগার এবং অনুমতি। কর্মচারীদের প্রশ্ন এখন \"টেবিল বিদ্যমান নেই\" এর সাথে ব্যর্থ হয়।"
+            }
+          ]
+        },
+        {
+          "title": "DELETE বনাম TRUNCATE বনাম ড্রপ৷"
+        }
+      ],
+      "pitfalls": [
+        "TRUNCATE বললে কখনই ফিরিয়ে আনা যায় না — PostgreSQL এবং SQL সার্ভারে, এটি একটি লেনদেনের ভিতরে হতে পারে",
+        "DELETE (কোথায় নেই) দিয়ে একটি বিশাল টেবিল খালি করা — ধীর এবং লগ-ভারী; আপনি যখন সত্যিই সবকিছু চলে যেতে চান তখন TRUNCATE ব্যবহার করুন",
+        "বিদেশী কী দ্বারা উল্লেখিত একটি প্যারেন্ট টেবিলে TRUNCATE কাজ করবে বলে আশা করা হচ্ছে",
+        "DROP ভুলে যাওয়া সূচী, ট্রিগার এবং অনুদানও সরিয়ে দেয় — টেবিল পুনরায় তৈরি করা তাদের ফিরিয়ে আনে না"
+      ],
+      "followUps": [
+        {
+          "question": "আপনি কিভাবে উৎপাদনে 50 মিলিয়ন পুরানো সারি মুছে ফেলবেন?",
+          "answer": "ছোট ব্যাচে (প্রাথমিক-কী রেঞ্জ অনুসারে, অথবা মুছে ফেলুন … MySQL-এ সীমাবদ্ধ করুন) যাতে লেনদেন, লক এবং প্রতিলিপির ব্যবধান ছোট থাকে — অথবা তারিখ অনুসারে টেবিলটি বিভাজন করুন এবং তাত্ক্ষণিকভাবে পুরানো পার্টিশনগুলি ড্রপ/ডিট্যাচ করুন।"
+        },
+        {
+          "question": "ডিলিট ডিস্ক স্পেস খালি করে না কেন?",
+          "answer": "মুছে ফেলা সারিগুলি পৃষ্ঠাগুলির ভিতরে ফাঁকা জায়গা ছেড়ে দেয় যা পরে পুনঃব্যবহার করা হয়। PostgreSQL-এর মৃত সারিগুলিকে পুনঃব্যবহারযোগ্য চিহ্নিত করার জন্য VACUUM প্রয়োজন এবং ফাইলগুলি সঙ্কুচিত করার জন্য VACUUM FULL (PostgreSQL) বা অপ্টিমাইজ টেবিল (MySQL) প্রয়োজন৷"
+        }
+      ]
+    }
+  },
+  "quiz": {
+    "dbms-q5": {
+      "question": "T1 লোন থেকে সিলেক্ট কাউন্ট(*) চালায় যেখানে একটি লেনদেনে দুইবার পরিমাণ > 50000 এবং পায় 2, তারপর 3, কারণ T2 এর মধ্যে একটি ম্যাচিং লোন ঢোকানো এবং প্রতিশ্রুতিবদ্ধ। এই অসঙ্গতি কি?",
+      "options": [
+        "নোংরা পড়া",
+        "আপডেট হারিয়েছে",
+        "ফ্যান্টম পড়া",
+        "অ-পুনরাবৃত্ত পড়া"
+      ],
+      "explanation": "ফলাফল সেটে একটি নতুন সারি উপস্থিত হয়েছিল\n\n- একটি ফ্যান্টম। একটি নন-রিপিটেবল রিড হল যখন একটি বিদ্যমান সারির মান দুটি পড়ার মধ্যে পরিবর্তিত হয়।"
+    },
+    "dbms-q1": {
+      "question": "গ্রাহকের কাছে একটি স্থানান্তর নিশ্চিত করা হয়েছিল, তারপর ডেটা পৃষ্ঠাগুলি লেখার আগে সার্ভারটি শক্তি হারিয়েছিল। কোন এসিআইডি সম্পত্তি পুনরায় চালু করার পরেও স্থানান্তরের গ্যারান্টি দেয়?",
+      "options": [
+        "পারমাণবিকতা",
+        "ধারাবাহিকতা",
+        "বিচ্ছিন্নতা",
+        "স্থায়িত্ব"
+      ],
+      "explanation": "স্থায়িত্ব: COMMIT রেকর্ডটি \"ঠিক আছে\" ফেরত দেওয়ার আগে রাইটিং-এহেড লগে ফ্লাশ করা হয়েছিল, তাই পুনরুদ্ধার এটি পুনরায় প্লে করে৷ পারমাণবিকতা হল *অসম্পূর্ণ* লেনদেনগুলিকে পূর্বাবস্থায় ফিরিয়ে আনার বিষয়ে, প্রতিশ্রুতিবদ্ধকে রাখা নয়।"
+    },
+    "dbms-q2": {
+      "question": "একটি টেবিলে প্রার্থী কী আছে {emp_id} এবং {nid}। emp_id প্রাথমিক কী হিসেবে বেছে নেওয়া হয়েছে। {nid} কাকে বলে?",
+      "options": [
+        "বিদেশী কী",
+        "বিকল্প কী",
+        "কম্পোজিট কী",
+        "আংশিক কী"
+      ],
+      "explanation": "প্রার্থী কীগুলি প্রাথমিক কী হিসাবে বেছে নেওয়া হয়নি তা হল বিকল্প কী (তাদের NOT NULL + UNIQUE ঘোষণা করুন)। এটি যৌগিক নয়\n\n- এটির একটি কলাম রয়েছে৷"
+    },
+    "dbms-q3": {
+      "question": "order_lines(order_id, product_id, product_name, qty) এর প্রাথমিক কী আছে (order_id, product_id)। কোন স্বাভাবিক ফর্ম এটি প্রথমে লঙ্ঘন করে?",
+      "options": [
+        "1NF",
+        "2NF",
+        "3NF",
+        "বিসিএনএফ"
+      ],
+      "explanation": "পণ্য_নাম শুধুমাত্র পণ্য_আইডির উপর নির্ভর করে — যৌগিক কী-এর অংশ। সেই আংশিক নির্ভরতা 2NF লঙ্ঘন করে (টেবিলটি ইতিমধ্যে 1NF-তে রয়েছে: সমস্ত মান পারমাণবিক)।"
+    },
+    "dbms-q4": {
+      "question": "কোন বিচ্ছিন্নতা স্তরে একটি লেনদেন অন্য লেনদেনের অনিয়মিত পরিবর্তনগুলি পড়তে পারে (একটি নোংরা পড়া)?",
+      "options": [
+        "নিঃসন্দেহে পড়ুন",
+        "প্রতিশ্রুতিবদ্ধ পড়ুন",
+        "পুনরাবৃত্তিযোগ্য পড়া",
+        "সিরিয়ালাইজেবল"
+      ],
+      "explanation": "শুধুমাত্র READ UNCOMMITTED নোংরা পড়ার অনুমতি দেয়। READ COMMITTED-এর প্রতিটি স্তর শুধুমাত্র প্রতিশ্রুতিবদ্ধ ডেটাই পড়ে (PostgreSQL এমনকি READ UNCOMMITTED থেকে READ কমিটেড পর্যন্ত আপগ্রেড করে)।"
+    },
+    "dbms-q11": {
+      "question": "একটি টেবিল 3NF এ রয়েছে। কোন পরিস্থিতি এখনও এটি BCNF লঙ্ঘন করতে পারে?",
+      "options": [
+        "একটি নন-কী কলাম অন্য নন-কী কলামের উপর নির্ভর করে",
+        "একটি সেল একটি কমা দ্বারা পৃথক তালিকা ধারণ করে৷",
+        "একটি নন-কী কলাম কীটির অংশের উপর নির্ভর করে",
+        "একজন নন-কী নির্ধারক প্রার্থীর কী-এর অংশ নির্ধারণ করে (প্রার্থী কী ওভারল্যাপ করা)"
+      ],
+      "explanation": "3NF X → A কে অনুমতি দেয় যখন A একটি প্রার্থী কী-এর অংশ হয়; BCNF করে না (প্রত্যেক নির্ধারক একটি কী হতে হবে)। অন্যান্য বিকল্পগুলি হল যথাক্রমে 3NF, 1NF এবং 2NF লঙ্ঘন।"
+    },
+    "dbms-q9": {
+      "question": "আশাবাদী লকিংয়ের সাথে, অ্যাকাউন্ট আপডেট করুন সেট ব্যালেন্স = 900, সংস্করণ = 8 যেখানে আইডি = 1 এবং সংস্করণ = 7 রিপোর্ট 0 সারি প্রভাবিত হয়েছে৷ আবেদন কি করা উচিত?",
+      "options": [
+        "সারি লকের জন্য অপেক্ষা করুন এবং একই বিবৃতি আবার চালান",
+        "সারিটি পুনরায় পড়ুন (নতুন ব্যালেন্স এবং সংস্করণ) এবং পুনরায় চেষ্টা করুন বা একটি দ্বন্দ্ব রিপোর্ট করুন",
+        "কিছুই না — আপডেট সফল হয়েছে",
+        "ডাটাবেস সার্ভার পুনরায় চালু করুন"
+      ],
+      "explanation": "0 সারি মানে সংস্করণটি আর 7 নয়: অন্য একটি লেনদেন সারিটিকে প্রথমে আপডেট করেছে৷ একই বিবৃতি পুনরায় চালানো আবার ব্যর্থ হবে; আপনাকে অবশ্যই পুনরায় পড়তে হবে এবং পুনরায় গণনা করতে হবে।"
+    },
+    "dbms-q7": {
+      "question": "একটি টেবিলে কয়টি ক্লাস্টার ইনডেক্স থাকতে পারে?",
+      "options": [
+        "ঠিক দুই",
+        "প্রতি কলামে একটি",
+        "সর্বাধিক একটি",
+        "আনলিমিটেড"
+      ],
+      "explanation": "একটি গুচ্ছ সূচক সারিগুলির প্রকৃত ক্রম সংজ্ঞায়িত করে, এবং সারিগুলি শুধুমাত্র একটি ক্রমে সংরক্ষণ করা যেতে পারে — তাই শূন্য (a heap ) বা একটি৷"
+    },
+    "dbms-q12": {
+      "question": "কোন ডাটাবেস তার ডিফল্ট বিচ্ছিন্নতা স্তর হিসাবে REPEATABLE READ ব্যবহার করে?",
+      "options": [
+        "পোস্টগ্রেএসকিউএল",
+        "MySQL (InnoDB)",
+        "ওরাকল",
+        "SQL সার্ভার"
+      ],
+      "explanation": "MySQL InnoDB ডিফল্ট রিপিটেবল রিড। PostgreSQL, Oracle এবং SQL সার্ভার ডিফল্ট পড়ার জন্য প্রতিশ্রুতিবদ্ধ।"
+    },
+    "dbms-q8": {
+      "question": "MySQL-এ TRUNCATE TABLE সম্পর্কে কোন বিবৃতিটি সত্য?",
+      "options": [
+        "এটি প্রতিটি সারির জন্য DELETE ট্রিগারগুলিকে ফায়ার করে৷",
+        "এটি একটি WHERE ধারা গ্রহণ করে",
+        "এটি টেবিলের সংজ্ঞা সরিয়ে দেয়",
+        "এটি নিহিতভাবে কমিট করে এবং AUTO_INCREMENT রিসেট করে"
+      ],
+      "explanation": "MySQL-এ TRUNCATE হল DDL: এটি একটি অন্তর্নিহিত প্রতিশ্রুতি ঘটায় (রোলব্যাক করা যাবে না) এবং AUTO_INCREMENT রিসেট করে। এটির কোন কোথায় নেই, কোন ডিলিট ট্রিগার ফায়ার করে না এবং টেবিলটি রাখে।"
+    },
+    "dbms-q10": {
+      "question": "কোনটি অস্বাভাবিককরণের সেরা কারণ?",
+      "options": [
+        "আপডেট অসঙ্গতি অপসারণ করতে",
+        "ডিস্কের জায়গা বাঁচাতে",
+        "যোগদান বা সমষ্টি এড়িয়ে একটি পরিমাপ, ঘন ঘন পঠিত গতি বাড়ানোর জন্য",
+        "বিদেশী কী প্রয়োগ করতে"
+      ],
+      "explanation": "ডিনরমালাইজেশন বাড়তি স্টোরেজ ট্রেড করে এবং সস্তা পড়ার জন্য লেখার কাজ করে। এটি পুনরায় প্রবর্তন করে (পরিচালিত) অপ্রয়োজনীয়তা, তাই এটি কখনই অসঙ্গতি দূর করে না বা স্থান বাঁচায় না।"
+    },
+    "dbms-q6": {
+      "question": "অর্ডারে একটি সূচক বিদ্যমান (customer_id, created_at)। কোনটি যেখানে ধারাটি একটি সাধারণ সূচকের জন্য ব্যবহার করতে পারে না?",
+      "options": [
+        "customer_id = 7",
+        "customer_id = 7 এবং created_at > '2024-01-01'",
+        "create_at > '2024-01-01'",
+        "customer_id IN (7, 9)"
+      ],
+      "explanation": "সূচকটি প্রথমে customer_id দ্বারা সাজানো হয়; শুধুমাত্র দ্বিতীয় কলামে ফিল্টার করা বামতম উপসর্গটিকে এড়িয়ে যায়, তাই অনুসন্ধান করার জন্য কোন মূল পরিসর নেই। ইঞ্জিনটি পুরো সূচকটি স্ক্যান করে (অথবা, Oracle, MySQL 8.0.13+ এবং PostgreSQL 18+, প্রতি স্বতন্ত্র কাস্টমার_আইডি প্রতি একটি সন্ধান দিয়ে এটি এড়িয়ে যেতে পারে)। IN (7, 9) হল দুটি সমতা চাওয়া।"
+    }
+  }
+}

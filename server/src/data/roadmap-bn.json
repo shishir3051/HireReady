@@ -1,0 +1,622 @@
+{
+  "title": "30-দিনের ইন্টারভিউ রোডম্যাপ",
+  "description": "নতুন স্নাতকদের জন্য প্রতিদিনের একটি পরিকল্পনা: দিনে প্রায় 3 ফোকাসড ঘন্টা DSA প্যাটার্ন, CS ফান্ডামেন্টাল, ওয়েব stack এবং আচরণগত উত্তর যা জুনিয়র সফ্টওয়্যার ইঞ্জিনিয়ার ইন্টারভিউতে সবচেয়ে বেশি আসে। প্রথমে প্রতিটি প্রশ্ন নিজেই সমাধান করুন, তারপর এর ভিজ্যুয়াল ওয়াকথ্রু অধ্যয়ন করুন।",
+  "days": [
+    {
+      "day": 1,
+      "week": 1,
+      "title": "Big-O এবং কিভাবে একটি সমস্যা আক্রমণ করতে হয়",
+      "topics": [
+        "big-o",
+        "behavioral"
+      ],
+      "goals": [
+        "কোন লুপ বা recursion এর জটিলতা পড়ুন এবং অনুমান করুন",
+        "একটি লক্ষ্য জটিলতা বাছাই করতে ইনপুট সীমা ব্যবহার করুন",
+        "স্পষ্টীকরণ → brute force → অপ্টিমাইজ → পরীক্ষা ইন্টারভিউ লুপ শিখুন"
+      ],
+      "questionSlugs": [
+        "what-is-big-o-notation",
+        "complexity-classes-ranking",
+        "analyze-nested-loops",
+        "how-to-approach-a-coding-interview"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 2,
+      "week": 1,
+      "title": "অ্যারে এবং হ্যাশিং I",
+      "topics": [
+        "arrays-hashing"
+      ],
+      "goals": [
+        "বুঝুন কিভাবে একটি hash map O(1) লুকআপ দেয়",
+        "সমাধান \"আগে দেখেছি?\" একটি সেট বা মানচিত্র নিয়ে সমস্যা"
+      ],
+      "questionSlugs": [
+        "two-sum",
+        "contains-duplicate",
+        "valid-anagram",
+        "how-hash-map-works"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 3,
+      "week": 1,
+      "title": "অ্যারে এবং হ্যাশিং II",
+      "topics": [
+        "arrays-hashing"
+      ],
+      "goals": [
+        "গ্রুপ এবং মানচিত্র সঙ্গে গণনা",
+        "সাব্যারে সমস্যার জন্য উপসর্গ যোগফল এবং Kadane ব্যবহার করুন"
+      ],
+      "questionSlugs": [
+        "group-anagrams",
+        "top-k-frequent-elements",
+        "product-of-array-except-self",
+        "longest-consecutive-sequence",
+        "subarray-sum-equals-k",
+        "maximum-subarray"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 4,
+      "week": 1,
+      "title": "Two pointers",
+      "topics": [
+        "two-pointers"
+      ],
+      "goals": [
+        "সাজানো-ইনপুট এবং in-place সমস্যা চিনুন",
+        "pointer সরান যা এখনও উত্তর উন্নত করতে পারে"
+      ],
+      "questionSlugs": [
+        "valid-palindrome",
+        "two-sum-ii-sorted-array",
+        "three-sum",
+        "container-with-most-water",
+        "move-zeroes",
+        "sort-colors"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 5,
+      "week": 1,
+      "title": "Sliding window",
+      "topics": [
+        "sliding-window"
+      ],
+      "goals": [
+        "স্থির বনাম পরিবর্তনশীল উইন্ডোজ",
+        "ঠিক কখন বাড়তে হবে এবং কখন সঙ্কুচিত হবে তা জানুন"
+      ],
+      "questionSlugs": [
+        "max-sum-subarray-size-k",
+        "best-time-to-buy-sell-stock",
+        "longest-substring-without-repeating-characters",
+        "longest-repeating-character-replacement",
+        "minimum-window-substring"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 6,
+      "week": 1,
+      "title": "Stack এবং queue",
+      "topics": [
+        "stack-queue"
+      ],
+      "goals": [
+        "বন্ধনী মিলান এবং একটি stack দিয়ে অভিব্যক্তি মূল্যায়ন করুন",
+        "\"পরবর্তী বৃহত্তর\" সমস্যার জন্য একটি monotonic stack ব্যবহার করুন"
+      ],
+      "questionSlugs": [
+        "valid-parentheses",
+        "min-stack",
+        "evaluate-reverse-polish-notation",
+        "daily-temperatures",
+        "stack-vs-queue",
+        "implement-queue-using-stacks"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 7,
+      "week": 1,
+      "title": "OOP মৌলিক + সপ্তাহ 1 পর্যালোচনা",
+      "topics": [
+        "oop"
+      ],
+      "goals": [
+        "আপনার নিজের উদাহরণ দিয়ে চারটি স্তম্ভ ব্যাখ্যা করুন",
+        "আপনি 3 এর নিচে রেটিং করেছেন এমন যেকোনো সপ্তাহ-1 প্রশ্ন পুনরায় সমাধান করুন"
+      ],
+      "questionSlugs": [
+        "four-pillars-of-oop",
+        "class-vs-object",
+        "encapsulation",
+        "abstraction-vs-encapsulation"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 8,
+      "week": 2,
+      "title": "Binary search",
+      "topics": [
+        "binary-search"
+      ],
+      "goals": [
+        "একটি বাগ-মুক্ত নিম্ন-বাউন্ড টেমপ্লেট লিখুন",
+        "উত্তরের জায়গায় Binary search"
+      ],
+      "questionSlugs": [
+        "binary-search",
+        "search-insert-position",
+        "first-and-last-position-sorted-array",
+        "search-in-rotated-sorted-array",
+        "koko-eating-bananas"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 9,
+      "week": 2,
+      "title": "Linked list আমি",
+      "topics": [
+        "linked-list"
+      ],
+      "goals": [
+        "pointer ডায়াগ্রামের সাথে তালিকাগুলিকে বিপরীত করুন এবং একত্রিত করুন",
+        "চক্র এবং মধ্যম জন্য দ্রুত/ধীর পয়েন্টার"
+      ],
+      "questionSlugs": [
+        "reverse-linked-list",
+        "merge-two-sorted-lists",
+        "linked-list-cycle",
+        "middle-of-linked-list",
+        "array-vs-linked-list"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 10,
+      "week": 2,
+      "title": "Linked list II + LRU ক্যাশে",
+      "topics": [
+        "linked-list"
+      ],
+      "goals": [
+        "প্রান্ত কেস সহজ করতে একটি ডামি মাথা ব্যবহার করুন",
+        "একটি O(1) LRU ক্যাশে ডিজাইন করুন"
+      ],
+      "questionSlugs": [
+        "remove-nth-node-from-end",
+        "reorder-list",
+        "add-two-numbers",
+        "lru-cache"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 11,
+      "week": 2,
+      "title": "অ্যালগরিদম বাছাই",
+      "topics": [
+        "sorting"
+      ],
+      "goals": [
+        "মেমরি থেকে মার্জ বাছাই এবং দ্রুত সাজানোর প্রয়োগ করুন",
+        "স্থিতিশীলতা এবং কোন ভাষা ব্যবহার করে তা ব্যাখ্যা করুন"
+      ],
+      "questionSlugs": [
+        "insertion-sort",
+        "merge-sort",
+        "quick-sort",
+        "counting-sort",
+        "sorting-algorithms-comparison",
+        "stable-vs-unstable-sorting"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 12,
+      "week": 2,
+      "title": "Recursion এবং backtracking আমি",
+      "topics": [
+        "recursion-backtracking"
+      ],
+      "goals": [
+        "কোডিং করার আগে recursion গাছটি আঁকুন",
+        "বেছে নিন → এক্সপ্লোর → আন-চয়েজ করুন"
+      ],
+      "questionSlugs": [
+        "recursion-basics-call-stack",
+        "subsets",
+        "permutations",
+        "combination-sum"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 13,
+      "week": 2,
+      "title": "Backtracking II + বিট কৌশল",
+      "topics": [
+        "recursion-backtracking",
+        "math-bits"
+      ],
+      "goals": [
+        "অকার্যকর শাখাগুলি তাড়াতাড়ি ছেঁটে ফেলুন",
+        "XOR এবং n & (n − 1) কৌশলগুলি জানুন"
+      ],
+      "questionSlugs": [
+        "generate-parentheses",
+        "n-queens",
+        "word-search",
+        "single-number-xor",
+        "bitwise-operators-basics"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 14,
+      "week": 2,
+      "title": "OOP গভীর ডুব + SOLID",
+      "topics": [
+        "oop",
+        "design-patterns"
+      ],
+      "goals": [
+        "কনট্রাস্ট ওভারলোডিং/ওভাররাইডিং এবং বিমূর্ত ক্লাস/ইন্টারফেস",
+        "প্রতিটি SOLID নীতি আগে/পরে ব্যাখ্যা করুন"
+      ],
+      "questionSlugs": [
+        "inheritance-types-and-diamond-problem",
+        "polymorphism-overloading-vs-overriding",
+        "abstract-class-vs-interface",
+        "composition-vs-inheritance",
+        "solid-principles"
+      ],
+      "estimatedHours": 2.5
+    },
+    {
+      "day": 15,
+      "week": 3,
+      "title": "বাইনারি গাছ",
+      "topics": [
+        "trees"
+      ],
+      "goals": [
+        "চারটি ট্র্যাভারসাল, পুনরাবৃত্ত এবং পুনরাবৃত্তিমূলক",
+        "প্রতিটি সাবট্রি রিটার্ন কি পরিপ্রেক্ষিতে চিন্তা করুন"
+      ],
+      "questionSlugs": [
+        "binary-tree-traversals",
+        "level-order-traversal",
+        "maximum-depth-binary-tree",
+        "invert-binary-tree",
+        "symmetric-tree"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 16,
+      "week": 3,
+      "title": "BST + চেষ্টা করুন",
+      "topics": [
+        "trees"
+      ],
+      "goals": [
+        "ছাঁটাই করতে BST অর্ডারিং সম্পত্তি ব্যবহার করুন",
+        "উপসর্গ অনুসন্ধানের জন্য একটি চেষ্টা তৈরি করুন"
+      ],
+      "questionSlugs": [
+        "validate-bst",
+        "lowest-common-ancestor-bst",
+        "kth-smallest-in-bst",
+        "delete-node-in-bst",
+        "implement-trie"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 17,
+      "week": 3,
+      "title": "গাদা / অগ্রাধিকার সারি",
+      "topics": [
+        "heap"
+      ],
+      "goals": [
+        "হাত দিয়ে sift up/sif down",
+        "Top-k এবং স্ট্রিমিং-মিডিয়ান প্যাটার্ন"
+      ],
+      "questionSlugs": [
+        "heap-basics-sift-up-sift-down",
+        "kth-largest-element-in-array",
+        "merge-k-sorted-lists",
+        "find-median-from-data-stream"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 18,
+      "week": 3,
+      "title": "গ্রাফ I — ট্রাভার্সাল",
+      "topics": [
+        "graphs"
+      ],
+      "goals": [
+        "সংলগ্ন তালিকা তৈরি করুন",
+        "সংক্ষিপ্ততম পদক্ষেপের জন্য BFS, উপাদানগুলি অন্বেষণের জন্য DFS"
+      ],
+      "questionSlugs": [
+        "graph-representations",
+        "bfs-and-dfs-traversal",
+        "number-of-islands",
+        "rotting-oranges",
+        "clone-graph"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 19,
+      "week": 3,
+      "title": "গ্রাফ II — ক্রম এবং সংক্ষিপ্ত পথ",
+      "topics": [
+        "graphs"
+      ],
+      "goals": [
+        "চক্র সনাক্ত করুন এবং টপোলজিক্যালি সাজান",
+        "একটি মিনিট- heap দিয়ে Dijkstra চালান",
+        "পাথ কম্প্রেশন সঙ্গে ইউনিয়ন- খুঁজুন"
+      ],
+      "questionSlugs": [
+        "course-schedule",
+        "course-schedule-ii-topological-sort",
+        "network-delay-time-dijkstra",
+        "number-of-connected-components-union-find"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 20,
+      "week": 3,
+      "title": "Dynamic programming আমি",
+      "topics": [
+        "dynamic-programming"
+      ],
+      "goals": [
+        "স্টেট, ট্রানজিশন, বেস কেস সংজ্ঞায়িত করুন",
+        "memoization থেকে ট্যাবুলেশনে যান"
+      ],
+      "questionSlugs": [
+        "what-is-dynamic-programming",
+        "climbing-stairs",
+        "house-robber",
+        "coin-change",
+        "unique-paths"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 21,
+      "week": 3,
+      "title": "Dynamic programming II + ব্যবধান",
+      "topics": [
+        "dynamic-programming",
+        "greedy-intervals"
+      ],
+      "goals": [
+        "আত্মবিশ্বাসের সাথে 2D ডিপি টেবিল পূরণ করুন",
+        "ব্যবধান বাছাই এবং সুইপ"
+      ],
+      "questionSlugs": [
+        "longest-common-subsequence",
+        "longest-increasing-subsequence",
+        "knapsack-0-1",
+        "merge-intervals",
+        "meeting-rooms-ii"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 22,
+      "week": 4,
+      "title": "ডাটাবেস",
+      "topics": [
+        "dbms"
+      ],
+      "goals": [
+        "একটি ব্যাঙ্ক-ট্রান্সফার উদাহরণ সহ ACID",
+        "একটি টেবিলকে 3NF এ স্বাভাবিক করুন",
+        "সূচক এবং বিচ্ছিন্নতা স্তর ব্যাখ্যা করুন"
+      ],
+      "questionSlugs": [
+        "acid-properties",
+        "database-keys",
+        "normalization-1nf-2nf-3nf-bcnf",
+        "database-indexing-b-tree",
+        "transaction-isolation-levels",
+        "sql-vs-nosql"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 23,
+      "week": 4,
+      "title": "SQL",
+      "topics": [
+        "sql"
+      ],
+      "goals": [
+        "মেমরি থেকে প্রতিটি যোগ টাইপ লিখুন",
+        "র‌্যাঙ্কিং সমস্যার জন্য উইন্ডো ফাংশন ব্যবহার করুন"
+      ],
+      "questionSlugs": [
+        "sql-joins-explained",
+        "second-highest-salary",
+        "department-top-three-salaries",
+        "where-vs-having",
+        "sql-query-execution-order",
+        "duplicate-emails"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 24,
+      "week": 4,
+      "title": "অপারেটিং সিস্টেম",
+      "topics": [
+        "operating-systems"
+      ],
+      "goals": [
+        "প্রক্রিয়া বনাম থ্রেড, সময়সূচী, অচলাবস্থা",
+        "পেজিং এবং হাত দ্বারা পৃষ্ঠা প্রতিস্থাপন"
+      ],
+      "questionSlugs": [
+        "process-vs-thread",
+        "cpu-scheduling-algorithms",
+        "deadlock-conditions-and-handling",
+        "mutex-vs-semaphore",
+        "paging-and-virtual-memory",
+        "page-replacement-algorithms"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 25,
+      "week": 4,
+      "title": "কম্পিউটার নেটওয়ার্ক",
+      "topics": [
+        "computer-networks"
+      ],
+      "goals": [
+        "ইউআরএল → পৃষ্ঠা যাত্রার মাধ্যমে হাঁটুন",
+        "TCP বনাম UDP , DNS এবং TLS"
+      ],
+      "questionSlugs": [
+        "osi-vs-tcp-ip-model",
+        "tcp-vs-udp",
+        "what-happens-when-you-type-a-url",
+        "how-dns-works",
+        "https-and-tls-handshake"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 26,
+      "week": 4,
+      "title": "JavaScript এবং React",
+      "topics": [
+        "javascript",
+        "react-nextjs"
+      ],
+      "goals": [
+        "ইভেন্ট-লুপ আউটপুট আদেশের পূর্বাভাস",
+        "পুনর্মিলন, প্রভাব এবং সার্ভার উপাদান ব্যাখ্যা করুন"
+      ],
+      "questionSlugs": [
+        "closures",
+        "event-loop",
+        "promises-and-async-await",
+        "this-keyword",
+        "virtual-dom-and-reconciliation",
+        "useeffect-dependency-array-and-cleanup",
+        "server-vs-client-components"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 27,
+      "week": 4,
+      "title": "ব্যাকএন্ড এবং ওয়েব মৌলিক",
+      "topics": [
+        "nodejs-express",
+        "web-fundamentals"
+      ],
+      "goals": [
+        "মিডলওয়্যার, অথ ফ্লোস এবং REST ডিজাইন",
+        "CORS, কুকিজ এবং স্ট্যাটাস কোড"
+      ],
+      "questionSlugs": [
+        "express-middleware-flow",
+        "jwt-authentication-flow",
+        "http-status-codes",
+        "rest-api-design-best-practices",
+        "session-vs-jwt-authentication",
+        "cors-explained"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 28,
+      "week": 4,
+      "title": "Java এবং স্প্রিং বুট",
+      "topics": [
+        "java-spring"
+      ],
+      "goals": [
+        "JVM মেমরি, সমান/হ্যাশকোড এবং হ্যাশম্যাপ ইন্টারনাল",
+        "স্প্রিং IoC, REST কন্ট্রোলার এবং @Transactional"
+      ],
+      "questionSlugs": [
+        "jdk-vs-jre-vs-jvm",
+        "equals-and-hashcode-contract",
+        "hashmap-internals",
+        "spring-ioc-and-dependency-injection",
+        "spring-boot-rest-controller",
+        "spring-transactional"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 29,
+      "week": 5,
+      "title": "সিস্টেম ডিজাইন + Git",
+      "topics": [
+        "system-design",
+        "git"
+      ],
+      "goals": [
+        "ডিজাইন ফ্রেমওয়ার্ক শেষ থেকে শেষ অনুসরণ করুন",
+        "ক্যাশিং এবং লোড ব্যালেন্সিং ট্রেড-অফ",
+        "মার্জ বনাম রিবেস, রিসেট বনাম রিভার্ট"
+      ],
+      "questionSlugs": [
+        "system-design-interview-framework",
+        "caching-strategies",
+        "load-balancing",
+        "design-a-url-shortener",
+        "merge-vs-rebase",
+        "reset-vs-revert-vs-restore"
+      ],
+      "estimatedHours": 3
+    },
+    {
+      "day": 30,
+      "week": 5,
+      "title": "আচরণগত + সম্পূর্ণ উপহাস সাক্ষাৎকার",
+      "topics": [
+        "behavioral"
+      ],
+      "goals": [
+        "আপনার প্রকল্প থেকে 4 স্টার গল্প প্রস্তুত করুন",
+        "একটি সময়মতো মক ইন্টারভিউ চালান এবং আপনার দুর্বলতম উত্তরগুলি পর্যালোচনা করুন"
+      ],
+      "questionSlugs": [
+        "tell-me-about-yourself",
+        "most-challenging-project-star",
+        "strengths-and-weaknesses",
+        "conflict-with-a-teammate",
+        "questions-to-ask-the-interviewer"
+      ],
+      "estimatedHours": 2.5
+    }
+  ]
+}

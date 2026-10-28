@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import { applyQuizOverlay, getRequestLang } from '../content/overlay';
 import { authUser } from '../middleware/auth';
 import { input } from '../middleware/validate';
 import * as quiz from '../services/quiz.service';
@@ -9,7 +10,9 @@ export const listQuizTopics: RequestHandler = async (_req, res) => {
 };
 
 export const getQuiz: RequestHandler = async (req, res) => {
-  res.json(await quiz.getQuiz(input<{ topic: string }>(req, 'params').topic, input<QuizTopicQuery>(req, 'query')));
+  const lang = getRequestLang(req);
+  const data = await quiz.getQuiz(input<{ topic: string }>(req, 'params').topic, input<QuizTopicQuery>(req, 'query'));
+  res.json(applyQuizOverlay(data, lang));
 };
 
 /** optional auth: graded for everyone, saved only when logged in */
