@@ -187,7 +187,37 @@ async function request<T>(path: string, opts: InternalOptions = {}): Promise<T> 
   const headers = new Headers(opts.headers);
   headers.set("Accept", "application/json");
   if (body !== undefined) headers.set("Content-Type", "application/json");
-  if (isServer && cookie) headers.set("Cookie", cookie);
+
+  let activeLang: string | undefined;
+  if (isServer) {
+    if (!cookie) {
+      try {
+        const { cookies } = await import("next/headers");
+        const cookieStore = await cookies();
+        const cookieString = cookieStore.toString();
+        if (cookieString) headers.set("Cookie", cookieString);
+        const l = cookieStore.get("hr-lang")?.value;
+        if (l) activeLang = l;
+      } catch {
+        // Outside request context (e.g. build time)
+      }
+    } else {
+      headers.set("Cookie", cookie);
+      if (cookie.includes("hr-lang=bn")) activeLang = "bn";
+    }
+  } else {
+    const match = typeof document !== "undefined" ? document.cookie.match(/hr-lang=([^;]+)/) : null;
+    if (match?.[1]) activeLang = match[1];
+  }
+
+  if (activeLang) {
+    headers.set("Accept-Language", activeLang);
+  }
+
+  const effectiveQuery = {
+    ...query,
+    ...(activeLang && activeLang !== "en" && !query?.lang ? { lang: activeLang } : {}),
+  };
 
   const init: FetchInit = {
     method,
@@ -208,7 +238,7 @@ async function request<T>(path: string, opts: InternalOptions = {}): Promise<T> 
 
   let res: Response;
   try {
-    res = await fetch(`${apiBase()}${path}${buildQuery(query)}`, init);
+    res = await fetch(`${apiBase()}${path}${buildQuery(effectiveQuery)}`, init);
   } catch (e) {
     if (isAbortError(e)) throw e;
     throw new ApiError(0, "NETWORK_ERROR", "Could not reach the HireReady API. Check your connection and try again.");

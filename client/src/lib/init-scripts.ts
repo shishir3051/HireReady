@@ -19,4 +19,7 @@ export const practiceInitScript = `(function(){try{if(localStorage.getItem(${JSO
   STORAGE_KEYS.practiceMode,
 )})==="true"){document.documentElement.setAttribute("data-practice","on")}}catch(e){}})();`;
 
-export const bootScript = themeInitScript + practiceInitScript;
+/** Applies the stored language (`hr-lang` cookie) to <html lang="..."> before first paint. */
+export const langInitScript = `(function(){try{var m=document.cookie.match(/(?:^|; )hr-lang=([^;]+)/);if(m&&m[1]==="bn"){document.documentElement.lang="bn"}}catch(e){}})();`;
+
+export const bootScript = themeInitScript + practiceInitScript + langInitScript;

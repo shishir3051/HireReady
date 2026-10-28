@@ -131,10 +131,15 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   text: "Text",
 };
 
-// ---------------------------------------------------------------- storage keys
+// ---------------------------------------------------------------- storage & cookie keys
+
+export const LANG_COOKIE = "hr-lang";
+export type AppLang = "en" | "bn";
+export const DEFAULT_LANG: AppLang = "en";
 
 export const STORAGE_KEYS = {
   theme: "hr-theme",
   codeLanguage: "hr-code-lang",
   practiceMode: "hr-practice-mode",
+  lang: "hr-lang",
 } as const;

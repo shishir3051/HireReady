@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Hind_Siliguri } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
-import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/constants";
+import { LANG_COOKIE, SITE_DESCRIPTION, SITE_NAME, type AppLang } from "@/lib/constants";
 import { Providers } from "@/components/providers";
 import { bootScript } from "@/lib/init-scripts";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -16,6 +17,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const hindSiliguri = Hind_Siliguri({
+  variable: "--font-hind-siliguri",
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["bengali"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -47,20 +55,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
+
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang={lang}
+      className={`${geistSans.variable} ${geistMono.variable} ${hindSiliguri.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
-        {/* Applies the saved theme (and practice mode) before first paint — no flash. */}
+        {/* Applies the saved theme (and practice mode and lang) before first paint — no flash. */}
         <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
       {/* Extensions (e.g. ColorZilla's cz-shortcut-listen) add attributes to <body> before hydration. */}
       <body className="min-h-full bg-background font-sans text-foreground" suppressHydrationWarning>
-        <Providers>
+        <Providers initialLang={lang}>
           <div className="flex min-h-dvh flex-col overflow-x-clip">
             <SiteHeader />
             <main id="main" tabIndex={-1} className="flex flex-1 scroll-mt-14 flex-col outline-none">

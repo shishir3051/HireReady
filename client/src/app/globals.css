@@ -97,6 +97,23 @@
   html.dark {
     color-scheme: dark;
   }
+  html[lang="bn"],
+  html[lang="bn"] body {
+    font-family: var(--font-hind-siliguri), "Hind Siliguri", "Noto Sans Bengali", var(--font-sans), system-ui, sans-serif;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+  html[lang="bn"] strong,
+  html[lang="bn"] b,
+  html[lang="bn"] .font-semibold {
+    font-weight: 700;
+  }
+  html[lang="bn"] h1,
+  html[lang="bn"] h2,
+  html[lang="bn"] h3,
+  html[lang="bn"] h4 {
+    line-height: 1.35;
+  }
   body {
     background: var(--background);
     color: var(--foreground);
