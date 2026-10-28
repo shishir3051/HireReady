@@ -4,6 +4,7 @@ import { useCallback, useMemo, type KeyboardEvent } from "react";
 import { motion } from "motion/react";
 import { Keyboard } from "lucide-react";
 import type { Visual } from "@/lib/types";
+import { useT } from "@/i18n";
 import { useStepPlayer } from "../lib/hooks";
 import { useNarration } from "../lib/narration";
 import { stepCount, stepMeta, typeMeta, usedColors, visualFeatures } from "../lib/steps";
@@ -69,6 +70,7 @@ export function VisualStage({
   onStepChange?: (i: number) => void;
   className?: string;
 }) {
+  const t = useT();
   const count = stepCount(visual);
   const features = useMemo(() => visualFeatures(visual), [visual]);
   const narration = useNarration();
@@ -192,7 +194,7 @@ export function VisualStage({
             transition={T_FAST}
             className="min-w-0 flex-1 text-sm leading-relaxed text-foreground"
           >
-            {meta.note ? <InlineMarkdown text={meta.note} /> : <span className="italic text-muted">No note for this step.</span>}
+            {meta.note ? <InlineMarkdown text={meta.note} /> : <span className="italic text-muted">{t.visualPlayer.noNote}</span>}
           </motion.div>
         </div>
 
@@ -201,7 +203,7 @@ export function VisualStage({
             <Controls player={player} label={visual.title || label} narration={narration} />
             <p className="hidden items-center gap-1.5 text-[11px] text-muted @2xl:flex">
               <Keyboard aria-hidden className="size-3.5" />
-              Focus the player, then use ← → to step, space to play/pause{narration.supported ? ", N to narrate" : ""}.
+              {t.visualPlayer.keyboardHint}{narration.supported ? t.visualPlayer.keyboardHintNarrate : ""}.
             </p>
           </div>
         ) : null}

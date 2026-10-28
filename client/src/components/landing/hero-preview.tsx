@@ -31,7 +31,7 @@ export function HeroPreview() {
   const seen = NUMS.slice(0, found ? i : i + 1).map((v, idx) => ({ v, idx }));
 
   return (
-    <div className="relative mx-auto w-full max-w-md" aria-hidden>
+    <div className="relative mx-auto w-full max-w-lg xl:max-w-xl 2xl:max-w-2xl" aria-hidden>
       <div
         className="absolute -inset-6 -z-10 rounded-[2rem] opacity-80 blur-2xl"
         style={{

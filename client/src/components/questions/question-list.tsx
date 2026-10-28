@@ -70,11 +70,15 @@ export function Pagination({
   totalPages,
   hrefForPage,
   className,
+  previousLabel = "Previous",
+  nextLabel = "Next",
 }: {
   page: number;
   totalPages: number;
   hrefForPage: (page: number) => string;
   className?: string;
+  previousLabel?: string;
+  nextLabel?: string;
 }) {
   if (totalPages <= 1) return null;
   const pages = pageWindow(page, totalPages);
@@ -85,13 +89,13 @@ export function Pagination({
       {page > 1 ? (
         <Link href={hrefForPage(page - 1)} className={cn(linkCls, "gap-1 text-muted hover:bg-surface-2 hover:text-foreground")} scroll>
           <ChevronLeft className="size-4" aria-hidden />
-          <span className="hidden sm:inline">Previous</span>
-          <span className="sr-only sm:hidden">Previous page</span>
+          <span className="hidden sm:inline">{previousLabel}</span>
+          <span className="sr-only sm:hidden">{previousLabel}</span>
         </Link>
       ) : (
         <span className={cn(linkCls, "gap-1 text-muted/50")} aria-hidden>
           <ChevronLeft className="size-4" />
-          <span className="hidden sm:inline">Previous</span>
+          <span className="hidden sm:inline">{previousLabel}</span>
         </span>
       )}
       <ul className="flex items-center gap-1">
@@ -119,13 +123,13 @@ export function Pagination({
       </ul>
       {page < totalPages ? (
         <Link href={hrefForPage(page + 1)} className={cn(linkCls, "gap-1 text-muted hover:bg-surface-2 hover:text-foreground")}>
-          <span className="hidden sm:inline">Next</span>
-          <span className="sr-only sm:hidden">Next page</span>
+          <span className="hidden sm:inline">{nextLabel}</span>
+          <span className="sr-only sm:hidden">{nextLabel}</span>
           <ChevronRight className="size-4" aria-hidden />
         </Link>
       ) : (
         <span className={cn(linkCls, "gap-1 text-muted/50")} aria-hidden>
-          <span className="hidden sm:inline">Next</span>
+          <span className="hidden sm:inline">{nextLabel}</span>
           <ChevronRight className="size-4" />
         </span>
       )}

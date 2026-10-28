@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { api } from "@/lib/api";
 import type { TopicSummary } from "@/lib/types";
+import { LANG_COOKIE, type AppLang } from "@/lib/constants";
 import { listParam } from "@/lib/utils";
 import { Container } from "@/components/layout/page";
 import { MockInterview } from "@/components/mock/mock-interview";
@@ -15,6 +17,8 @@ export const metadata: Metadata = {
 type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
 
 export default async function MockInterviewPage({ searchParams }: Props) {
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
   const requested = listParam((await searchParams).topics).filter((t) => /^[a-z0-9-]+$/.test(t));
 
   let topics: TopicSummary[] = [];
@@ -31,8 +35,8 @@ export default async function MockInterviewPage({ searchParams }: Props) {
   const initialTopics = options.length ? requested.filter((t) => known.has(t)) : requested;
 
   return (
-    <Container>
-      <MockInterview key={initialTopics.join(",")} topics={options} initialTopics={initialTopics} />
+    <Container size="wide">
+      <MockInterview key={initialTopics.join(",")} topics={options} initialTopics={initialTopics} lang={lang} />
     </Container>
   );
 }

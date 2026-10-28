@@ -3,7 +3,7 @@ import { LoadingLabel, Skeleton } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <Container className="pb-12">
+    <Container size="wide" className="pb-12">
       <LoadingLabel label="Loading mock interview…" />
       <div className="space-y-3 pb-5 pt-6 sm:pt-8">
         <Skeleton className="h-4 w-28" />

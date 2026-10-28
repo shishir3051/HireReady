@@ -1,6 +1,7 @@
 "use client";
 
 import { Pause, Play, RotateCcw, StepBack, StepForward, Volume2, VolumeOff } from "lucide-react";
+import { useT } from "@/i18n";
 import { SPEEDS, type StepPlayer } from "../lib/hooks";
 import { cn } from "../lib/utils";
 
@@ -25,6 +26,7 @@ export function Controls({
   narration?: NarrationToggle;
   className?: string;
 }) {
+  const t = useT();
   const { index, count, playing, speed } = player;
   const pct = count <= 1 ? 100 : (index / (count - 1)) * 100;
   const showTicks = count > 1 && count <= 40;
@@ -35,18 +37,18 @@ export function Controls({
       className={cn("flex flex-wrap items-center gap-x-3 gap-y-1.5", className)}
     >
       <div className="flex items-center gap-1.5">
-        <button type="button" className={iconBtn} onClick={player.restart} disabled={player.atStart} aria-label="Restart" title="Restart">
+        <button type="button" className={iconBtn} onClick={player.restart} disabled={player.atStart} aria-label={t.visualPlayer.restart} title={t.visualPlayer.restart}>
           <RotateCcw aria-hidden className="size-4" />
         </button>
-        <button type="button" className={iconBtn} onClick={player.prev} disabled={player.atStart} aria-label="Previous step" title="Previous (←)">
+        <button type="button" className={iconBtn} onClick={player.prev} disabled={player.atStart} aria-label={t.visualPlayer.prev} title={`${t.visualPlayer.prev} (←)`}>
           <StepBack aria-hidden className="size-4" />
         </button>
         <button
           type="button"
           onClick={player.toggle}
           disabled={count <= 1}
-          aria-label={playing ? "Pause" : player.atEnd ? "Replay from start" : "Play"}
-          title={playing ? "Pause (space)" : "Play (space)"}
+          aria-label={playing ? t.visualPlayer.pause : player.atEnd ? t.visualPlayer.restart : t.visualPlayer.play}
+          title={playing ? `${t.visualPlayer.pause} (space)` : `${t.visualPlayer.play} (space)`}
           className={cn(
             iconBtn,
             "w-11 border-transparent bg-brand text-brand-foreground hover:bg-brand/90",
@@ -54,7 +56,7 @@ export function Controls({
         >
           {playing ? <Pause aria-hidden className="size-4" /> : <Play aria-hidden className="size-4 translate-x-px" />}
         </button>
-        <button type="button" className={iconBtn} onClick={player.next} disabled={player.atEnd} aria-label="Next step" title="Next (→)">
+        <button type="button" className={iconBtn} onClick={player.next} disabled={player.atEnd} aria-label={t.visualPlayer.next} title={`${t.visualPlayer.next} (→)`}>
           <StepForward aria-hidden className="size-4" />
         </button>
         {narration?.supported && (
@@ -62,8 +64,8 @@ export function Controls({
             type="button"
             onClick={narration.toggle}
             aria-pressed={narration.on}
-            aria-label="Narrate steps"
-            title={narration.on ? "Narration on: each step is read aloud (N)" : "Narrate: read each step aloud (N)"}
+            aria-label={t.visualPlayer.narrate}
+            title={narration.on ? `${t.visualPlayer.narrating} (N)` : `${t.visualPlayer.narrate} (N)`}
             className={cn(
               iconBtn,
               "w-auto gap-1.5 px-2.5 text-xs font-medium",
@@ -71,13 +73,13 @@ export function Controls({
             )}
           >
             {narration.on ? <Volume2 aria-hidden className="size-4" /> : <VolumeOff aria-hidden className="size-4" />}
-            <span className="hidden @md:inline">Narrate</span>
+            <span className="hidden @md:inline">{t.visualPlayer.narrate}</span>
           </button>
         )}
       </div>
 
       <span className="ml-auto font-mono text-xs tabular-nums text-muted @lg:ml-1" aria-hidden>
-        Step <span className="font-semibold text-foreground">{index + 1}</span> / {count}
+        {t.visualPlayer.step} <span className="font-semibold text-foreground">{index + 1}</span> {t.visualPlayer.of} {count}
       </span>
 
       <div className="flex min-w-0 basis-full items-center gap-3 @lg:basis-0 @lg:flex-1">

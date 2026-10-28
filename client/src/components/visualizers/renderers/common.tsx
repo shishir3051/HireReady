@@ -62,7 +62,7 @@ export function SvgFrame({
         aria-label={label}
         viewBox={`0 0 ${w} ${h}`}
         className={cn("mx-auto block h-auto w-full select-none", className)}
-        style={{ minWidth: Math.round(w * minScale), maxWidth: Math.round(w * maxScale) }}
+        style={{ minWidth: Math.round(w * minScale), maxWidth: Math.round(w * maxScale), aspectRatio: `${w} / ${h}` }}
       >
         {children}
       </svg>

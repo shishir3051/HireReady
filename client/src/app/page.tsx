@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import {
   ArrowRight,
   BookOpen,
@@ -18,10 +19,11 @@ import {
 } from "lucide-react";
 import type { Category, PlatformStats, Roadmap } from "@/lib/types";
 import { api, orFallback } from "@/lib/api";
-import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/constants";
+import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER, LANG_COOKIE } from "@/lib/constants";
 import { CATEGORY_ICONS } from "@/lib/icons";
 import { TWO_SUM_JS, TWO_SUM_SUMMARY, TWO_SUM_VISUAL } from "@/lib/demo-content";
 import { cn, formatNumber } from "@/lib/utils";
+import { getDictionary, type Dictionary } from "@/i18n/dictionary";
 import { VisualWalkthrough } from "@/components/visualizers";
 import { Container } from "@/components/layout/page";
 import { ButtonLink } from "@/components/ui/button";
@@ -108,36 +110,39 @@ function roadmapWeeks(roadmap: Roadmap | null) {
 }
 
 export default async function HomePage() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get(LANG_COOKIE)?.value;
+  const t = getDictionary(lang);
   const [stats, roadmap] = await Promise.all([orFallback(api.stats()), orFallback(api.roadmap.get())]);
   const plan = roadmapWeeks(roadmap);
 
   return (
     <div className="flex flex-col">
-      <Hero stats={stats} />
-      <Categories stats={stats} />
-      <HowItWorks />
-      <RoadmapTeaser weeks={plan.weeks} days={plan.days} hours={plan.hours} />
-      <PracticeModes />
-      <FinalCta />
+      <Hero stats={stats} t={t} />
+      <Categories stats={stats} t={t} />
+      <HowItWorks t={t} />
+      <RoadmapTeaser weeks={plan.weeks} days={plan.days} hours={plan.hours} t={t} />
+      <PracticeModes t={t} />
+      <FinalCta t={t} />
     </div>
   );
 }
 
 // ---------------------------------------------------------------- hero
 
-function Hero({ stats }: { stats: PlatformStats | null }) {
+function Hero({ stats, t }: { stats: PlatformStats | null; t: Dictionary }) {
   const items = stats
     ? [
-        { value: formatNumber(stats.topics), label: "topics" },
-        { value: formatNumber(stats.questions), label: "interview questions" },
-        { value: formatNumber(stats.visuals), label: "visual walkthroughs" },
-        { value: formatNumber(stats.quizQuestions), label: "quiz MCQs" },
+        { value: formatNumber(stats.topics), label: t.hero.statTopics },
+        { value: formatNumber(stats.questions), label: t.hero.statQuestions },
+        { value: formatNumber(stats.visuals), label: t.hero.statVisuals },
+        { value: formatNumber(stats.quizQuestions), label: t.hero.statQuizzes },
       ]
     : [
-        { value: "29", label: "topics" },
-        { value: "5", label: "interview tracks" },
-        { value: "3", label: "languages per solution" },
-        { value: "30", label: "day study plan" },
+        { value: "29", label: t.hero.statTopics },
+        { value: "5", label: t.hero.statTracks },
+        { value: "3", label: t.hero.statLanguages },
+        { value: "30", label: t.hero.statPlan },
       ];
 
   return (
@@ -158,44 +163,43 @@ function Hero({ stats }: { stats: PlatformStats | null }) {
         className="pointer-events-none absolute -top-40 left-1/2 h-[28rem] w-[56rem] max-w-none -translate-x-1/2 rounded-full opacity-70 blur-3xl"
         style={{ background: "radial-gradient(closest-side, var(--brand-soft), transparent)" }}
       />
-      <Container size="wide" className="relative grid items-center gap-8 py-10 sm:py-12 lg:grid-cols-[1.1fr_1fr] lg:py-16">
-        <div className="max-w-2xl">
+      <Container size="wide" className="relative grid items-center gap-8 py-10 sm:py-12 lg:grid-cols-[1.1fr_1fr] xl:grid-cols-[1.2fr_1fr] 2xl:grid-cols-[1.25fr_1fr] xl:gap-12 2xl:gap-16 lg:py-16 xl:py-20 2xl:py-24">
+        <div className="max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
           <Link
             href="/roadmap"
             className="group inline-flex items-center gap-2 rounded-full border border-border bg-surface/80 py-1 pl-1 pr-3 text-xs font-medium text-muted shadow-xs backdrop-blur transition-colors hover:border-brand/40 hover:text-foreground"
           >
-            <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-brand-foreground">New grad?</span>
-            Follow the 30-day plan
+            <span className="rounded-full bg-brand px-2 py-0.5 text-[11px] font-semibold text-brand-foreground">{t.hero.tag}</span>
+            {t.hero.tagAction}
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
           </Link>
-          <h1 className="mt-5 text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl">
-            Crack your{" "}
-            <span className="relative whitespace-nowrap text-brand">
-              first
+          <h1 className="mt-5 text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl 2xl:text-6xl leading-[1.3] sm:leading-[1.25]">
+            {t.hero.titleBefore}{" "}
+            <span className="relative inline-block whitespace-nowrap text-brand pb-2">
+              {t.hero.titleHighlight}
               <svg
                 aria-hidden
                 viewBox="0 0 120 12"
                 preserveAspectRatio="none"
-                className="absolute -bottom-1.5 left-0 h-2.5 w-full"
+                className="absolute bottom-0 left-0 h-2 w-full"
               >
-                <path d="M2 9 C 30 2, 60 2, 118 7" fill="none" stroke="var(--viz-warning)" strokeWidth="4" strokeLinecap="round" />
+                <path d="M2 8 C 30 2, 60 2, 118 7" fill="none" stroke="var(--viz-warning)" strokeWidth="3.5" strokeLinecap="round" />
               </svg>
             </span>{" "}
-            software engineering interview
+            {t.hero.titleAfter}
           </h1>
-          <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
-            Model answers you can say out loud, and a step-by-step visual for every solution. DSA, CS fundamentals,
-            web, system design and behavioral rounds — everything a fresh graduate is actually asked.
+          <p className="mt-4 max-w-xl xl:max-w-2xl 2xl:max-w-3xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
+            {t.hero.subtitle}
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/topics" size="lg" rightIcon={<ArrowRight aria-hidden />}>
-              Start learning — it&apos;s free
+              {t.hero.ctaPrimary}
             </ButtonLink>
             <ButtonLink href="/questions" size="lg" variant="outline" leftIcon={<ListChecks aria-hidden />}>
-              Browse questions
+              {t.hero.ctaSecondary}
             </ButtonLink>
           </div>
-          <dl className="mt-6 grid max-w-xl grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-4">
+          <dl className="mt-6 grid max-w-xl xl:max-w-2xl 2xl:max-w-3xl grid-cols-2 gap-x-5 gap-y-4 sm:grid-cols-4">
             {items.map((s) => (
               <div key={s.label} className="border-l-2 border-brand/30 pl-3">
                 <dt className="sr-only">{s.label}</dt>
@@ -215,17 +219,17 @@ function Hero({ stats }: { stats: PlatformStats | null }) {
 
 // ---------------------------------------------------------------- categories
 
-function Categories({ stats }: { stats: PlatformStats | null }) {
+function Categories({ stats, t }: { stats: PlatformStats | null; t: Dictionary }) {
   return (
     <section aria-labelledby="tracks-heading" className="py-12 sm:py-14">
       <Container size="wide">
         <SectionIntro
           id="tracks-heading"
-          eyebrow="Five tracks, one plan"
-          title="Everything your first interview loop can throw at you"
-          text="Online coding test, technical rounds, CS fundamentals, the stack on your CV and the HR round — organised into 29 focused topics."
+          eyebrow={t.categories.eyebrow}
+          title={t.categories.title}
+          text={t.categories.text}
         />
-        <ul className="mt-8 grid gap-4 md:grid-cols-6">
+        <ul className="mt-8 grid gap-4 md:grid-cols-6 lg:gap-6">
           {CATEGORY_ORDER.map((cat, i) => {
             const Icon = CATEGORY_ICONS[cat];
             const count = stats?.byCategory?.[cat];
@@ -250,27 +254,33 @@ function Categories({ stats }: { stats: PlatformStats | null }) {
                       <Icon className={i === 0 ? "size-6" : "size-5"} aria-hidden />
                     </span>
                     <span className="text-right text-xs text-muted">
-                      <span className="block font-medium text-foreground">{TOPIC_COUNT[cat]} topics</span>
-                      {typeof count === "number" && <span>{formatNumber(count)} questions</span>}
+                      <span className="block font-medium text-foreground">
+                        {t.categories.topicCount.replace("{count}", String(TOPIC_COUNT[cat]))}
+                      </span>
+                      {typeof count === "number" && (
+                        <span>{t.categories.questionCount.replace("{count}", formatNumber(count))}</span>
+                      )}
                     </span>
                   </div>
                   <h3 className={cn("relative mt-4 font-semibold tracking-tight", i === 0 ? "text-2xl" : "text-lg")}>
-                    {CATEGORY_LABELS[cat]}
+                    {t.categories.labels[cat] || CATEGORY_LABELS[cat]}
                   </h3>
-                  <p className="relative mt-2 text-sm leading-relaxed text-muted">{CATEGORY_DESCRIPTIONS[cat]}</p>
+                  <p className="relative mt-2 text-sm leading-relaxed text-muted">
+                    {t.categories.descriptions[cat] || CATEGORY_DESCRIPTIONS[cat]}
+                  </p>
                   <ul className="relative mt-4 flex flex-wrap gap-1.5" aria-label={`${CATEGORY_LABELS[cat]} topics`}>
-                    {CATEGORY_TOPICS[cat].map((t) => (
+                    {CATEGORY_TOPICS[cat].map((item) => (
                       <li
-                        key={t.slug}
+                        key={item.slug}
                         className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface-2/60 px-2.5 py-1 text-xs text-foreground/80"
                       >
-                        <TopicIcon slug={t.slug} className="size-3 text-muted" />
-                        {t.title}
+                        <TopicIcon slug={item.slug} className="size-3 text-muted" />
+                        {item.title}
                       </li>
                     ))}
                   </ul>
                   <span className="relative mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-brand">
-                    Explore
+                    {t.categories.explore}
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                   </span>
                 </Link>
@@ -285,19 +295,28 @@ function Categories({ stats }: { stats: PlatformStats | null }) {
 
 // ---------------------------------------------------------------- how it works
 
-function HowItWorks() {
+function HowItWorks({ t }: { t: Dictionary }) {
+  const anatomyItems = [
+    { icon: MessageSquareQuote, title: t.howItWorks.anatomy.sayFirstTitle, text: t.howItWorks.anatomy.sayFirstText },
+    { icon: Lightbulb, title: t.howItWorks.anatomy.hintsTitle, text: t.howItWorks.anatomy.hintsText },
+    { icon: Waypoints, title: t.howItWorks.anatomy.visualTitle, text: t.howItWorks.anatomy.visualText },
+    { icon: Route, title: t.howItWorks.anatomy.approachesTitle, text: t.howItWorks.anatomy.approachesText },
+    { icon: Code, title: t.howItWorks.anatomy.codeTitle, text: t.howItWorks.anatomy.codeText },
+    { icon: TriangleAlert, title: t.howItWorks.anatomy.pitfallsTitle, text: t.howItWorks.anatomy.pitfallsText },
+  ];
+
   return (
     <section aria-labelledby="how-heading" className="border-y border-border bg-surface/50 py-12 sm:py-14">
       <Container size="wide">
         <SectionIntro
           id="how-heading"
-          eyebrow="How every question is explained"
-          title="Don't just read the answer. Watch it work."
-          text="Every question follows the same interview-ready structure — and every solution comes with a visual you can step through. Try it on Two Sum:"
+          eyebrow={t.howItWorks.eyebrow}
+          title={t.howItWorks.title}
+          text={t.howItWorks.text}
         />
-        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-8">
+        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-8 xl:gap-12 items-start">
           <ol className="grid content-start gap-3 sm:grid-cols-2 lg:grid-cols-1">
-            {ANATOMY.map(({ icon: Icon, title, text }, i) => (
+            {anatomyItems.map(({ icon: Icon, title, text }, i) => (
               <li key={title} className="flex gap-4 rounded-xl border border-transparent p-3 transition-colors hover:border-border hover:bg-surface">
                 <span className="relative grid size-10 shrink-0 place-items-center rounded-xl border border-border bg-surface text-brand shadow-xs">
                   <Icon className="size-5" aria-hidden />
@@ -335,7 +354,7 @@ function HowItWorks() {
               <div className="space-y-4 p-3 sm:p-4">
                 <div className="rounded-xl border border-brand/30 bg-brand-soft/40 px-4 py-3">
                   <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand">
-                    <MessageSquareQuote className="size-3.5" aria-hidden /> Say this first
+                    <MessageSquareQuote className="size-3.5" aria-hidden /> {t.howItWorks.sayThisFirst}
                   </p>
                   <p className="mt-1 text-sm leading-relaxed">{TWO_SUM_SUMMARY}</p>
                 </div>
@@ -343,7 +362,7 @@ function HowItWorks() {
               </div>
             </div>
             <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
-              <Sparkles className="size-3.5 text-brand" aria-hidden /> Use the controls or your arrow keys to step through the trace.
+              <Sparkles className="size-3.5 text-brand" aria-hidden /> {t.howItWorks.hint}
             </p>
           </div>
         </div>
@@ -358,27 +377,32 @@ function RoadmapTeaser({
   weeks,
   days,
   hours,
+  t,
 }: {
   weeks: { week: number; title: string; items: string[] }[];
   days: number;
   hours: number | null;
+  t: Dictionary;
 }) {
+  const hoursText = hours ? t.roadmapTeaser.textHours.replace("{hours}", formatNumber(Math.round(hours))) : "";
+  const roadmapIntro = `${t.roadmapTeaser.textPrefix} ${days}${t.roadmapTeaser.textMiddle}${hoursText}${t.roadmapTeaser.textSuffix}`;
+
   return (
     <section aria-labelledby="roadmap-heading" className="py-12 sm:py-14">
       <Container size="wide">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <SectionIntro
             id="roadmap-heading"
-            eyebrow="The 30-day roadmap"
-            title="Know exactly what to study today"
-            text={`A ${days}-day plan that takes you from Big-O to your first mock interview${hours ? `, about ${formatNumber(Math.round(hours))} hours in total` : ""}. Tick off each day and keep your streak.`}
+            eyebrow={t.roadmapTeaser.eyebrow}
+            title={t.roadmapTeaser.title}
+            text={roadmapIntro}
             align="left"
           />
           <ButtonLink href="/roadmap" variant="outline" rightIcon={<ArrowRight aria-hidden />} className="self-start md:self-auto">
-            See the full plan
+            {t.roadmapTeaser.cta}
           </ButtonLink>
         </div>
-        <ol className="relative mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <ol className="relative mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
           <span
             aria-hidden
             className="pointer-events-none absolute left-0 right-0 top-[1.375rem] hidden h-px lg:block"
@@ -390,7 +414,9 @@ function RoadmapTeaser({
                 W{w.week}
               </span>
               <div className="mt-3 flex-1 rounded-2xl border border-border bg-surface p-4">
-                <p className="text-xs font-medium uppercase tracking-wider text-muted">Week {w.week}</p>
+                <p className="text-xs font-medium uppercase tracking-wider text-muted">
+                  {t.roadmapTeaser.week.replace("{week}", String(w.week))}
+                </p>
                 <h3 className="mt-1 font-semibold">{w.title}</h3>
                 <ul className="mt-3 space-y-1.5">
                   {w.items.map((item) => (
@@ -411,25 +437,25 @@ function RoadmapTeaser({
 
 // ---------------------------------------------------------------- practice modes
 
-function PracticeModes() {
+function PracticeModes({ t }: { t: Dictionary }) {
   const modes = [
     {
       href: "/quiz",
       icon: Target,
-      title: "Topic quizzes",
-      text: "10–12 MCQs per topic with instant explanations — including “what does this print?” code questions.",
+      title: t.practiceModes.quiz.title,
+      text: t.practiceModes.quiz.text,
     },
     {
       href: "/mock-interview",
       icon: Mic,
-      title: "Timed mock interviews",
-      text: "Random questions under a timer. Answer out loud, reveal the model answer, rate yourself honestly.",
+      title: t.practiceModes.mock.title,
+      text: t.practiceModes.mock.text,
     },
     {
       href: "/dashboard",
       icon: ChartColumn,
-      title: "Progress dashboard",
-      text: "Solved by topic and difficulty, streaks, an activity heatmap and your weakest areas at a glance.",
+      title: t.practiceModes.dashboard.title,
+      text: t.practiceModes.dashboard.text,
     },
   ];
   return (
@@ -437,11 +463,11 @@ function PracticeModes() {
       <Container size="wide">
         <SectionIntro
           id="practice-heading"
-          eyebrow="Practice like it's the real thing"
-          title="Reading is not preparing. Practising is."
-          text="Turn on practice mode to hide every answer until you've tried it yourself, then test yourself with quizzes and mock rounds."
+          eyebrow={t.practiceModes.eyebrow}
+          title={t.practiceModes.title}
+          text={t.practiceModes.text}
         />
-        <ul className="mt-8 grid gap-4 md:grid-cols-3">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
           {modes.map(({ href, icon: Icon, title, text }) => (
             <li key={href}>
               <Link
@@ -454,7 +480,7 @@ function PracticeModes() {
                 <h3 className="mt-4 font-semibold">{title}</h3>
                 <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
                 <span className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-medium text-brand">
-                  Open
+                  {t.practiceModes.open}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" aria-hidden />
                 </span>
               </Link>
@@ -468,12 +494,12 @@ function PracticeModes() {
 
 // ---------------------------------------------------------------- CTA
 
-function FinalCta() {
+function FinalCta({ t }: { t: Dictionary }) {
   return (
     <section aria-labelledby="cta-heading" className="py-12 sm:py-14">
       <Container size="wide">
         <div
-          className="relative overflow-hidden rounded-3xl px-6 py-10 text-center sm:px-12 sm:py-12"
+          className="relative overflow-hidden rounded-3xl px-6 py-10 text-center sm:px-12 sm:py-14 lg:py-16 xl:py-20"
           style={{
             background:
               "radial-gradient(80% 120% at 0% 0%, color-mix(in oklch, var(--brand) 85%, var(--viz-info)), var(--brand) 60%)",
@@ -490,24 +516,24 @@ function FinalCta() {
               WebkitMaskImage: "radial-gradient(ellipse 60% 70% at 50% 100%, black, transparent)",
             }}
           />
-          <h2 id="cta-heading" className="relative mx-auto max-w-2xl text-balance text-2xl font-semibold tracking-tight text-brand-foreground sm:text-3xl">
-            Your first offer starts with one question
+          <h2 id="cta-heading" className="relative mx-auto max-w-2xl xl:max-w-3xl 2xl:max-w-4xl text-balance text-2xl font-semibold tracking-tight text-brand-foreground sm:text-3xl xl:text-4xl">
+            {t.finalCta.title}
           </h2>
-          <p className="relative mx-auto mt-3 max-w-xl text-pretty text-brand-foreground/85">
-            Create a free account to save solved questions, notes and your roadmap progress — then pick a topic and start.
+          <p className="relative mx-auto mt-3 max-w-xl xl:max-w-2xl 2xl:max-w-3xl text-pretty text-brand-foreground/85 sm:text-base xl:text-lg">
+            {t.finalCta.subtitle}
           </p>
           <div className="relative mt-5 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/register"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-foreground px-5 text-base font-semibold text-brand shadow-lg transition-transform hover:-translate-y-0.5"
             >
-              <UserPlus className="size-5" aria-hidden /> Create free account
+              <UserPlus className="size-5" aria-hidden /> {t.finalCta.button}
             </Link>
             <Link
               href="/topics/arrays-hashing"
               className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-brand-foreground/30 px-5 text-base font-medium text-brand-foreground transition-colors hover:bg-brand-foreground/10"
             >
-              <BookOpen className="size-5" aria-hidden /> Start with Arrays &amp; Hashing
+              <BookOpen className="size-5" aria-hidden /> Arrays &amp; Hashing
             </Link>
           </div>
         </div>
@@ -532,12 +558,12 @@ function SectionIntro({
   align?: "center" | "left";
 }) {
   return (
-    <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
+    <div className={cn("max-w-2xl xl:max-w-3xl 2xl:max-w-4xl", align === "center" && "mx-auto text-center")}>
       <p className="text-sm font-semibold text-brand">{eyebrow}</p>
-      <h2 id={id} className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl">
+      <h2 id={id} className="mt-2 text-balance text-2xl font-semibold tracking-tight sm:text-3xl xl:text-4xl">
         {title}
       </h2>
-      <p className="mt-3 text-pretty text-sm leading-relaxed text-muted sm:text-base">{text}</p>
+      <p className="mt-3 text-pretty text-sm leading-relaxed text-muted sm:text-base xl:text-lg">{text}</p>
     </div>
   );
 }

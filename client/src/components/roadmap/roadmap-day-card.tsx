@@ -4,7 +4,7 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import { Check, CircleCheck, Clock, Target } from "lucide-react";
 import type { ProgressStatus, RoadmapDay } from "@/lib/types";
-import { DIFFICULTY_LABELS } from "@/lib/constants";
+import { DIFFICULTY_LABELS, type AppLang } from "@/lib/constants";
 import { cn, titleFromSlug } from "@/lib/utils";
 import { Badge, toneText } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,11 @@ export interface RoadmapDayCardProps {
   questions: QuestionIndex;
   topicTitles: Record<string, string>;
   status: (slug: string) => ProgressStatus;
+  lang?: AppLang;
   onToggle: (day: number) => void;
 }
 
-export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitles, status, onToggle }: RoadmapDayCardProps) {
+export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitles, status, lang = "en", onToggle }: RoadmapDayCardProps) {
   const solved = ready ? day.questionSlugs.filter((s) => status(s) === "solved").length : 0;
   const titleId = `day-${day.day}-title`;
   return (
@@ -52,7 +53,7 @@ export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitle
             </motion.span>
           ) : (
             <span>
-              <span className="block text-[10px] font-medium uppercase tracking-wider opacity-75">Day</span>
+              <span className="block text-[10px] font-medium uppercase tracking-wider opacity-75">{lang === "bn" ? "দিন" : "Day"}</span>
               <span className="block text-lg font-semibold tabular-nums">{day.day}</span>
             </span>
           )}
@@ -67,18 +68,18 @@ export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitle
               <Clock className="size-3.5" aria-hidden />~{day.estimatedHours}h
             </span>
             <span>
-              {day.questionSlugs.length} {day.questionSlugs.length === 1 ? "question" : "questions"}
+              {lang === "bn" ? `${day.questionSlugs.length}টি প্রশ্ন` : `${day.questionSlugs.length} ${day.questionSlugs.length === 1 ? "question" : "questions"}`}
             </span>
             {done && (
               <span className="inline-flex items-center gap-1 font-medium" style={toneText("success")}>
-                <CircleCheck className="size-3.5" aria-hidden /> Done
+                <CircleCheck className="size-3.5" aria-hidden /> {lang === "bn" ? "সম্পন্ন" : "Done"}
               </span>
             )}
           </p>
         </div>
         {upNext && (
           <Badge tone="brand" variant="solid" className="shrink-0">
-            Up next
+            {lang === "bn" ? "পরবর্তী" : "Up next"}
           </Badge>
         )}
       </header>
@@ -101,7 +102,7 @@ export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitle
 
       {day.goals.length > 0 && (
         <div className="mt-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Goals</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">{lang === "bn" ? "লক্ষ্যসমূহ" : "Goals"}</p>
           <ul className="mt-1.5 space-y-1">
             {day.goals.map((g) => (
               <li key={g} className="flex gap-2 text-sm leading-snug text-foreground/85">
@@ -116,10 +117,10 @@ export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitle
       {day.questionSlugs.length > 0 && (
         <div className="mt-3">
           <div className="flex items-center justify-between">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">Practice</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">{lang === "bn" ? "অনুশীলন" : "Practice"}</p>
             {ready && (
               <span className="text-xs tabular-nums text-muted">
-                {solved}/{day.questionSlugs.length} solved
+                {lang === "bn" ? `${solved}/${day.questionSlugs.length} সমাধানকৃত` : `${solved}/${day.questionSlugs.length} solved`}
               </span>
             )}
           </div>
@@ -167,11 +168,11 @@ export function RoadmapDayCard({ day, done, upNext, ready, questions, topicTitle
         >
           {done ? (
             <>
-              Completed<span className="text-muted"> · undo</span>
+              {lang === "bn" ? "সম্পন্ন" : "Completed"}<span className="text-muted"> · {lang === "bn" ? "বাতিল" : "undo"}</span>
               <span className="sr-only"> day {day.day}</span>
             </>
           ) : (
-            `Mark day ${day.day} complete`
+            lang === "bn" ? `দিন ${day.day} সম্পন্ন চিহ্নিত করুন` : `Mark day ${day.day} complete`
           )}
         </Button>
       </div>

@@ -3,13 +3,23 @@ import type { ComponentProps, ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Centered page width with responsive gutters. */
-export function Container({ className, size = "default", ...props }: ComponentProps<"div"> & { size?: "default" | "narrow" | "wide" }) {
+/** Centered page width with responsive gutters that scale for ultrawide and big screens. */
+export function Container({
+  className,
+  size = "default",
+  ...props
+}: ComponentProps<"div"> & { size?: "default" | "narrow" | "wide" | "full" }) {
   return (
     <div
       className={cn(
-        "mx-auto w-full px-4 sm:px-6 lg:px-8",
-        size === "narrow" ? "max-w-3xl" : size === "wide" ? "max-w-7xl" : "max-w-6xl",
+        "mx-auto w-full px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20",
+        size === "narrow"
+          ? "max-w-3xl"
+          : size === "wide"
+          ? "max-w-7xl xl:max-w-[100rem] 2xl:max-w-[110rem]"
+          : size === "full"
+          ? "max-w-none"
+          : "max-w-6xl xl:max-w-[92rem] 2xl:max-w-[104rem]",
         className,
       )}
       {...props}
@@ -30,10 +40,10 @@ export interface PageHeaderProps {
 export function PageHeader({ eyebrow, title, description, actions, className, children }: PageHeaderProps) {
   return (
     <div className={cn("flex flex-col gap-3 pb-5 pt-6 sm:pt-8 md:flex-row md:items-end md:justify-between", className)}>
-      <div className="min-w-0 max-w-3xl space-y-2">
+      <div className="min-w-0 max-w-3xl xl:max-w-4xl 2xl:max-w-5xl space-y-2">
         {eyebrow && <div className="text-sm font-medium text-brand">{eyebrow}</div>}
-        <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h1>
-        {description && <p className="text-pretty text-sm leading-relaxed text-muted sm:text-base">{description}</p>}
+        <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl xl:text-4xl">{title}</h1>
+        {description && <p className="text-pretty text-sm leading-relaxed text-muted sm:text-base xl:text-lg">{description}</p>}
         {children}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>}

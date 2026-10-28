@@ -20,13 +20,19 @@ import {
   Trophy,
 } from "lucide-react";
 import { cn, formatDuration } from "@/lib/utils";
+import { useLanguage } from "@/components/providers";
 import { Badge, DifficultyBadge, KindBadge, toneStyle, toneText } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { SectionHeading } from "@/components/layout/page";
 import { TopicIcon } from "@/components/topics/topic-icon";
-import { KIND_MINUTES, RATING_LABELS, ratingTone } from "./constants";
+import {
+  KIND_MINUTES,
+  RATING_LABELS,
+  RATING_LABELS_BN,
+  ratingTone,
+} from "./constants";
 import type { MockRunItem } from "./mock-session";
 import { RatingDots } from "./rating-dots";
 
@@ -45,7 +51,13 @@ export interface MockResult {
   endedEarly: boolean;
 }
 
-function verdict(avg: number) {
+function verdict(avg: number, lang = "en") {
+  if (lang === "bn") {
+    if (avg >= 4.5) return { title: "ইন্টারভিউয়ের জন্য প্রস্তুত!", message: "আত্মবিশ্বাসী ও দারুণ উত্তর। কঠিন প্রশ্ন অনুশীলনের মাধ্যমে প্রস্তুতি ধরে রাখুন।" };
+    if (avg >= 3.5) return { title: "চমৎকার পারফরম্যান্স", message: "বেশ ভালো প্রস্তুতি। নিচের কম রেটিং পাওয়া বিষয়গুলো আরেকটু ঝালিয়ে নিলেই হবে।" };
+    if (avg >= 2.5) return { title: "ভালো অনুশীলন হয়েছে", message: "অধিকাংশ প্রশ্নে উত্তর দিতে পেরেছেন। দুর্বল বিষয়গুলো রিভিশন দিয়ে আবার মক টেস্ট দিন।" };
+    return { title: "কঠিন ছিল — অনুশীলনের উদ্দেশ্যও তাই", message: "এখন ভুল করা মানে আসল ইন্টারভিউতে সেই ভুল না হওয়া। নিচের দুর্বল টপিকগুলো দিয়ে শুরু করুন।" };
+  }
   if (avg >= 4.5) return { title: "Interview ready", message: "Clear, confident answers. Keep the streak going with harder questions." };
   if (avg >= 3.5) return { title: "Strong session", message: "Mostly solid. Tighten up the lower-rated answers below and you're there." };
   if (avg >= 2.5) return { title: "Good practice", message: "You got there on most questions. Study the weak topics, then run it again." };
@@ -70,6 +82,7 @@ export function MockSummary({
   /** a new session is being fetched (restart button spinner) */
   starting?: boolean;
 }) {
+  const { lang } = useLanguage();
   const headingRef = useRef<HTMLHeadingElement>(null);
   useEffect(() => {
     headingRef.current?.focus({ preventScroll: true });
@@ -79,7 +92,7 @@ export function MockSummary({
   const avg = items.reduce((s, i) => s + i.rating, 0) / Math.max(1, items.length);
   const avgRounded = Math.round(avg * 10) / 10;
   const tone = ratingTone(avg);
-  const v = verdict(avg);
+  const v = verdict(avg, lang);
   const revealed = items.filter((i) => i.revealed).length;
   const avgTime = result.durationSec / Math.max(1, items.length);
 
@@ -110,63 +123,69 @@ export function MockSummary({
               tone={tone}
               size={148}
               thickness={12}
-              label="Average self-rating"
+              label={lang === "bn" ? "গড় সেলফ-রেটিং" : "Average self-rating"}
               valueText={`${avgRounded} out of 5`}
             >
               <span className="text-4xl font-semibold tabular-nums tracking-tight">{avgRounded.toFixed(1)}</span>
-              <span className="text-xs text-muted">out of 5</span>
+              <span className="text-xs text-muted">{lang === "bn" ? "/ ৫" : "out of 5"}</span>
             </ProgressRing>
             <div className="min-w-0 flex-1 space-y-3">
               <p className="text-sm font-medium text-brand">
-                Mock interview {result.endedEarly ? "· ended early" : "complete"}
+                {lang === "bn"
+                  ? `মক ইন্টারভিউ ${result.endedEarly ? "· আগে সমাপ্ত" : "সম্পন্ন"}`
+                  : `Mock interview ${result.endedEarly ? "· ended early" : "complete"}`}
               </p>
               <h2 ref={headingRef} tabIndex={-1} className="text-2xl font-semibold tracking-tight outline-none sm:text-3xl">
                 {v.title}
               </h2>
               <p className="max-w-xl text-pretty text-muted">{v.message}</p>
-              <SaveBanner save={save} onRetry={onRetrySave} />
+              <SaveBanner save={save} onRetry={onRetrySave} lang={lang} />
             </div>
           </div>
           <dl className="relative grid grid-cols-2 border-t border-border sm:grid-cols-4">
-            <Stat icon={<ListChecks aria-hidden />} label="Answered" value={`${items.length}/${result.total}`} />
-            <Stat icon={<Clock aria-hidden />} label="Total time" value={formatDuration(result.durationSec)} />
-            <Stat icon={<Target aria-hidden />} label="Avg per question" value={formatDuration(avgTime)} />
-            <Stat icon={<Eye aria-hidden />} label="Answers revealed" value={`${revealed}/${items.length}`} />
+            <Stat icon={<ListChecks aria-hidden />} label={lang === "bn" ? "উত্তর দেওয়া হয়েছে" : "Answered"} value={`${items.length}/${result.total}`} />
+            <Stat icon={<Clock aria-hidden />} label={lang === "bn" ? "মোট সময়" : "Total time"} value={formatDuration(result.durationSec)} />
+            <Stat icon={<Target aria-hidden />} label={lang === "bn" ? "গড় সময় / প্রশ্ন" : "Avg per question"} value={formatDuration(avgTime)} />
+            <Stat icon={<Eye aria-hidden />} label={lang === "bn" ? "মডেল উত্তর দেখা হয়েছে" : "Answers revealed"} value={`${revealed}/${items.length}`} />
           </dl>
         </Card>
       </motion.div>
 
       <div className="flex flex-wrap items-center justify-center gap-2 md:justify-start">
         <Button size="lg" onClick={onRestart} loading={starting} leftIcon={<RotateCcw aria-hidden />}>
-          New interview, same settings
+          {lang === "bn" ? "একই সেটিংসে নতুন ইন্টারভিউ" : "New interview, same settings"}
         </Button>
         <Button size="lg" variant="outline" onClick={onNewSettings} leftIcon={<Settings2 aria-hidden />}>
-          Change settings
+          {lang === "bn" ? "সেটিংস পরিবর্তন করুন" : "Change settings"}
         </Button>
         {save.status === "saved" && (
           <ButtonLink href="/dashboard" size="lg" variant="ghost" leftIcon={<LayoutDashboard aria-hidden />}>
-            Dashboard
+            {lang === "bn" ? "ড্যাশবোর্ড" : "Dashboard"}
           </ButtonLink>
         )}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
         <section aria-labelledby="mock-breakdown" className="min-w-0">
-          <SectionHeading id="mock-breakdown" title="Question by question" description="Time against the suggested limit, and how you rated yourself." />
+          <SectionHeading
+            id="mock-breakdown"
+            title={lang === "bn" ? "প্রতিটি প্রশ্নের বিশ্লেষণ" : "Question by question"}
+            description={lang === "bn" ? "বরাদ্দকৃত সময়ের বিপরীতে ব্যয়িত সময় এবং আপনার নিজস্ব রেটিং।" : "Time against the suggested limit, and how you rated yourself."}
+          />
           <ol className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
             {items.map((item, i) => (
-              <BreakdownRow key={item.question.slug} item={item} index={i} topicTitle={topicTitles[item.question.topic]} />
+              <BreakdownRow key={item.question.slug} item={item} index={i} topicTitle={topicTitles[item.question.topic]} lang={lang} />
             ))}
           </ol>
         </section>
 
         <section aria-labelledby="mock-weak" className="min-w-0">
-          <SectionHeading id="mock-weak" title="Study next" icon={<TrendingDown aria-hidden />} />
+          <SectionHeading id="mock-weak" title={lang === "bn" ? "পরবর্তীতে যা পড়বেন" : "Study next"} icon={<TrendingDown aria-hidden />} />
           {weak.length === 0 ? (
             <Card className="flex flex-col items-center gap-2 p-4 text-center">
               <Trophy className="size-8" style={toneText("success")} aria-hidden />
-              <p className="font-semibold">No weak spots this time</p>
-              <p className="text-sm text-muted">Every topic averaged 4 or more. Try a harder difficulty next.</p>
+              <p className="font-semibold">{lang === "bn" ? "এই সেশনে কোনো দুর্বলতা পাওয়া যায়নি" : "No weak spots this time"}</p>
+              <p className="text-sm text-muted">{lang === "bn" ? "প্রতিটি টপিকে গড় স্কোর ৪ বা তার বেশি। পরবর্তীতে কঠিন লেভেলে চেষ্টা করুন।" : "Every topic averaged 4 or more. Try a harder difficulty next."}</p>
             </Card>
           ) : (
             <ul className="space-y-3">
@@ -180,11 +199,11 @@ export function MockSummary({
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold leading-snug">{topicTitles[topic] ?? topic}</p>
                         <p className="mt-0.5 text-xs text-muted">
-                          Average{" "}
+                          {lang === "bn" ? "গড় " : "Average "}
                           <span className="font-medium tabular-nums" style={toneText(ratingTone(topicAvg))}>
                             {topicAvg.toFixed(1)}
                           </span>{" "}
-                          over {list.length} {list.length === 1 ? "question" : "questions"}
+                          ({list.length} {lang === "bn" ? "টি প্রশ্ন" : list.length === 1 ? "question" : "questions"})
                         </p>
                       </div>
                     </div>
@@ -201,7 +220,7 @@ export function MockSummary({
                         ))}
                     </ul>
                     <ButtonLink href={`/topics/${topic}`} size="sm" variant="soft" className="mt-3 w-full" leftIcon={<BookOpen aria-hidden />}>
-                      Study {topicTitles[topic] ?? "this topic"}
+                      {lang === "bn" ? `${topicTitles[topic] ?? "এই টপিক"} পড়ুন` : `Study ${topicTitles[topic] ?? "this topic"}`}
                     </ButtonLink>
                   </Card>
                 </li>
@@ -226,19 +245,19 @@ function Stat({ icon, label, value }: { icon: ReactNode; label: string; value: s
   );
 }
 
-function SaveBanner({ save, onRetry }: { save: SaveState; onRetry: () => void }) {
+function SaveBanner({ save, onRetry, lang = "en" }: { save: SaveState; onRetry: () => void; lang?: string }) {
   if (save.status === "idle") return null;
   if (save.status === "saving") {
     return (
       <p className="flex items-center justify-center gap-2 text-sm text-muted md:justify-start" role="status">
-        <LoaderCircle className="size-4 animate-spin" aria-hidden /> Saving your session…
+        <LoaderCircle className="size-4 animate-spin" aria-hidden /> {lang === "bn" ? "সেশন সেভ হচ্ছে…" : "Saving your session…"}
       </p>
     );
   }
   if (save.status === "saved") {
     return (
       <p className="flex items-center justify-center gap-1.5 text-sm font-medium md:justify-start" style={toneText("success")} role="status">
-        <CircleCheck className="size-4" aria-hidden /> Saved to your history and dashboard
+        <CircleCheck className="size-4" aria-hidden /> {lang === "bn" ? "আপনার হিস্ট্রি ও ড্যাশবোর্ডে সংরক্ষিত হয়েছে" : "Saved to your history and dashboard"}
       </p>
     );
   }
@@ -247,10 +266,12 @@ function SaveBanner({ save, onRetry }: { save: SaveState; onRetry: () => void })
       <div className="flex flex-col items-center gap-3 rounded-xl border border-brand/30 bg-brand-soft/40 p-3 text-sm sm:flex-row">
         <span className="flex items-center gap-2 text-left">
           <LogIn className="size-4 shrink-0 text-brand" aria-hidden />
-          Log in to keep a history of your mock interviews and track your weak topics.
+          {lang === "bn"
+            ? "মক ইন্টারভিউয়ের হিস্ট্রি এবং দুর্বল টপিক ট্র্যাক করতে লগইন করুন।"
+            : "Log in to keep a history of your mock interviews and track your weak topics."}
         </span>
         <ButtonLink href="/login?next=%2Fmock-interview" size="sm" className="shrink-0 sm:ml-auto">
-          Log in
+          {lang === "bn" ? "লগইন করুন" : "Log in"}
         </ButtonLink>
       </div>
     );
@@ -259,21 +280,22 @@ function SaveBanner({ save, onRetry }: { save: SaveState; onRetry: () => void })
     <div className="flex flex-col items-center gap-2 rounded-lg border px-3 py-2 text-sm sm:flex-row" style={toneStyle("danger")} role="alert">
       <span className="flex items-center gap-2">
         <CircleAlert className="size-4 shrink-0" aria-hidden />
-        Couldn&apos;t save this session: {save.message}
+        {lang === "bn" ? `সেশন সংরক্ষণ করা যায়নি: ${save.message}` : `Couldn't save this session: ${save.message}`}
       </span>
       <Button size="xs" variant="outline" onClick={onRetry} className="sm:ml-auto">
-        Try again
+        {lang === "bn" ? "পুনরায় চেষ্টা করুন" : "Try again"}
       </Button>
     </div>
   );
 }
 
-function BreakdownRow({ item, index, topicTitle }: { item: MockRunItem; index: number; topicTitle?: string }) {
+function BreakdownRow({ item, index, topicTitle, lang = "en" }: { item: MockRunItem; index: number; topicTitle?: string; lang?: string }) {
   const { question: q, rating, timeSec, revealed } = item;
   const suggested = KIND_MINUTES[q.kind] * 60;
   const scale = Math.max(suggested, timeSec, 1);
   const over = timeSec > suggested;
   const tone = ratingTone(rating);
+  const ratingLabels = lang === "bn" ? RATING_LABELS_BN : RATING_LABELS;
   return (
     <li className="flex gap-3 px-4 py-3 sm:px-5">
       <span
@@ -291,7 +313,7 @@ function BreakdownRow({ item, index, topicTitle }: { item: MockRunItem; index: n
           <span className="flex shrink-0 items-center gap-2">
             <RatingDots rating={rating} />
             <span className="text-xs font-medium" style={toneText(tone)}>
-              {RATING_LABELS[rating]}
+              {ratingLabels[rating]}
             </span>
           </span>
         </div>
@@ -300,8 +322,8 @@ function BreakdownRow({ item, index, topicTitle }: { item: MockRunItem; index: n
           <KindBadge kind={q.kind} />
           {topicTitle && <Badge variant="outline">{topicTitle}</Badge>}
           {revealed && (
-            <Badge icon={<Eye aria-hidden />} title="You revealed the model answer">
-              Revealed
+            <Badge icon={<Eye aria-hidden />} title={lang === "bn" ? "মডেল সমাধান দেখেছেন" : "You revealed the model answer"}>
+              {lang === "bn" ? "মডেল সমাধান দেখা হয়েছে" : "Revealed"}
             </Badge>
           )}
         </div>

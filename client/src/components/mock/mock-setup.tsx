@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { CircleAlert, Clock, Play, Shuffle } from "lucide-react";
 import type { Category, Difficulty, MockConfig, QuestionKind } from "@/lib/types";
-import { CATEGORY_LABELS, CATEGORY_ORDER, DIFFICULTY_LABELS, KINDS, KIND_LABELS } from "@/lib/constants";
+import { CATEGORY_LABELS, CATEGORY_ORDER, DIFFICULTY_LABELS, KINDS, KIND_LABELS, type AppLang } from "@/lib/constants";
 import { KIND_ICONS } from "@/lib/icons";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -12,7 +12,16 @@ import { MultiSelect, type MultiSelectOption } from "@/components/ui/multi-selec
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { toneStyle } from "@/components/ui/badge";
 import { TopicIcon } from "@/components/topics/topic-icon";
-import { DIFFICULTY_CHOICES, KIND_HINTS, KIND_MINUTES, MAX_QUESTIONS, MIN_QUESTIONS } from "./constants";
+import {
+  DIFFICULTY_CHOICES,
+  DIFFICULTY_LABELS_BN,
+  KIND_HINTS,
+  KIND_HINTS_BN,
+  KIND_LABELS_BN,
+  KIND_MINUTES,
+  MAX_QUESTIONS,
+  MIN_QUESTIONS,
+} from "./constants";
 
 export interface TopicOption {
   slug: string;
@@ -26,13 +35,14 @@ export interface MockSetupProps {
   initial: MockConfig;
   starting: boolean;
   error: string | null;
+  lang?: AppLang;
   onStart: (config: MockConfig) => void;
 }
 
 const COUNTS = Array.from({ length: MAX_QUESTIONS - MIN_QUESTIONS + 1 }, (_, i) => String(MIN_QUESTIONS + i));
 
 /** Mock interview configuration form. */
-export function MockSetup({ topics, initial, starting, error, onStart }: MockSetupProps) {
+export function MockSetup({ topics, initial, starting, error, lang = "en", onStart }: MockSetupProps) {
   const [count, setCount] = useState(initial.count);
   const [kinds, setKinds] = useState<QuestionKind[]>(initial.kinds);
   const [selectedTopics, setSelectedTopics] = useState<string[]>(initial.topics);
@@ -75,16 +85,20 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
       <form onSubmit={submit} noValidate aria-labelledby="mock-setup-title">
         <div className="border-b border-border px-4 py-3 sm:px-5">
           <h2 id="mock-setup-title" className="text-lg font-semibold tracking-tight">
-            Set up your interview
+            {lang === "bn" ? "আপনার ইন্টারভিউ সেটআপ করুন" : "Set up your interview"}
           </h2>
-          <p className="mt-0.5 text-sm text-muted">Random questions from the bank, timed like the real thing.</p>
+          <p className="mt-0.5 text-sm text-muted">
+            {lang === "bn"
+              ? "প্রশ্নব্যাংক থেকে এলোমেলো প্রশ্ন, আসল ইন্টারভিউয়ের মতো সময় নির্ধারণ করা।"
+              : "Random questions from the bank, timed like the real thing."}
+          </p>
         </div>
 
         <div className="space-y-5 p-4 sm:p-5">
           {/* count */}
           <div className="space-y-2.5">
             <p className="text-sm font-medium">
-              Number of questions
+              {lang === "bn" ? "প্রশ্নের সংখ্যা" : "Number of questions"}
             </p>
             <SegmentedControl
               label="Number of questions"
@@ -103,7 +117,9 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
             aria-describedby={kindsError ? "mock-kinds-error" : undefined}
             aria-invalid={kindsError || undefined}
           >
-            <legend className="float-left mb-2.5 text-sm font-medium">Question types</legend>
+            <legend className="float-left mb-2.5 text-sm font-medium">
+              {lang === "bn" ? "প্রশ্নের ধরণ" : "Question types"}
+            </legend>
             <div className="absolute right-0 top-0 flex gap-1 text-xs">
                 <button
                   type="button"
@@ -113,14 +129,14 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
                   }}
                   className="rounded px-1.5 py-0.5 font-medium text-brand hover:bg-brand-soft"
                 >
-                  All
+                  {lang === "bn" ? "সব" : "All"}
                 </button>
                 <button
                   type="button"
                   onClick={() => setKinds([])}
                   className="rounded px-1.5 py-0.5 font-medium text-muted hover:bg-surface-2 hover:text-foreground"
                 >
-                  None
+                  {lang === "bn" ? "কোনটি নয়" : "None"}
                 </button>
             </div>
             <div className="clear-both grid gap-2 sm:grid-cols-2">
@@ -140,47 +156,47 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
                     label={
                       <span className="flex items-center gap-1.5 font-medium">
                         <Icon className="size-4 text-muted" aria-hidden />
-                        {KIND_LABELS[kind]}
+                        {lang === "bn" ? KIND_LABELS_BN[kind] : KIND_LABELS[kind]}
                         <span className="inline-flex items-center gap-1 text-xs font-normal tabular-nums text-muted">
                           <span aria-hidden>·</span>
-                          {KIND_MINUTES[kind]} min
+                          {KIND_MINUTES[kind]} {lang === "bn" ? "মিনিট" : "min"}
                         </span>
                       </span>
                     }
-                    description={KIND_HINTS[kind]}
+                    description={lang === "bn" ? KIND_HINTS_BN[kind] : KIND_HINTS[kind]}
                   />
                 );
               })}
             </div>
             {kindsError && (
               <p id="mock-kinds-error" className="mt-2.5 flex items-center gap-1.5 text-xs font-medium" style={{ color: "var(--viz-danger)" }}>
-                <CircleAlert className="size-3.5" aria-hidden /> Pick at least one question type.
+                <CircleAlert className="size-3.5" aria-hidden /> {lang === "bn" ? "কমপক্ষে একটি প্রশ্নের ধরণ নির্বাচন করুন।" : "Pick at least one question type."}
               </p>
             )}
           </fieldset>
 
           {/* topics */}
           <div className="space-y-2.5">
-            <p className="text-sm font-medium">Topics</p>
+            <p className="text-sm font-medium">{lang === "bn" ? "টপিকসমূহ" : "Topics"}</p>
             <MultiSelect
               label="Topics"
               options={topicOptions}
               value={selectedTopics}
               onChange={setSelectedTopics}
-              searchPlaceholder="Filter topics…"
+              searchPlaceholder={lang === "bn" ? "টপিক খুঁজুন…" : "Filter topics…"}
             />
             <p className="text-xs text-muted">
               {topics.length === 0
-                ? "Topics couldn't be loaded — the interview will draw from every topic."
+                ? (lang === "bn" ? "টপিক লোড করা যায়নি — সব টপিক থেকেই প্রশ্ন নেওয়া হবে।" : "Topics couldn't be loaded — the interview will draw from every topic.")
                 : selectedTopics.length === 0
-                  ? "All topics. Narrow it down to focus on what you're about to be asked."
-                  : `${selectedTopics.length} ${selectedTopics.length === 1 ? "topic" : "topics"} selected.`}
+                  ? (lang === "bn" ? "সব টপিক। নির্দিষ্ট বিষয়ে ফোকাস করতে টপিক সিলেক্ট করুন।" : "All topics. Narrow it down to focus on what you're about to be asked.")
+                  : (lang === "bn" ? `${selectedTopics.length}টি টপিক নির্বাচিত।` : `${selectedTopics.length} ${selectedTopics.length === 1 ? "topic" : "topics"} selected.`)}
             </p>
           </div>
 
           {/* difficulty */}
           <div className="space-y-2.5">
-            <p className="text-sm font-medium">Difficulty</p>
+            <p className="text-sm font-medium">{lang === "bn" ? "কঠিনতা" : "Difficulty"}</p>
             <SegmentedControl
               label="Difficulty"
               fullWidth
@@ -188,7 +204,10 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
               onChange={setDifficulty}
               options={DIFFICULTY_CHOICES.map((d) => ({
                 value: d,
-                label: d === "mixed" ? "Mixed" : DIFFICULTY_LABELS[d],
+                label:
+                  d === "mixed"
+                    ? (lang === "bn" ? "মিশ্র" : "Mixed")
+                    : (lang === "bn" ? DIFFICULTY_LABELS_BN[d] : DIFFICULTY_LABELS[d]),
                 icon:
                   d === "mixed" ? (
                     <Shuffle aria-hidden />
@@ -212,14 +231,15 @@ export function MockSetup({ topics, initial, starting, error, onStart }: MockSet
             <Clock className="size-4" aria-hidden />
             {kinds.length ? (
               <>
-                About <span className="font-medium tabular-nums text-foreground">{estimate}</span> · {count} questions
+                {lang === "bn" ? "প্রায় " : "About "}
+                <span className="font-medium tabular-nums text-foreground">{estimate}</span> · {count} {lang === "bn" ? "টি প্রশ্ন" : "questions"}
               </>
             ) : (
-              "Pick at least one question type"
+              lang === "bn" ? "কমপক্ষে একটি প্রশ্নের ধরণ নির্বাচন করুন" : "Pick at least one question type"
             )}
           </p>
           <Button type="submit" size="lg" loading={starting} leftIcon={<Play aria-hidden />}>
-            {starting ? "Picking questions…" : "Start interview"}
+            {starting ? (lang === "bn" ? "প্রশ্ন নির্বাচন করা হচ্ছে…" : "Picking questions…") : (lang === "bn" ? "ইন্টারভিউ শুরু করুন" : "Start interview")}
           </Button>
         </div>
       </form>

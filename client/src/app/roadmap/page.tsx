@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Map as MapIcon, ServerCrash } from "lucide-react";
 import { api, getErrorMessage, orFallback, orNull } from "@/lib/api";
 import type { Roadmap } from "@/lib/types";
+import { LANG_COOKIE, type AppLang } from "@/lib/constants";
+import { getDictionary } from "@/i18n/dictionary";
 import { Container, PageHeader } from "@/components/layout/page";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -17,6 +20,10 @@ export const metadata: Metadata = {
 };
 
 export default async function RoadmapPage() {
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
+  const dict = getDictionary(lang);
+
   let roadmap: Roadmap | null = null;
   let error: unknown = null;
   try {
@@ -27,31 +34,31 @@ export default async function RoadmapPage() {
 
   if (!roadmap) {
     return (
-      <Container className="pb-12">
-        <PageHeader eyebrow="Roadmap" title="30-day interview roadmap" />
+      <Container size="wide" className="pb-12">
+        <PageHeader eyebrow={dict.roadmapPage.eyebrow} title={dict.roadmapPage.title} />
         {error ? (
           <EmptyState
             icon={ServerCrash}
-            title="The roadmap is unavailable right now"
+            title={dict.roadmapPage.unavailableTitle}
             description={`We couldn't reach the HireReady API (${getErrorMessage(error)}). Please try again in a moment.`}
             action={
               <ButtonLink href="/roadmap" variant="outline" size="sm" prefetch={false}>
-                Try again
+                {dict.common.tryAgain}
               </ButtonLink>
             }
           />
         ) : (
           <EmptyState
             icon={MapIcon}
-            title="The roadmap hasn't been published yet"
-            description="The day-by-day plan is still being put together. Start with the topics in order — they follow the same path."
+            title={dict.roadmapPage.notPublishedTitle}
+            description={dict.roadmapPage.notPublishedDesc}
             action={
               <>
                 <ButtonLink href="/topics" size="sm">
-                  Browse topics
+                  {dict.roadmapPage.browseTopics}
                 </ButtonLink>
                 <ButtonLink href="/questions" size="sm" variant="outline">
-                  Practice questions
+                  {dict.hero.ctaSecondary}
                 </ButtonLink>
               </>
             }
@@ -66,8 +73,8 @@ export default async function RoadmapPage() {
   const topicTitles = Object.fromEntries((topics?.items ?? []).map((t) => [t.slug, t.title]));
 
   return (
-    <Container>
-      <RoadmapView roadmap={roadmap} questions={questions ?? {}} topicTitles={topicTitles} />
+    <Container size="wide">
+      <RoadmapView roadmap={roadmap} questions={questions ?? {}} topicTitles={topicTitles} lang={lang} />
     </Container>
   );
 }

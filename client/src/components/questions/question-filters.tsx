@@ -27,20 +27,28 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Select } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { TopicIcon } from "@/components/topics/topic-icon";
+import { useLanguage } from "@/components/providers";
+import { getDictionary, type Dictionary } from "@/i18n/dictionary";
+import type { AppLang } from "@/lib/constants";
 
 export interface QuestionFiltersProps {
   filters: Filters;
   topics: Pick<TopicSummary, "slug" | "title" | "category" | "order">[];
   /** results region — dimmed while a new URL is loading */
   children: ReactNode;
+  dict?: Dictionary;
+  lang?: AppLang;
 }
 
 /**
  * Search + filters for /questions. Every change updates the URL (router.replace, no scroll);
  * the server page re-renders the results passed as children.
  */
-export function QuestionFilters({ filters, topics, children }: QuestionFiltersProps) {
+export function QuestionFilters({ filters, topics, children, dict: dictProp, lang: langProp }: QuestionFiltersProps) {
   const router = useRouter();
+  const { lang: clientLang } = useLanguage();
+  const lang = langProp ?? clientLang;
+  const dict = dictProp ?? getDictionary(lang);
   const [pending, startTransition] = useTransition();
   // Controls reflect the requested filters immediately while the server renders the new results.
   const [view, setView] = useOptimistic(filters);
@@ -98,7 +106,12 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
     topics
       .filter((t) => t.category === cat)
       .sort((a, b) => a.order - b.order)
-      .map((t) => ({ value: t.slug, label: t.title, group: CATEGORY_LABELS[cat], icon: <TopicIcon slug={t.slug} /> })),
+      .map((t) => ({
+        value: t.slug,
+        label: t.title,
+        group: dict.categories.labels[cat] ?? CATEGORY_LABELS[cat],
+        icon: <TopicIcon slug={t.slug} />,
+      })),
   );
 
   const count = activeFilterCount(view);
@@ -106,28 +119,40 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
 
   const facets = (
     <div className="grid gap-4 sm:grid-cols-3">
-      <FacetGroup label="Difficulty">
+      <FacetGroup label={dict.questionsPage.facets.difficulty}>
         <ChipGroup
-          label="Difficulty"
+          label={dict.questionsPage.facets.difficulty}
           value={view.difficulty}
           onChange={(difficulty) => navigate({ difficulty })}
-          options={DIFFICULTIES.map((d) => ({ value: d, label: DIFFICULTY_LABELS[d], tone: d }))}
+          options={DIFFICULTIES.map((d) => ({
+            value: d,
+            label: dict.question.difficulty[d] ?? DIFFICULTY_LABELS[d],
+            tone: d,
+          }))}
         />
       </FacetGroup>
-      <FacetGroup label="Type">
+      <FacetGroup label={dict.questionsPage.facets.type}>
         <ChipGroup
-          label="Question type"
+          label={dict.questionsPage.facets.type}
           value={view.kind}
           onChange={(kind) => navigate({ kind })}
-          options={KINDS.map((k) => ({ value: k, label: KIND_LABELS[k] }))}
+          options={KINDS.map((k) => ({
+            value: k,
+            label: lang === "bn"
+              ? (k === "coding" ? "কোডিং" : k === "concept" ? "কনসেপ্ট" : k === "sql" ? "SQL" : k === "design" ? "ডিজাইন" : "বিহেভিয়ারাল")
+              : KIND_LABELS[k],
+          }))}
         />
       </FacetGroup>
-      <FacetGroup label="How often asked">
+      <FacetGroup label={dict.questionsPage.facets.frequency}>
         <ChipGroup
-          label="How often asked"
+          label={dict.questionsPage.facets.frequency}
           value={view.frequency}
           onChange={(frequency) => navigate({ frequency })}
-          options={FREQUENCIES.map((f) => ({ value: f, label: FREQUENCY_LABELS[f] }))}
+          options={FREQUENCIES.map((f) => ({
+            value: f,
+            label: dict.question.frequency[f] ?? FREQUENCY_LABELS[f],
+          }))}
         />
       </FacetGroup>
     </div>
@@ -143,8 +168,8 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
               type="search"
               value={text}
               onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Search by title, tag, pattern or prompt…"
-              aria-label="Search questions"
+              placeholder={dict.questionsPage.searchPlaceholder}
+              aria-label={dict.questionsPage.searchPlaceholder}
               className="h-9 w-full rounded-lg border border-border bg-surface pl-9 pr-9 text-sm shadow-xs outline-none transition-[border-color,box-shadow] placeholder:text-muted focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/25"
             />
             {pending && (
@@ -156,12 +181,12 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
           </div>
           <div className="grid grid-cols-2 gap-2 md:flex">
             <MultiSelect
-              label="Topics"
+              label={dict.questionsPage.topics}
               className="md:w-56"
               options={topicOptions}
               value={view.topic}
               onChange={(topic) => navigate({ topic })}
-              searchPlaceholder="Find a topic…"
+              searchPlaceholder={dict.questionsPage.findTopic}
             />
             <Select
               aria-label="Sort questions"
@@ -171,7 +196,10 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
             >
               {SORT_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
-                  Sort: {o.label}
+                  {dict.questionsPage.sortLabel.replace(
+                    "{label}",
+                    dict.questionsPage.sortOptions[o.value] ?? o.label,
+                  )}
                 </option>
               ))}
             </Select>
@@ -184,7 +212,10 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
             size="sm"
             value={view.status}
             onChange={(status) => navigate({ status })}
-            options={STATUS_FILTERS.map((s) => ({ value: s.value, label: s.label }))}
+            options={STATUS_FILTERS.map((s) => ({
+              value: s.value,
+              label: dict.questionsPage.status[s.value] ?? s.label,
+            }))}
           />
           <div className="flex items-center gap-1">
             <Button
@@ -195,7 +226,7 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
               leftIcon={<ListFilter aria-hidden />}
               className="lg:hidden"
             >
-              Filters
+              {dict.questionsPage.facets.filters}
               {facetCount > 0 && (
                 <span className="grid min-w-5 place-items-center rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-5 text-brand-foreground">
                   {facetCount}
@@ -204,7 +235,7 @@ export function QuestionFilters({ filters, topics, children }: QuestionFiltersPr
             </Button>
             {count > 0 && (
               <Button variant="ghost" size="sm" onClick={clearAll} leftIcon={<X aria-hidden />}>
-                Clear all
+                {dict.questionsPage.facets.clearAll}
               </Button>
             )}
           </div>

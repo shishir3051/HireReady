@@ -2,7 +2,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { BookOpenText, Clock, Lightbulb, ListChecks, Mic, NotebookTabs, Play, Puzzle, Target } from "lucide-react";
 import type { TopicDetailResponse } from "@/lib/types";
-import { CATEGORY_LABELS, DIFFICULTIES, DIFFICULTY_LABELS } from "@/lib/constants";
+import { CATEGORY_LABELS, DIFFICULTIES, DIFFICULTY_LABELS, type AppLang } from "@/lib/constants";
+import { getDictionary, type Dictionary } from "@/i18n/dictionary";
 import { Breadcrumbs, Container, SectionHeading } from "@/components/layout/page";
 import { Markdown } from "@/components/markdown";
 import { CodeBlock } from "@/components/code-block";
@@ -15,15 +16,26 @@ import { TopicQuestionList } from "@/components/topics/topic-question-list";
 import { TopicIcon } from "@/components/topics/topic-icon";
 
 /** Topic page body: hero, overview, cheat sheet, patterns, filterable question list, sidebar. */
-export function TopicView({ data }: { data: TopicDetailResponse }) {
+export function TopicView({
+  data,
+  dict: dictProp,
+  lang = "en",
+}: {
+  data: TopicDetailResponse;
+  dict?: Dictionary;
+  lang?: AppLang;
+}) {
+  const dict = dictProp ?? getDictionary(lang);
   const { topic, questions } = data;
   const firstQuestion = questions[0];
   const sections = [
-    { id: "overview", label: "Overview", show: Boolean(topic.overview) },
-    { id: "cheatsheet", label: "Cheat sheet", show: topic.cheatsheet.length > 0 },
-    { id: "patterns", label: "Patterns", show: (topic.patterns?.length ?? 0) > 0 },
-    { id: "questions", label: "Questions", show: true },
+    { id: "overview", label: dict.topicView.overview, show: Boolean(topic.overview) },
+    { id: "cheatsheet", label: dict.topicView.cheatsheet, show: topic.cheatsheet.length > 0 },
+    { id: "patterns", label: dict.topicView.patterns, show: (topic.patterns?.length ?? 0) > 0 },
+    { id: "questions", label: dict.topicView.questions, show: true },
   ].filter((s) => s.show);
+
+  const categoryLabel = dict.categories.labels[topic.category] ?? CATEGORY_LABELS[topic.category];
 
   return (
     <div className="pb-12">
@@ -37,8 +49,8 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
               "radial-gradient(60rem 20rem at 85% -10%, var(--brand-soft), transparent 70%), radial-gradient(30rem 16rem at 0% 120%, color-mix(in oklch, var(--viz-info) 12%, transparent), transparent 70%)",
           }}
         />
-        <Container className="relative py-5 sm:py-8">
-          <Breadcrumbs items={[{ href: "/topics", label: "Topics" }, { label: topic.title }]} />
+        <Container size="wide" className="relative py-5 sm:py-8">
+          <Breadcrumbs items={[{ href: "/topics", label: dict.nav.topics }, { label: topic.title }]} />
           <div className="mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div className="flex min-w-0 items-start gap-4">
               <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand text-brand-foreground shadow-lg shadow-brand/25">
@@ -49,7 +61,7 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
                   href={`/topics#${topic.category}`}
                   className="text-sm font-medium text-brand hover:underline"
                 >
-                  {CATEGORY_LABELS[topic.category]}
+                  {categoryLabel}
                 </Link>
                 <h1 className="text-balance text-2xl font-semibold tracking-tight sm:text-3xl">{topic.title}</h1>
                 <p className="max-w-2xl text-pretty text-sm text-muted sm:text-base">{topic.summary}</p>
@@ -58,12 +70,12 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
             <div className="flex shrink-0 flex-wrap gap-2 lg:max-w-md lg:justify-end">
               {firstQuestion && (
                 <ButtonLink href={`/questions/${firstQuestion.slug}`} leftIcon={<Play aria-hidden />}>
-                  Start practicing
+                  {dict.topicView.startPracticing}
                 </ButtonLink>
               )}
               {topic.quizCount > 0 && (
                 <ButtonLink href={`/quiz/${topic.slug}`} variant="outline" leftIcon={<Target aria-hidden />}>
-                  Take the quiz
+                  {dict.topicView.takeQuiz}
                 </ButtonLink>
               )}
               <ButtonLink
@@ -71,16 +83,16 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
                 variant="outline"
                 leftIcon={<Mic aria-hidden />}
               >
-                Mock interview on this topic
+                {dict.topicView.mockInterview}
               </ButtonLink>
             </div>
           </div>
           <dl className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Stat icon={<ListChecks aria-hidden />} label="Questions" value={String(topic.questionCount)} />
-            <Stat icon={<Target aria-hidden />} label="Quiz MCQs" value={String(topic.quizCount)} />
-            <Stat icon={<Clock aria-hidden />} label="Study time" value={`~${topic.estimatedHours}h`} />
+            <Stat icon={<ListChecks aria-hidden />} label={dict.topicView.questions} value={String(topic.questionCount)} />
+            <Stat icon={<Target aria-hidden />} label={dict.topicView.quizMCQs} value={String(topic.quizCount)} />
+            <Stat icon={<Clock aria-hidden />} label={dict.topicView.studyTime} value={`~${topic.estimatedHours}h`} />
             <div className="rounded-xl border border-border bg-surface px-4 py-3">
-              <dt className="text-xs text-muted">Difficulty mix</dt>
+              <dt className="text-xs text-muted">{dict.topicView.difficultyMix}</dt>
               <dd className="mt-2">
                 <DifficultyMixBar counts={topic.difficultyCounts} />
                 <p className="mt-1.5 flex gap-2 text-xs text-muted">
@@ -96,11 +108,11 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
         </Container>
       </div>
 
-      <Container className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <Container size="wide" className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0 space-y-8">
           {topic.overview && (
             <section aria-labelledby="overview">
-              <SectionHeading id="overview" title="Overview" icon={<BookOpenText aria-hidden />} />
+              <SectionHeading id="overview" title={dict.topicView.overview} icon={<BookOpenText aria-hidden />} />
               <Card className="p-4 sm:p-5">
                 <Markdown>{topic.overview}</Markdown>
               </Card>
@@ -111,8 +123,8 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
             <section aria-labelledby="cheatsheet">
               <SectionHeading
                 id="cheatsheet"
-                title="Cheat sheet"
-                description="The facts to have at your fingertips before the interview."
+                title={dict.topicView.cheatsheet}
+                description={dict.topicView.cheatsheetDesc}
                 icon={<NotebookTabs aria-hidden />}
               />
               <div className="grid gap-4 sm:grid-cols-2">
@@ -139,8 +151,8 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
             <section aria-labelledby="patterns">
               <SectionHeading
                 id="patterns"
-                title="Patterns"
-                description="Recognise the pattern, then reach for the template."
+                title={dict.topicView.patterns}
+                description={dict.topicView.patternsDesc}
                 icon={<Puzzle aria-hidden />}
               />
               <div className="space-y-4">
@@ -151,7 +163,7 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
                       <p className="flex items-start gap-2 text-sm text-muted">
                         <Lightbulb className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />
                         <span>
-                          <span className="font-medium text-foreground">When to use: </span>
+                          <span className="font-medium text-foreground">{dict.topicView.whenToUse} </span>
                           {p.whenToUse}
                         </span>
                       </p>
@@ -175,8 +187,8 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
           <section aria-labelledby="questions">
             <SectionHeading
               id="questions"
-              title="Questions"
-              description="Ordered from fundamentals to the harder follow-ups. Each has hints, a visual walkthrough and a model answer."
+              title={dict.topicView.questions}
+              description={lang === "bn" ? "মৌলিক বিষয় থেকে জটিল বিষয় পর্যন্ত সাজানো। প্রতিটিতে হিন্ট, ভিজ্যুয়াল ওয়াকথ্রু এবং মডেল উত্তর রয়েছে।" : "Ordered from fundamentals to the harder follow-ups. Each has hints, a visual walkthrough and a model answer."}
               icon={<ListChecks aria-hidden />}
             />
             <Card className="mb-4 p-4 empty:hidden lg:hidden">
@@ -185,7 +197,7 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
             {questions.length > 0 ? (
               <TopicQuestionList questions={questions} />
             ) : (
-              <EmptyState compact title="Questions are on their way" description="Content for this topic is being written." />
+              <EmptyState compact title={lang === "bn" ? "প্রশ্ন তৈরি করা হচ্ছে" : "Questions are on their way"} description={lang === "bn" ? "এই টপিকের প্রশ্ন শীঘ্রই আসবে।" : "Content for this topic is being written."} />
             )}
           </section>
         </div>
@@ -197,7 +209,7 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
               <div className="mt-4 grid gap-2 border-t border-border pt-4 first:mt-0 first:border-0 first:pt-0">
                 {topic.quizCount > 0 && (
                   <ButtonLink href={`/quiz/${topic.slug}`} variant="soft" size="sm" leftIcon={<Target aria-hidden />}>
-                    Take the quiz
+                    {dict.topicView.takeQuiz}
                   </ButtonLink>
                 )}
                 <ButtonLink
@@ -206,12 +218,12 @@ export function TopicView({ data }: { data: TopicDetailResponse }) {
                   size="sm"
                   leftIcon={<Mic aria-hidden />}
                 >
-                  Mock interview
+                  {dict.topicView.mockInterview}
                 </ButtonLink>
               </div>
             </Card>
             <nav aria-label="On this page" className="px-1">
-              <p className="text-xs font-semibold uppercase tracking-wider text-muted">On this page</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-muted">{dict.topicView.onThisPage}</p>
               <ul className="mt-3 space-y-1 border-l border-border">
                 {sections.map((s) => (
                   <li key={s.id}>

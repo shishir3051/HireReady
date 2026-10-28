@@ -5,8 +5,10 @@ import { api, getErrorMessage, type QuestionListQuery } from "@/lib/api";
 import { useApiQuery } from "@/lib/hooks";
 import type { QuestionProgress, QuestionSummary } from "@/lib/types";
 import { filtersToApiQuery, questionsHref, QUESTIONS_PAGE_SIZE, type QuestionFilters } from "@/lib/question-filters";
-import type { StatusFilter } from "@/lib/constants";
+import type { AppLang, StatusFilter } from "@/lib/constants";
 import { useProgress } from "@/components/providers/progress-provider";
+import { useLanguage } from "@/components/providers";
+import { getDictionary, type Dictionary } from "@/i18n/dictionary";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -50,7 +52,18 @@ const QUALIFIER: Record<StatusFilter, string | undefined> = {
  * /questions results when a progress-status filter is active. The API cannot filter by personal
  * progress, so this loads every question matching the other filters and filters/paginates locally.
  */
-export function StatusFilteredResults({ filters }: { filters: QuestionFilters }) {
+export function StatusFilteredResults({
+  filters,
+  dict: dictProp,
+  lang: langProp,
+}: {
+  filters: QuestionFilters;
+  dict?: Dictionary;
+  lang?: AppLang;
+}) {
+  const { lang: clientLang } = useLanguage();
+  const lang = langProp ?? clientLang;
+  const dict = dictProp ?? getDictionary(lang);
   const { ready, isLoggedIn, progress } = useProgress();
   const query = filtersToApiQuery(filters, { page: 1 });
   const key = isLoggedIn ? `all-questions:${JSON.stringify({ ...query, page: undefined, limit: undefined })}` : null;
@@ -79,15 +92,15 @@ export function StatusFilteredResults({ filters }: { filters: QuestionFilters })
     return (
       <EmptyState
         icon={LogIn}
-        title="Log in to filter by your progress"
-        description="Solved, attempted and bookmarked filters use the progress saved to your account."
+        title={dict.questionsPage.results.logInTitle}
+        description={dict.questionsPage.results.logInDesc}
         action={
           <>
             <ButtonLink href={`/login?next=${encodeURIComponent(questionsHref(filters))}`} size="sm">
-              Log in
+              {dict.questionsPage.results.logInButton}
             </ButtonLink>
             <ButtonLink href={questionsHref({ ...filters, status: "all" })} variant="outline" size="sm">
-              Show all questions
+              {dict.questionsPage.results.showAll}
             </ButtonLink>
           </>
         }
@@ -99,11 +112,11 @@ export function StatusFilteredResults({ filters }: { filters: QuestionFilters })
     return (
       <EmptyState
         icon={RotateCcw}
-        title="Couldn't load questions"
+        title={dict.questionsPage.results.loadErrorTitle}
         description={getErrorMessage(error)}
         action={
           <Button size="sm" variant="outline" onClick={reload}>
-            Try again
+            {dict.questionsPage.results.tryAgain}
           </Button>
         }
       />
@@ -123,6 +136,8 @@ export function StatusFilteredResults({ filters }: { filters: QuestionFilters })
       totalPages={totalPages}
       filters={filters}
       qualifier={QUALIFIER[filters.status]}
+      dict={dict}
+      lang={lang}
     />
   );
 }

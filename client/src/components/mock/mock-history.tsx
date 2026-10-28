@@ -9,7 +9,7 @@ import { useApiQuery } from "@/lib/hooks";
 import { DIFFICULTY_LABELS, KIND_LABELS } from "@/lib/constants";
 import { KIND_ICONS } from "@/lib/icons";
 import { formatDuration } from "@/lib/utils";
-import { useAuth } from "@/components/providers";
+import { useAuth, useLanguage } from "@/components/providers";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -26,6 +26,7 @@ export function formatSessionDate(iso: string) {
 /** Past mock sessions (GET /api/mock-sessions) for the setup screen. `version` forces a reload after a save. */
 export function MockHistory({ version = 0 }: { version?: number }) {
   const { user, loading: authLoading } = useAuth();
+  const { lang } = useLanguage();
   const [showAll, setShowAll] = useState(false);
   const { data, loading, error, reload } = useApiQuery(
     user ? `mock-sessions:${user.id}:${version}` : null,
@@ -39,13 +40,15 @@ export function MockHistory({ version = 0 }: { version?: number }) {
     return (
       <Card className="p-4">
         <p className="flex items-center gap-2 font-semibold">
-          <History className="size-4 text-brand" aria-hidden /> Your past sessions
+          <History className="size-4 text-brand" aria-hidden /> {lang === "bn" ? "পূর্ববর্তী সেশনসমূহ" : "Your past sessions"}
         </p>
         <p className="mt-1.5 text-sm text-muted">
-          Log in to save every mock interview and see how your self-ratings improve over time.
+          {lang === "bn"
+            ? "প্রতিটি মক ইন্টারভিউ সংরক্ষণ করতে এবং উন্নতির চিত্র দেখতে লগইন করুন।"
+            : "Log in to save every mock interview and see how your self-ratings improve over time."}
         </p>
         <ButtonLink href="/login?next=%2Fmock-interview" size="sm" variant="outline" className="mt-3" leftIcon={<LogIn aria-hidden />}>
-          Log in
+          {lang === "bn" ? "লগইন করুন" : "Log in"}
         </ButtonLink>
       </Card>
     );
@@ -58,9 +61,9 @@ export function MockHistory({ version = 0 }: { version?: number }) {
     <section aria-labelledby="mock-history-title" className="space-y-3">
       <div className="flex items-center justify-between gap-2">
         <h2 id="mock-history-title" className="flex items-center gap-2 font-semibold">
-          <History className="size-4 text-brand" aria-hidden /> Past sessions
+          <History className="size-4 text-brand" aria-hidden /> {lang === "bn" ? "পূর্ববর্তী সেশনসমূহ" : "Past sessions"}
         </h2>
-        {sessions.length > 0 && <span className="text-xs text-muted tabular-nums">{sessions.length} total</span>}
+        {sessions.length > 0 && <span className="text-xs text-muted tabular-nums">{sessions.length} {lang === "bn" ? "টি মোট" : "total"}</span>}
       </div>
 
       {loading && !data ? (
@@ -71,14 +74,14 @@ export function MockHistory({ version = 0 }: { version?: number }) {
         </div>
       ) : error && !data ? (
         <Card className="p-4 text-sm">
-          <p className="text-muted">Couldn&apos;t load your sessions: {getErrorMessage(error)}</p>
+          <p className="text-muted">{lang === "bn" ? "সেশন লোড করা সম্ভব হয়নি: " : "Couldn't load your sessions: "}{getErrorMessage(error)}</p>
           <Button size="xs" variant="outline" className="mt-3" onClick={reload} leftIcon={<RotateCcw aria-hidden />}>
-            Retry
+            {lang === "bn" ? "পুনরায় চেষ্টা করুন" : "Retry"}
           </Button>
         </Card>
       ) : sessions.length === 0 ? (
         <Card className="border-dashed p-4 text-center text-sm text-muted">
-          No sessions yet. Your first one will show up here with a per-question breakdown.
+          {lang === "bn" ? "এখনও কোনো সেশন সম্পন্ন করা হয়নি। প্রথম ইন্টারভিউ শেষ করলে এখানে তার বিবরণ দেখতে পাবেন।" : "No sessions yet. Your first one will show up here with a per-question breakdown."}
         </Card>
       ) : (
         <>
@@ -89,7 +92,7 @@ export function MockHistory({ version = 0 }: { version?: number }) {
           </Accordion>
           {sessions.length > 5 && (
             <Button variant="ghost" size="sm" className="w-full" onClick={() => setShowAll((v) => !v)}>
-              {showAll ? "Show fewer" : `Show all ${sessions.length}`}
+              {showAll ? (lang === "bn" ? "কম দেখুন" : "Show fewer") : (lang === "bn" ? `সবগুলো (${sessions.length}টি) দেখুন` : `Show all ${sessions.length}`)}
             </Button>
           )}
         </>

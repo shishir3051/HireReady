@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import type { Question } from "@/lib/types";
 import { cn, formatDuration } from "@/lib/utils";
+import { useLanguage } from "@/components/providers";
 import { VisualWalkthrough } from "@/components/visualizers";
 import { Markdown } from "@/components/markdown";
 import { CodeTabs } from "@/components/code-tabs";
@@ -70,6 +71,7 @@ function reducedMotion() {
 
 /** The interview itself: prompt, timers, scratch notes, reveal, mandatory self-rating, next. */
 export function MockSessionView({ questions, topicTitles, startedAt, onFinish, onDiscard }: MockSessionProps) {
+  const { lang } = useLanguage();
   const [index, setIndex] = useState(0);
   const [runs, setRuns] = useState<Run[]>(() =>
     questions.map(() => ({ notes: "", revealed: false, rating: null, timeMs: 0 })),
@@ -221,7 +223,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
 
           <div className="hidden items-center gap-1.5 text-sm text-muted md:flex" title="Total interview time">
             <Clock className="size-4" aria-hidden />
-            <span className="sr-only">Total time</span>
+            <span className="sr-only">{lang === "bn" ? "মোট সময়" : "Total time"}</span>
             <span className="font-mono tabular-nums text-foreground" role="timer" aria-live="off">
               {formatDuration(totalMs / 1000)}
             </span>
@@ -240,10 +242,10 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
             </ProgressRing>
             <div className="leading-tight">
               <p className="font-mono text-sm font-semibold tabular-nums" style={over || timerTone === "warning" ? toneText(timerTone) : undefined} role="timer" aria-live="off">
-                <span className="sr-only">Time left on this question: </span>
+                <span className="sr-only">{lang === "bn" ? "এই প্রশ্নে বাকি সময়: " : "Time left on this question: "}</span>
                 {over ? `+${formatDuration(-remainingMs / 1000)}` : formatDuration(remainingMs / 1000)}
               </p>
-              <p className="text-[11px] text-muted">{over ? "over time" : "left"}</p>
+              <p className="text-[11px] text-muted">{over ? (lang === "bn" ? "অতিরিক্ত সময়" : "over time") : (lang === "bn" ? "বাকি" : "left")}</p>
             </div>
           </div>
 
@@ -252,14 +254,14 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               variant="ghost"
               size="icon-sm"
               onClick={togglePause}
-              aria-label={paused ? "Resume interview" : "Pause interview"}
-              title={paused ? "Resume" : "Pause"}
+              aria-label={paused ? (lang === "bn" ? "ইন্টারভিউ চালু করুন" : "Resume interview") : (lang === "bn" ? "ইন্টারভিউ স্থগিত রাখুন" : "Pause interview")}
+              title={paused ? (lang === "bn" ? "চালু করুন" : "Resume") : (lang === "bn" ? "স্থগিত" : "Pause")}
             >
               {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
             </Button>
             <Button variant="outline" size="sm" onClick={() => setConfirmEnd(true)} leftIcon={<Square aria-hidden />}>
-              <span className="hidden sm:inline">End</span>
-              <span className="sr-only sm:hidden">End interview</span>
+              <span className="hidden sm:inline">{lang === "bn" ? "শেষ করুন" : "End"}</span>
+              <span className="sr-only sm:hidden">{lang === "bn" ? "ইন্টারভিউ শেষ করুন" : "End interview"}</span>
             </Button>
           </div>
         </div>
@@ -284,7 +286,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               <KindBadge kind={question.kind} />
               <Badge variant="outline">{topicTitles[question.topic] ?? question.topic}</Badge>
               <span className="ml-auto inline-flex items-center gap-1 text-xs text-muted">
-                <Timer className="size-3.5" aria-hidden /> {KIND_MINUTES[question.kind]} min suggested
+                <Timer className="size-3.5" aria-hidden /> {lang === "bn" ? `পরামর্শিত সময় ~${KIND_MINUTES[question.kind]} মিনিট` : `${KIND_MINUTES[question.kind]} min suggested`}
               </span>
             </div>
             <h2
@@ -302,7 +304,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
             {question.hints.length > 0 && !run.revealed && (
               <div className="mt-4 border-t border-border pt-4">
                 <p className="mb-3 flex items-center gap-2 text-sm font-medium">
-                  <Lightbulb className="size-4 text-brand" aria-hidden /> Interviewer nudges
+                  <Lightbulb className="size-4 text-brand" aria-hidden /> {lang === "bn" ? "ইন্টারভিউয়ারের সাহায্য বা ইঙ্গিত" : "Interviewer nudges"}
                 </p>
                 <Hints key={question.slug} hints={question.hints} />
               </div>
@@ -312,19 +314,25 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
           {/* Scratch notes */}
           <Card className="p-4 sm:p-5">
             <label htmlFor={`notes-${question.slug}`} className="flex items-center gap-2 text-sm font-medium">
-              <NotebookPen className="size-4 text-brand" aria-hidden /> Scratch notes
+              <NotebookPen className="size-4 text-brand" aria-hidden /> {lang === "bn" ? "খসড়া নোট" : "Scratch notes"}
             </label>
-            <p className="mt-1 text-xs text-muted">Private to this session — nothing is saved. Outline before you speak.</p>
+            <p className="mt-1 text-xs text-muted">{lang === "bn" ? "শুধুমাত্র এই সেশনের জন্য — কোথাও সেভ হবে না। কথা বলার আগে পয়েন্ট সাজান।" : "Private to this session — nothing is saved. Outline before you speak."}</p>
             <Textarea
               id={`notes-${question.slug}`}
               value={run.notes}
               onChange={(e) => patchRun({ notes: e.target.value })}
               placeholder={
-                question.kind === "behavioral"
-                  ? "Situation…\nTask…\nAction…\nResult…"
-                  : question.kind === "coding" || question.kind === "sql"
-                    ? "Clarifying questions…\nBrute force…\nOptimise…\nEdge cases / tests…"
-                    : "Definition…\nExample…\nTrade-offs…"
+                lang === "bn"
+                  ? question.kind === "behavioral"
+                    ? "পরিস্থিতি (Situation)…\nদায়িত্ব (Task)…\nপদক্ষেপ (Action)…\nফলাফল (Result)…"
+                    : question.kind === "coding" || question.kind === "sql"
+                      ? "স্পষ্টীকরণ প্রশ্ন…\nব্রুট ফোর্স…\nঅপ্টিমাইজেশন…\nএজ কেস ও টেস্ট…"
+                      : "সংজ্ঞা…\nবাস্তব উদাহরণ…\nট্রেড-অফ…"
+                  : question.kind === "behavioral"
+                    ? "Situation…\nTask…\nAction…\nResult…"
+                    : question.kind === "coding" || question.kind === "sql"
+                      ? "Clarifying questions…\nBrute force…\nOptimise…\nEdge cases / tests…"
+                      : "Definition…\nExample…\nTrade-offs…"
               }
               className="mt-3 min-h-36 font-mono text-[13px]"
               spellCheck={false}
@@ -338,9 +346,9 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                 <Eye className="size-5" aria-hidden />
               </span>
               <div className="max-w-md space-y-1">
-                <p className="font-semibold">Answer out loud first</p>
+                <p className="font-semibold">{lang === "bn" ? "প্রথমে মুখে উত্তর দিন" : "Answer out loud first"}</p>
                 <p className="text-sm text-muted">
-                  Then compare with the model answer, its key points and the visual walkthrough before rating yourself.
+                  {lang === "bn" ? "তারপর নিজেকে রেটিং দেওয়ার আগে মডেল উত্তর, মূল পয়েন্ট এবং ভিজ্যুয়াল ওয়াকথ্রু মিলিয়ে নিন।" : "Then compare with the model answer, its key points and the visual walkthrough before rating yourself."}
                 </p>
               </div>
               <Button
@@ -351,7 +359,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                 }}
                 leftIcon={<Eye aria-hidden />}
               >
-                Reveal model answer
+                {lang === "bn" ? "মডেল সমাধান দেখুন" : "Reveal model answer"}
               </Button>
             </div>
           ) : (
@@ -369,7 +377,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                   tabIndex={-1}
                   className="flex scroll-mt-32 items-center gap-2 text-lg font-semibold tracking-tight outline-none"
                 >
-                  <Sparkles className="size-5 text-brand" aria-hidden /> Model answer
+                  <Sparkles className="size-5 text-brand" aria-hidden /> {lang === "bn" ? "মডেল সমাধান" : "Model answer"}
                 </h2>
                 <a
                   href={`/questions/${question.slug}`}
@@ -377,7 +385,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                   rel="noopener"
                   className="inline-flex items-center gap-1 text-sm font-medium text-brand hover:underline"
                 >
-                  Full question page <ExternalLink className="size-3.5" aria-hidden />
+                  {lang === "bn" ? "সম্পূর্ণ প্রশ্নের পেজ" : "Full question page"} <ExternalLink className="size-3.5" aria-hidden />
                   <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </div>
@@ -385,7 +393,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
 
               {question.solution.keyPoints.length > 0 && (
                 <div className="space-y-2">
-                  <h3 className="text-sm font-semibold">What the interviewer listens for</h3>
+                  <h3 className="text-sm font-semibold">{lang === "bn" ? "ইন্টারভিউয়ার যা শুনতে চান" : "What the interviewer listens for"}</h3>
                   <KeyPoints key={question.slug} points={question.solution.keyPoints} />
                 </div>
               )}
@@ -400,7 +408,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                     }}
                   >
                     <Waypoints className="size-4 text-brand" aria-hidden />
-                    <h3 className="text-sm font-semibold">Visual walkthrough</h3>
+                    <h3 className="text-sm font-semibold">{lang === "bn" ? "ভিজ্যুয়াল ওয়াকথ্রু" : "Visual walkthrough"}</h3>
                   </div>
                   <div className="p-3 sm:p-4">
                     <VisualWalkthrough key={question.slug} visuals={question.visuals} code={jsCode} />
@@ -409,7 +417,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               )}
 
               <Accordion>
-                <AccordionItem title="Full explanation & code" headingLevel={3}>
+                <AccordionItem title={lang === "bn" ? "সম্পূর্ণ ব্যাখ্যা ও কোড" : "Full explanation & code"} headingLevel={3}>
                   <div className="space-y-4 pb-1">
                     <Markdown size="sm">{question.solution.explanation}</Markdown>
                     {question.solution.code && question.solution.code.length > 0 && <CodeTabs snippets={question.solution.code} />}
@@ -425,9 +433,9 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
         <aside className="lg:sticky lg:top-32 lg:self-start" inert={paused}>
           <Card className="p-4">
             <p id={`rate-${question.slug}`} className="font-semibold">
-              How did you do?
+              {lang === "bn" ? "কেমন করলেন?" : "How did you do?"}
             </p>
-            <p className="mt-0.5 text-xs text-muted">Rate yourself honestly — it drives your weak-topic list.</p>
+            <p className="mt-0.5 text-xs text-muted">{lang === "bn" ? "সততার সাথে রেটিং দিন — এটি দুর্বল টপিক চিহ্নিত করতে সাহায্য করে।" : "Rate yourself honestly — it drives your weak-topic list."}</p>
             <div ref={ratingRef} className="mt-3">
               <RatingInput
                 key={question.slug}
@@ -448,7 +456,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                 style={toneStyle("danger")}
                 role="alert"
               >
-                <CircleAlert className="size-3.5" aria-hidden /> Rate this answer before moving on.
+                <CircleAlert className="size-3.5" aria-hidden /> {lang === "bn" ? "পরবর্তী প্রশ্নে যাওয়ার আগে অনুগ্রহ করে এই প্রশ্নটি রেটিং দিন।" : "Rate this answer before moving on."}
               </p>
             )}
             <Button
@@ -458,19 +466,19 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               onClick={next}
               rightIcon={isLast ? <Flag aria-hidden /> : <ArrowRight aria-hidden />}
             >
-              {isLast ? "Finish interview" : "Next question"}
+              {isLast ? (lang === "bn" ? "ইন্টারভিউ সমাপ্ত করুন" : "Finish interview") : (lang === "bn" ? "পরবর্তী প্রশ্ন" : "Next question")}
             </Button>
             {run.rating === null && !ratingError && (
-              <p className="mt-2 text-center text-xs text-muted">Pick a rating to continue</p>
+              <p className="mt-2 text-center text-xs text-muted">{lang === "bn" ? "এগিয়ে যেতে একটি রেটিং নির্বাচন করুন" : "Pick a rating to continue"}</p>
             )}
             <div className="mt-3 flex items-center justify-between border-t border-border pt-3 text-xs text-muted">
               <span className="inline-flex items-center gap-1">
-                <Clock className="size-3.5" aria-hidden /> On this question
+                <Clock className="size-3.5" aria-hidden /> {lang === "bn" ? "এই প্রশ্নে ব্যয়িত সময়" : "On this question"}
               </span>
               <span className="font-mono tabular-nums text-foreground">{formatDuration(questionMs / 1000)}</span>
             </div>
             <div className="mt-1.5 flex items-center justify-between text-xs text-muted md:hidden">
-              <span>Total</span>
+              <span>{lang === "bn" ? "মোট সময়" : "Total"}</span>
               <span className="font-mono tabular-nums text-foreground">{formatDuration(totalMs / 1000)}</span>
             </div>
           </Card>
@@ -487,10 +495,10 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               <span className="grid size-12 place-items-center rounded-full bg-brand-soft text-brand">
                 <Pause className="size-6" aria-hidden />
               </span>
-              <p className="font-semibold">Interview paused</p>
-              <p className="text-sm text-muted">The timers are stopped. Resume when you&apos;re ready.</p>
+              <p className="font-semibold">{lang === "bn" ? "ইন্টারভিউ সাময়িক স্থগিত" : "Interview paused"}</p>
+              <p className="text-sm text-muted">{lang === "bn" ? "টাইমার বন্ধ রয়েছে। প্রস্তুত হলে পুনরায় চালু করুন।" : "The timers are stopped. Resume when you're ready."}</p>
               <Button onClick={togglePause} leftIcon={<Play aria-hidden />} autoFocus>
-                Resume
+                {lang === "bn" ? "পুনরায় চালু করুন" : "Resume"}
               </Button>
             </Card>
           </motion.div>
@@ -500,20 +508,20 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
       <Dialog
         open={confirmEnd}
         onOpenChange={setConfirmEnd}
-        title="End the interview now?"
+        title={lang === "bn" ? "এখনই ইন্টারভিউ শেষ করতে চান?" : "End the interview now?"}
         description={
           ratedCount > 0
-            ? `Your summary will include the ${ratedCount} ${ratedCount === 1 ? "question" : "questions"} you rated. Unrated questions are dropped.`
-            : "You haven't rated any answers yet, so nothing will be saved."
+            ? (lang === "bn" ? `আপনার ফলাফলে রেটিং দেওয়া ${ratedCount}টি প্রশ্ন সংরক্ষিত হবে। রেটিং না দেওয়া প্রশ্নগুলো বাদ পড়বে।` : `Your summary will include the ${ratedCount} ${ratedCount === 1 ? "question" : "questions"} you rated. Unrated questions are dropped.`)
+            : (lang === "bn" ? "আপনি এখনও কোনো প্রশ্নে রেটিং দেননি, তাই কোনো ফলাফল সংরক্ষিত হবে না।" : "You haven't rated any answers yet, so nothing will be saved.")
         }
         size="sm"
         footer={
           <>
             <Button variant="ghost" onClick={() => setConfirmEnd(false)}>
-              Keep going
+              {lang === "bn" ? "চালিয়ে যান" : "Keep going"}
             </Button>
             <Button variant="danger" onClick={endNow}>
-              {ratedCount > 0 ? "End and see summary" : "Discard session"}
+              {ratedCount > 0 ? (lang === "bn" ? "শেষ করুন ও ফলাফল দেখুন" : "End and see summary") : (lang === "bn" ? "সেশন বাতিল করুন" : "Discard session")}
             </Button>
           </>
         }

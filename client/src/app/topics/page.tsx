@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { ServerCrash } from "lucide-react";
 import type { Category, TopicSummary } from "@/lib/types";
 import { api, getErrorMessage } from "@/lib/api";
-import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER } from "@/lib/constants";
+import { CATEGORY_ORDER, LANG_COOKIE, type AppLang } from "@/lib/constants";
 import { CATEGORY_ICONS } from "@/lib/icons";
+import { getDictionary } from "@/i18n/dictionary";
 import { formatNumber } from "@/lib/utils";
 import { Container, PageHeader } from "@/components/layout/page";
 import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { TopicCard } from "@/components/topics/topic-card";
 import { TopicsProgressProvider } from "@/components/topics/topic-progress";
+import type { Dictionary } from "@/i18n/en";
 
 export const revalidate = 60;
 
@@ -20,6 +23,10 @@ export const metadata: Metadata = {
 };
 
 export default async function TopicsPage() {
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
+  const dict = getDictionary(lang);
+
   let topics: TopicSummary[] | null = null;
   let error: unknown = null;
   try {
@@ -31,14 +38,14 @@ export default async function TopicsPage() {
   if (!topics) {
     return (
       <Container className="pb-12">
-        <PageHeader eyebrow="Topics" title="Everything you need for your first interview" />
+        <PageHeader eyebrow={dict.nav.topics} title={dict.categories.title} />
         <EmptyState
           icon={ServerCrash}
-          title="Topics are unavailable right now"
+          title={dict.common.error}
           description={`We couldn't reach the HireReady API (${getErrorMessage(error)}). Please try again in a moment.`}
           action={
             <ButtonLink href="/topics" variant="outline" size="sm" prefetch={false}>
-              Try again
+              {dict.common.tryAgain}
             </ButtonLink>
           }
         />
@@ -55,17 +62,22 @@ export default async function TopicsPage() {
   const totalHours = topics.reduce((s, t) => s + t.estimatedHours, 0);
 
   return (
-    <Container className="pb-12">
+    <Container size="wide" className="pb-12">
       <PageHeader
-        eyebrow="Topics"
-        title="Everything you need for your first interview"
-        description={`${topics.length} topics · ${formatNumber(totalQuestions)} questions · about ${formatNumber(totalHours)} hours of focused study. Start with the fundamentals, then work through the patterns interviewers love.`}
+        eyebrow={dict.nav.topics}
+        title={dict.categories.title}
+        description={
+          lang === "bn"
+            ? `${topics.length}টি টপিক · ${formatNumber(totalQuestions)}টি প্রশ্ন · প্রায় ${formatNumber(totalHours)} ঘণ্টার ফোকাসড স্টাডি প্ল্যান। বেসিক দিয়ে শুরু করে ইন্টারভিউয়ারদের প্রিয় কমন প্যাটার্নগুলো আয়ত্ত করুন।`
+            : `${topics.length} topics · ${formatNumber(totalQuestions)} questions · about ${formatNumber(totalHours)} hours of focused study. Start with the fundamentals, then work through the patterns interviewers love.`
+        }
       />
 
-      <nav aria-label="Categories" className="sticky top-14 z-30 -mx-4 mb-5 border-b border-border bg-background/85 px-4 py-2.5 backdrop-blur-lg sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <nav aria-label="Categories" className="sticky top-14 z-30 -mx-4 mb-5 border-b border-border bg-background/85 px-4 py-2.5 backdrop-blur-lg sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 lg:-mx-12 lg:px-12 xl:-mx-16 xl:px-16 2xl:-mx-20 2xl:px-20">
         <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
           {groups.map(({ category, topics: list }) => {
             const Icon = CATEGORY_ICONS[category];
+            const label = dict.categories.labels[category] || category;
             return (
               <li key={category} className="shrink-0">
                 <a
@@ -73,7 +85,7 @@ export default async function TopicsPage() {
                   className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-surface px-3 text-xs font-medium text-muted transition-colors hover:border-brand/40 hover:text-foreground"
                 >
                   <Icon className="size-3.5" aria-hidden />
-                  {CATEGORY_LABELS[category]}
+                  {label}
                   <span className="tabular-nums opacity-70">{list.length}</span>
                 </a>
               </li>
@@ -85,7 +97,7 @@ export default async function TopicsPage() {
       <TopicsProgressProvider>
         <div className="space-y-8">
           {groups.map(({ category, topics: list }) => (
-            <CategorySection key={category} category={category} topics={list} />
+            <CategorySection key={category} category={category} topics={list} dict={dict} />
           ))}
         </div>
       </TopicsProgressProvider>
@@ -93,9 +105,20 @@ export default async function TopicsPage() {
   );
 }
 
-function CategorySection({ category, topics }: { category: Category; topics: TopicSummary[] }) {
+function CategorySection({
+  category,
+  topics,
+  dict,
+}: {
+  category: Category;
+  topics: TopicSummary[];
+  dict: Dictionary;
+}) {
   const Icon = CATEGORY_ICONS[category];
   const questions = topics.reduce((s, t) => s + t.questionCount, 0);
+  const label = dict.categories.labels[category] || category;
+  const description = dict.categories.descriptions[category];
+
   return (
     <section aria-labelledby={`${category}-heading`} id={category} className="scroll-mt-28">
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
@@ -105,16 +128,16 @@ function CategorySection({ category, topics }: { category: Category; topics: Top
           </span>
           <div>
             <h2 id={`${category}-heading`} className="text-lg font-semibold tracking-tight">
-              {CATEGORY_LABELS[category]}
+              {label}
             </h2>
-            <p className="mt-1 max-w-2xl text-sm text-muted">{CATEGORY_DESCRIPTIONS[category]}</p>
+            {description && <p className="mt-1 max-w-2xl xl:max-w-3xl text-sm text-muted">{description}</p>}
           </div>
         </div>
         <p className="shrink-0 text-xs text-muted sm:text-right">
-          {topics.length} topics · {questions} questions
+          {topics.length} {dict.common.topics} · {questions} {dict.common.questions}
         </p>
       </div>
-      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {topics.map((t) => (
           <li key={t.slug}>
             <TopicCard topic={t} />

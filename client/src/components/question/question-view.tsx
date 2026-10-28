@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import type { Dictionary } from "@/i18n/en";
+import { getDictionary } from "@/i18n/dictionary";
 import {
   BookOpenCheck,
   Code,
@@ -41,6 +43,7 @@ export interface QuestionViewProps {
   data: QuestionDetailResponse;
   /** resolved `question.related` entries (missing ones already dropped) */
   related?: QuestionDetailResponse[];
+  dict?: Dictionary;
 }
 
 /**
@@ -48,22 +51,33 @@ export interface QuestionViewProps {
  * solution, key points, pitfalls, follow-ups, related, notes, prev/next) — server component with
  * client islands. `app/questions/[slug]/page.tsx` fetches the data and renders this.
  */
-export function QuestionView({ data, related = [] }: QuestionViewProps) {
+export function QuestionView({ data, related = [], dict = getDictionary("en") }: QuestionViewProps) {
   const { question: q, topic, prev, next } = data;
   const jsCode = q.solution.code?.find((c) => c.language === "javascript")?.code;
   const hasVisuals = q.visuals.length > 0;
 
   const toc: TocItem[] = [
-    { id: "problem", label: "Problem" },
-    ...(q.hints.length ? [{ id: "hints", label: "Hints" }] : []),
-    ...(hasVisuals ? [{ id: "walkthrough", label: "Visual walkthrough", gated: true }] : []),
-    ...(q.approaches.length ? [{ id: "approaches", label: "Approaches", gated: true }] : []),
-    { id: "solution", label: "Solution", gated: true },
-    ...(q.solution.keyPoints.length ? [{ id: "key-points", label: "Key points", gated: true }] : []),
-    ...(q.pitfalls?.length ? [{ id: "pitfalls", label: "Pitfalls", gated: true }] : []),
-    ...(q.followUps?.length ? [{ id: "follow-ups", label: "Follow-ups", gated: true }] : []),
-    ...(related.length ? [{ id: "related", label: "Related" }] : []),
-    { id: "notes", label: "Your notes" },
+    { id: "problem", label: dict.question.problem },
+    ...(q.hints.length ? [{ id: "hints", label: dict.question.hints }] : []),
+    ...(hasVisuals ? [{ id: "walkthrough", label: dict.question.visualWalkthrough, gated: true }] : []),
+    ...(q.approaches.length
+      ? [
+          {
+            id: "approaches",
+            label:
+              q.kind === "coding" || q.kind === "sql"
+                ? dict.question.approachesCoding
+                : dict.question.approachesConceptual,
+            gated: true,
+          },
+        ]
+      : []),
+    { id: "solution", label: dict.question.solution, gated: true },
+    ...(q.solution.keyPoints.length ? [{ id: "key-points", label: dict.question.keyPoints, gated: true }] : []),
+    ...(q.pitfalls?.length ? [{ id: "pitfalls", label: dict.question.pitfalls, gated: true }] : []),
+    ...(q.followUps?.length ? [{ id: "follow-ups", label: dict.question.followUps, gated: true }] : []),
+    ...(related.length ? [{ id: "related", label: dict.question.related }] : []),
+    { id: "notes", label: dict.question.yourNotes },
   ];
   const gatedCount = toc.filter((t) => t.gated).length;
 
@@ -72,7 +86,7 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
       <Container size="wide" className="pb-12 pt-4 sm:pt-5">
         <Breadcrumbs
           items={[
-            { href: "/topics", label: "Topics" },
+            { href: "/topics", label: dict.nav.topics },
             { href: `/topics/${topic.slug}`, label: topic.title },
             { label: q.title },
           ]}
@@ -108,7 +122,7 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
 
         <div className="mt-5 grid gap-6 lg:grid-cols-[minmax(0,1fr)_220px] xl:gap-8">
           <article className="min-w-0 space-y-8">
-            <Section id="problem" title="Problem" icon={<FileText aria-hidden />}>
+            <Section id="problem" title={dict.question.problem} icon={<FileText aria-hidden />}>
               <div className="space-y-4">
                 <Markdown>{q.prompt}</Markdown>
                 {q.examples && q.examples.length > 0 && <Examples examples={q.examples} />}
@@ -119,9 +133,9 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
             {q.hints.length > 0 && (
               <Section
                 id="hints"
-                title="Hints"
+                title={dict.question.hints}
                 icon={<Lightbulb aria-hidden />}
-                description="Stuck? Reveal one hint at a time — the last one nearly gives it away."
+                description={dict.question.hintsDesc}
               >
                 <Hints hints={q.hints} />
               </Section>
@@ -140,10 +154,10 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
                     >
                       <div>
                         <h2 id="walkthrough" className="flex scroll-mt-20 items-center gap-2 text-base font-semibold tracking-tight sm:text-lg">
-                          <Waypoints className="size-5 text-brand" aria-hidden /> Visual walkthrough
+                          <Waypoints className="size-5 text-brand" aria-hidden /> {dict.question.visualWalkthrough}
                         </h2>
                         <p className="mt-0.5 text-sm text-muted">
-                          Step through the solution and watch the state change{jsCode ? " — synced to the code" : ""}.
+                          {dict.question.visualWalkthroughDesc}{jsCode ? dict.question.syncedToCode : ""}.
                         </p>
                       </div>
                       <VisualTypeIcons types={q.visuals.map((v) => v.type)} />
@@ -158,26 +172,26 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
               {q.approaches.length > 0 && (
                 <Section
                   id="approaches"
-                  title={q.kind === "coding" || q.kind === "sql" ? "Approaches: brute force → optimal" : "Weak vs strong answers"}
+                  title={q.kind === "coding" || q.kind === "sql" ? dict.question.approachesCoding : dict.question.approachesConceptual}
                   icon={<Route aria-hidden />}
                   description={
                     q.kind === "coding" || q.kind === "sql"
-                      ? "Say the brute force out loud first, then improve it step by step."
-                      : "What separates an average answer from one that gets you hired."
+                      ? dict.question.approachesDesc
+                      : dict.question.approachesDescConceptual
                   }
                 >
                   <Approaches approaches={q.approaches} kind={q.kind} />
                 </Section>
               )}
 
-              <Section id="solution" title="Solution" icon={<Sparkles aria-hidden />}>
+              <Section id="solution" title={dict.question.solution} icon={<Sparkles aria-hidden />}>
                 <div className="space-y-4">
-                  <SayThisFirst summary={q.solution.summary} />
+                  <SayThisFirst summary={q.solution.summary} label={dict.question.sayThisFirst} />
                   <Markdown>{q.solution.explanation}</Markdown>
                   {q.solution.code && q.solution.code.length > 0 && (
                     <div className="space-y-2">
                       <h3 className="flex items-center gap-2 text-sm font-semibold">
-                        <Code className="size-4 text-muted" aria-hidden /> Code
+                        <Code className="size-4 text-muted" aria-hidden /> {dict.question.code}
                       </h3>
                       <CodeTabs snippets={q.solution.code} />
                     </div>
@@ -189,7 +203,7 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
               {q.solution.keyPoints.length > 0 && (
                 <Section
                   id="key-points"
-                  title="What the interviewer listens for"
+                  title={dict.question.keyPoints}
                   icon={<ListChecks aria-hidden />}
                 >
                   <KeyPoints points={q.solution.keyPoints} />
@@ -197,7 +211,7 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
               )}
 
               {q.pitfalls && q.pitfalls.length > 0 && (
-                <Section id="pitfalls" title="Common pitfalls" icon={<TriangleAlert aria-hidden />}>
+                <Section id="pitfalls" title={dict.question.pitfalls} icon={<TriangleAlert aria-hidden />}>
                   <Pitfalls pitfalls={q.pitfalls} />
                 </Section>
               )}
@@ -205,9 +219,8 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
               {q.followUps && q.followUps.length > 0 && (
                 <Section
                   id="follow-ups"
-                  title="Likely follow-up questions"
+                  title={dict.question.followUps}
                   icon={<MessagesSquare aria-hidden />}
-                  description="Interviewers rarely stop at the first answer. Be ready for these."
                 >
                   <FollowUps followUps={q.followUps} />
                 </Section>
@@ -215,16 +228,15 @@ export function QuestionView({ data, related = [] }: QuestionViewProps) {
             </PracticeGate>
 
             {related.length > 0 && (
-              <Section id="related" title="Related questions" icon={<BookOpenCheck aria-hidden />}>
+              <Section id="related" title={dict.question.related} icon={<BookOpenCheck aria-hidden />}>
                 <RelatedQuestions items={related} />
               </Section>
             )}
 
             <Section
               id="notes"
-              title="Your notes"
+              title={dict.question.yourNotes}
               icon={<NotebookPen aria-hidden />}
-              description="Autosaved to your account. Write the answer the way you would say it."
             >
               <div className="space-y-4">
                 <QuestionNotes slug={q.slug} />

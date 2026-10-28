@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { api, orFallback } from "@/lib/api";
+import { LANG_COOKIE, type AppLang } from "@/lib/constants";
+import { getDictionary } from "@/i18n/dictionary";
 import { filtersToApiQuery, parseQuestionFilters } from "@/lib/question-filters";
 import { formatNumber } from "@/lib/utils";
 import { Container, PageHeader } from "@/components/layout/page";
@@ -18,6 +21,9 @@ export default async function QuestionsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
+  const dict = getDictionary(lang);
   const filters = parseQuestionFilters(await searchParams);
   const [topics, results] = await Promise.all([
     orFallback(api.topics.list()),
@@ -25,17 +31,17 @@ export default async function QuestionsPage({
   ]);
 
   return (
-    <Container className="pb-12">
+    <Container size="wide" className="pb-12">
       <PageHeader
-        eyebrow="Question bank"
-        title="Practice the questions juniors actually get asked"
+        eyebrow={dict.questionsPage.eyebrow}
+        title={dict.questionsPage.title}
         description={
           results && !filters.q && filters.topic.length + filters.difficulty.length + filters.kind.length + filters.frequency.length === 0
-            ? `${formatNumber(results.total)} questions across DSA, CS fundamentals, web, system design and behavioral rounds — each with a model answer and a visual walkthrough.`
-            : "Coding, concept, SQL, design and behavioral questions — each with a model answer and a visual walkthrough."
+            ? dict.questionsPage.description.replace("{count}", formatNumber(results.total))
+            : dict.questionsPage.descriptionFallback
         }
       />
-      <QuestionFilters filters={filters} topics={topics?.items ?? []}>
+      <QuestionFilters filters={filters} topics={topics?.items ?? []} dict={dict} lang={lang}>
         {results ? (
           <QuestionResultsView
             items={results.items}
@@ -43,9 +49,11 @@ export default async function QuestionsPage({
             page={results.page}
             totalPages={results.totalPages}
             filters={filters}
+            dict={dict}
+            lang={lang}
           />
         ) : (
-          <StatusFilteredResults filters={filters} />
+          <StatusFilteredResults filters={filters} dict={dict} lang={lang} />
         )}
       </QuestionFilters>
     </Container>

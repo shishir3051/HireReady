@@ -3,7 +3,7 @@ import { LoadingLabel, Skeleton, SkeletonCard } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <Container className="pb-12 pt-6 sm:pt-8">
+    <Container size="wide" className="pb-12 pt-6 sm:pt-8">
       <LoadingLabel label="Loading topics…" />
       <Skeleton className="h-4 w-20" />
       <Skeleton className="mt-3 h-8 w-full max-w-lg sm:h-9" />
@@ -14,7 +14,7 @@ export default function Loading() {
         ))}
       </div>
       <Skeleton className="mt-8 h-6 w-64" />
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
         {Array.from({ length: 6 }, (_, i) => (
           <SkeletonCard key={i} />
         ))}

@@ -115,12 +115,12 @@ export function Approaches({ approaches, kind }: { approaches: Question["approac
 
 // ---------------------------------------------------------------- solution
 
-export function SayThisFirst({ summary }: { summary: string }) {
+export function SayThisFirst({ summary, label = "Say this first" }: { summary: string; label?: string }) {
   return (
     <div className="relative overflow-hidden rounded-2xl border border-brand/30 bg-brand-soft/40 p-4 sm:p-5">
       <MessageSquareQuote className="absolute -right-3 -top-3 size-24 text-brand/10" aria-hidden />
       <p className="relative flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-brand">
-        <MessageSquareQuote className="size-4" aria-hidden /> Say this first
+        <MessageSquareQuote className="size-4" aria-hidden /> {label}
       </p>
       <p className="relative mt-2 text-pretty text-base font-medium leading-relaxed sm:text-lg">{summary}</p>
     </div>

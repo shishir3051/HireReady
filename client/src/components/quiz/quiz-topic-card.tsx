@@ -1,13 +1,17 @@
+"use client";
+
 import Link from "next/link";
 import { Clock, ListChecks } from "lucide-react";
 import type { QuizTopicSummary } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { TopicIcon } from "@/components/topics/topic-icon";
+import { useLanguage } from "@/components/providers";
 import { QuizBestScore } from "./quiz-stats";
 import { quizMinutes } from "./score";
 
 /** Topic tile on /quiz. The whole card links to the quiz; the best score loads on the client. */
 export function QuizTopicCard({ quiz }: { quiz: QuizTopicSummary }) {
+  const { lang } = useLanguage();
   return (
     <Card interactive className="group relative flex h-full flex-col p-4">
       <div className="flex items-start gap-3.5">
@@ -26,10 +30,10 @@ export function QuizTopicCard({ quiz }: { quiz: QuizTopicSummary }) {
           <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
             <span className="inline-flex items-center gap-1">
               <ListChecks className="size-3.5" aria-hidden />
-              {quiz.count} {quiz.count === 1 ? "question" : "questions"}
+              {lang === "bn" ? `${quiz.count}টি প্রশ্ন` : `${quiz.count} ${quiz.count === 1 ? "question" : "questions"}`}
             </span>
             <span className="inline-flex items-center gap-1">
-              <Clock className="size-3.5" aria-hidden />~{quizMinutes(quiz.count)} min
+              <Clock className="size-3.5" aria-hidden />~{quizMinutes(quiz.count)} {lang === "bn" ? "মিনিট" : "min"}
             </span>
           </p>
         </div>

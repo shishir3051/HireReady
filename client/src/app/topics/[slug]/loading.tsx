@@ -6,7 +6,7 @@ export default function Loading() {
     <div className="pb-12">
       <LoadingLabel label="Loading topic…" />
       <div className="border-b border-border bg-surface/60">
-        <Container className="py-5 sm:py-8">
+        <Container size="wide" className="py-5 sm:py-8">
           <Skeleton className="h-4 w-40" />
           <div className="mt-4 flex items-start gap-4">
             <Skeleton className="size-14 rounded-2xl" />
@@ -23,7 +23,7 @@ export default function Loading() {
           </div>
         </Container>
       </div>
-      <Container className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <Container size="wide" className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px] xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-4">
           <Skeleton className="h-6 w-40" />
           <div className="rounded-xl border border-border bg-surface p-4 sm:p-5">

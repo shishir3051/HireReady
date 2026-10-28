@@ -36,7 +36,7 @@ export function VisualGallery() {
   const allVisuals = FIXTURES.flatMap((f) => f.visuals.map((v, i) => ({ fixture: f, v, i })));
   const types = new Set(allVisuals.map((x) => x.v.type));
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+    <main className="mx-auto w-full max-w-6xl xl:max-w-7xl 2xl:max-w-[90rem] px-4 py-8 sm:px-6 sm:py-10">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-widest text-brand">Dev</p>

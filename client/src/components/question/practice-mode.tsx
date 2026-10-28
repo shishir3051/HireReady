@@ -7,6 +7,7 @@ import { STORAGE_KEYS } from "@/lib/constants";
 import { createLocalStore, parseBoolean, useIsClient } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { useT } from "@/i18n";
 
 const practiceStore = createLocalStore<boolean>(STORAGE_KEYS.practiceMode, false, parseBoolean, String);
 
@@ -56,20 +57,21 @@ export function usePracticeMode(): PracticeModeValue {
 /** Switch in the question header. */
 export function PracticeModeToggle({ className }: { className?: string }) {
   const { enabled, setEnabled } = usePracticeMode();
+  const t = useT();
   return (
     <button
       type="button"
       role="switch"
       aria-checked={enabled}
       onClick={() => setEnabled(!enabled)}
-      title="Hide the walkthrough and solution until you reveal them"
+      title={t.question.practiceModeTitle}
       className={cn(
         "inline-flex h-9 items-center gap-2.5 rounded-lg border border-border bg-surface px-3 text-sm font-medium transition-colors hover:bg-surface-2",
         className,
       )}
     >
       <GraduationCap className="size-4 text-muted" aria-hidden />
-      Practice mode
+      {t.question.practiceMode}
       <span
         aria-hidden
         className={cn(
@@ -104,6 +106,7 @@ export function PracticeGate({
 }) {
   const { hidden, reveal, setEnabled } = usePracticeMode();
   const isClient = useIsClient();
+  const t = useT();
 
   const card = (
     <div
@@ -113,17 +116,17 @@ export function PracticeGate({
       <span className="mx-auto grid size-12 place-items-center rounded-full bg-surface text-brand shadow-sm">
         <Lock className="size-5" aria-hidden />
       </span>
-      <h2 className="mt-4 text-lg font-semibold">The answer is hidden — try it yourself first</h2>
+      <h2 className="mt-4 text-lg font-semibold">{t.question.answerHidden}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm text-muted">
-        Say your approach out loud, write it down, use the hints if you are stuck. Then reveal the visual walkthrough,
-        approaches and model answer{sectionCount ? ` (${sectionCount} sections)` : ""}.
+        {t.question.answerHiddenDesc}
+        {sectionCount ? ` ${t.question.sectionsCount.replace("{count}", String(sectionCount))}` : ""}.
       </p>
       <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
         <Button onClick={reveal} leftIcon={<Eye aria-hidden />}>
-          Reveal the answer
+          {t.question.revealAnswer}
         </Button>
         <Button variant="ghost" onClick={() => setEnabled(false)} leftIcon={<EyeOff aria-hidden />}>
-          Turn off practice mode
+          {t.question.turnOffPractice}
         </Button>
       </div>
     </div>

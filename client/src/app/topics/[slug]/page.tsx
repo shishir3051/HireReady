@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { api, orNull } from "@/lib/api";
 import type { TopicDetailResponse } from "@/lib/types";
+import { LANG_COOKIE, type AppLang } from "@/lib/constants";
+import { getDictionary } from "@/i18n/dictionary";
 import { titleFromSlug } from "@/lib/utils";
 import { TopicView } from "@/components/topics/topic-view";
 
@@ -26,7 +29,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function TopicPage({ params }: Props) {
   const { slug } = await params;
+  const cookieStore = await cookies();
+  const lang: AppLang = cookieStore.get(LANG_COOKIE)?.value === "bn" ? "bn" : "en";
+  const dict = getDictionary(lang);
   const data = await getTopic(slug);
   if (!data) notFound();
-  return <TopicView data={data} />;
+  return <TopicView data={data} dict={dict} lang={lang} />;
 }

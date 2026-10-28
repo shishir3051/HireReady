@@ -3,7 +3,7 @@ import { LoadingLabel, Skeleton, SkeletonText } from "@/components/ui/skeleton";
 
 export default function Loading() {
   return (
-    <Container className="pb-12">
+    <Container size="wide" className="pb-12">
       <LoadingLabel label="Loading roadmap…" />
       <div className="space-y-3 pb-5 pt-6 sm:pt-8">
         <Skeleton className="h-4 w-32" />
@@ -12,7 +12,7 @@ export default function Loading() {
       </div>
       <Skeleton className="mb-5 h-36 w-full rounded-xl" />
       <Skeleton className="mb-3 h-7 w-32" />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
         {Array.from({ length: 6 }, (_, i) => (
           <div key={i} className="rounded-xl border border-border bg-surface p-4">
             <div className="flex items-start gap-3">

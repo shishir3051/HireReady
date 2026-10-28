@@ -15,6 +15,9 @@ import { MockSetup, type TopicOption } from "./mock-setup";
 import { MockSummary, type MockResult, type SaveState } from "./mock-summary";
 import { useLeaveGuard } from "./use-leave-guard";
 
+import type { AppLang } from "@/lib/constants";
+import { getDictionary } from "@/i18n/dictionary";
+
 type Phase = "setup" | "running" | "summary";
 
 interface RunningSession {
@@ -33,7 +36,16 @@ function scrollTop() {
  * /mock-interview: setup → timed session → summary (saved via POST /api/mock-sessions when logged in).
  * Keyed by the ?topics= value in the page, so following a "practice this topic" link starts fresh.
  */
-export function MockInterview({ topics, initialTopics }: { topics: TopicOption[]; initialTopics: string[] }) {
+export function MockInterview({
+  topics,
+  initialTopics,
+  lang = "en",
+}: {
+  topics: TopicOption[];
+  initialTopics: string[];
+  lang?: AppLang;
+}) {
+  const dict = getDictionary(lang);
   const { user } = useAuth();
   const { toast } = useToast();
   const [phase, setPhase] = useState<Phase>("setup");
@@ -167,9 +179,13 @@ export function MockInterview({ topics, initialTopics }: { topics: TopicOption[]
   return (
     <div className="pb-12">
       <PageHeader
-        eyebrow="Mock interview"
-        title="Practice under real interview pressure"
-        description="Random questions, a timer per question, private scratch notes, then the model answer with its visual walkthrough. Rate yourself honestly and we'll point out your weakest topics."
+        eyebrow={dict.nav.mockInterview}
+        title={lang === "bn" ? "আসল ইন্টারভিউয়ের মতো পরিবেশে প্রস্তুতি নিন" : "Practice under real interview pressure"}
+        description={
+          lang === "bn"
+            ? "এলোমেলো প্রশ্ন, প্রতি প্রশ্নে টাইমার, ব্যক্তিগত স্ক্র্যাচ নোট, তারপর মডেল উত্তর ও ভিজ্যুয়াল ওয়াকথ্রু। সততার সাথে নিজেকে রেটিং দিন এবং দুর্বল বিষয়গুলো খুঁজে বের করুন।"
+            : "Random questions, a timer per question, private scratch notes, then the model answer with its visual walkthrough. Rate yourself honestly and we'll point out your weakest topics."
+        }
       />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
         <MockSetup
@@ -178,10 +194,11 @@ export function MockInterview({ topics, initialTopics }: { topics: TopicOption[]
           initial={config}
           starting={starting}
           error={startError}
+          lang={lang}
           onStart={(cfg) => void start(cfg)}
         />
         <aside className="space-y-6">
-          <HowItWorks />
+          <HowItWorks lang={lang} />
           <MockHistory version={historyVersion} />
         </aside>
       </div>
@@ -189,17 +206,25 @@ export function MockInterview({ topics, initialTopics }: { topics: TopicOption[]
   );
 }
 
-function HowItWorks() {
-  const steps = [
-    { icon: Timer, title: "Answer against the clock", text: KINDS.map((k) => `${KIND_LABELS[k]} ${KIND_MINUTES[k]}m`).join(" · ") },
-    { icon: NotebookPen, title: "Think on paper", text: "Private scratch notes per question — outline before you speak." },
-    { icon: Eye, title: "Reveal the model answer", text: "Summary, the points interviewers listen for, and the visual walkthrough." },
-    { icon: Star, title: "Rate yourself 1–5", text: "Required before moving on. Your summary shows where to study next." },
-  ];
+function HowItWorks({ lang = "en" }: { lang?: AppLang }) {
+  const steps =
+    lang === "bn"
+      ? [
+          { icon: Timer, title: "সময়ের সাথে পাল্লা দিয়ে উত্তর দিন", text: "প্রতিটি প্রশ্নের ধরণের জন্য নির্ধারিত সময় বরাদ্দ থাকে।" },
+          { icon: NotebookPen, title: "খসড়া নোট লিখুন", text: "কথা বলার আগে আপনার চিন্তা ও সমাধান পয়েন্ট আকারে সাজিয়ে নিন।" },
+          { icon: Eye, title: "মডেল উত্তর দেখুন", text: "সারসংক্ষেপ, ইন্টারভিউয়াররা যা শুনতে চান এবং স্টেপ-বাই-স্টেপ ভিজ্যুয়াল ওয়াকথ্রু।" },
+          { icon: Star, title: "নিজেকে ১-৫ রেটিং দিন", text: "পরের প্রশ্নে যাওয়ার আগে সততার সাথে নিজের মূল্যায়ন করুন।" },
+        ]
+      : [
+          { icon: Timer, title: "Answer against the clock", text: KINDS.map((k) => `${KIND_LABELS[k]} ${KIND_MINUTES[k]}m`).join(" · ") },
+          { icon: NotebookPen, title: "Think on paper", text: "Private scratch notes per question — outline before you speak." },
+          { icon: Eye, title: "Reveal the model answer", text: "Summary, the points interviewers listen for, and the visual walkthrough." },
+          { icon: Star, title: "Rate yourself 1–5", text: "Required before moving on. Your summary shows where to study next." },
+        ];
   return (
     <Card className="p-4">
       <p className="flex items-center gap-2 font-semibold">
-        <Mic className="size-4 text-brand" aria-hidden /> How it works
+        <Mic className="size-4 text-brand" aria-hidden /> {lang === "bn" ? "মক ইন্টারভিউ যেভাবে কাজ করে" : "How it works"}
       </p>
       <ol className="mt-3 space-y-3">
         {steps.map(({ icon: Icon, title, text }, i) => (

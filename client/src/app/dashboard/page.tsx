@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   // Public content only; the personal data loads in the browser (the page requires login).
   const [questionIndex, roadmap] = await Promise.all([orFallback(fetchQuestionIndex()), orFallback(api.roadmap.get())]);
   return (
-    <Container>
+    <Container size="wide">
       <DashboardView questionIndex={questionIndex ?? {}} roadmap={roadmap} />
     </Container>
   );

@@ -8,9 +8,10 @@ import { LogIn, Menu, Search, UserPlus, X } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useCommandPalette } from "@/components/command-palette";
-import { useAuth } from "@/components/providers/auth-provider";
+import { useAuth, useT } from "@/components/providers";
 import { ButtonLink } from "@/components/ui/button";
 import { Kbd, ModKey } from "@/components/ui/kbd";
+import { LanguageToggle } from "./language-toggle";
 import { Logo } from "./logo";
 import { ThemeToggle } from "./theme-toggle";
 import { Avatar, UserMenu } from "./user-menu";
@@ -20,11 +21,21 @@ function isActive(pathname: string, href: string) {
 }
 
 export function SiteHeader() {
+  const t = useT();
   const pathname = usePathname() ?? "/";
   const { setOpen: setPaletteOpen } = useCommandPalette();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const mobileId = useId();
+
+  const navLinks = [
+    { href: "/topics", label: t.nav.topics },
+    { href: "/questions", label: t.nav.questions },
+    { href: "/quiz", label: t.nav.quiz },
+    { href: "/mock-interview", label: t.nav.mockInterview },
+    { href: "/roadmap", label: t.nav.roadmap },
+    { href: "/dashboard", label: t.nav.dashboard },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 4);
@@ -51,12 +62,12 @@ export function SiteHeader() {
       >
         Skip to content
       </a>
-      <div className="mx-auto flex h-14 w-full max-w-7xl items-center gap-3 px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-14 w-full max-w-7xl xl:max-w-[100rem] 2xl:max-w-[110rem] items-center gap-3 px-4 sm:px-6 md:px-8 lg:px-12 xl:px-16 2xl:px-20">
         <Logo className="mr-2 shrink-0" />
 
         <nav aria-label="Main" className="hidden lg:block">
           <ul className="flex items-center gap-0.5">
-            {NAV_LINKS.map((link) => {
+            {navLinks.map((link) => {
               const active = isActive(pathname, link.href);
               return (
                 <li key={link.href}>
@@ -65,13 +76,13 @@ export function SiteHeader() {
                     aria-current={active ? "page" : undefined}
                     className={cn(
                       "relative inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium transition-colors",
-                      active ? "text-foreground" : "text-muted hover:bg-surface-2 hover:text-foreground",
+                      active ? "font-semibold text-brand" : "text-muted hover:bg-surface-2 hover:text-foreground",
                     )}
                   >
                     {active && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-0 rounded-lg bg-surface-2"
+                        className="absolute inset-0 rounded-lg bg-brand-soft"
                         transition={{ type: "spring", bounce: 0.15, duration: 0.35 }}
                         aria-hidden
                       />
@@ -89,11 +100,11 @@ export function SiteHeader() {
             type="button"
             onClick={() => setPaletteOpen(true)}
             className="hidden h-9 items-center gap-2 rounded-lg border border-border bg-surface pl-3 pr-1.5 text-sm text-muted shadow-xs transition-colors hover:border-brand/40 hover:text-foreground sm:inline-flex"
-            aria-label="Search questions"
+            aria-label={t.common.search}
             aria-keyshortcuts="Control+K Meta+K"
           >
             <Search className="size-4" aria-hidden />
-            <span className="w-28 text-left xl:w-36">Search…</span>
+            <span className="w-28 text-left xl:w-36">{t.common.search}…</span>
             <span className="flex items-center gap-0.5" aria-hidden>
               <ModKey />
               <Kbd>K</Kbd>
@@ -103,10 +114,11 @@ export function SiteHeader() {
             type="button"
             onClick={() => setPaletteOpen(true)}
             className="grid size-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface-2 hover:text-foreground sm:hidden"
-            aria-label="Search questions"
+            aria-label={t.common.search}
           >
             <Search className="size-[18px]" aria-hidden />
           </button>
+          <LanguageToggle />
           <ThemeToggle />
           <div className="hidden sm:block">
             <UserMenu />
@@ -126,14 +138,30 @@ export function SiteHeader() {
 
       <AnimatePresence initial={false}>
         {mobileOpen && (
-          <MobileNav id={mobileId} pathname={pathname} onNavigate={() => setMobileOpen(false)} />
+          <MobileNav
+            id={mobileId}
+            pathname={pathname}
+            onNavigate={() => setMobileOpen(false)}
+            navLinks={navLinks}
+          />
         )}
       </AnimatePresence>
     </header>
   );
 }
 
-function MobileNav({ id, pathname, onNavigate }: { id: string; pathname: string; onNavigate: () => void }) {
+function MobileNav({
+  id,
+  pathname,
+  onNavigate,
+  navLinks,
+}: {
+  id: string;
+  pathname: string;
+  onNavigate: () => void;
+  navLinks: { href: string; label: string }[];
+}) {
+  const t = useT();
   const { user, loading, logout } = useAuth();
 
   useEffect(() => {
@@ -153,9 +181,13 @@ function MobileNav({ id, pathname, onNavigate }: { id: string; pathname: string;
       transition={{ duration: 0.2, ease: "easeOut" }}
       className="overflow-hidden border-t border-border lg:hidden"
     >
-      <nav aria-label="Mobile" className="mx-auto max-h-[calc(100dvh-3.5rem)] max-w-7xl overflow-y-auto px-4 pb-4 pt-2 sm:px-6">
+      <nav aria-label="Mobile" className="mx-auto max-h-[calc(100dvh-3.5rem)] max-w-7xl xl:max-w-[100rem] 2xl:max-w-[110rem] overflow-y-auto px-4 pb-4 pt-2 sm:px-6 lg:px-12 xl:px-16 2xl:px-20">
+        <div className="mb-2 flex items-center justify-between border-b border-border pb-2 sm:hidden">
+          <span className="text-xs font-medium text-muted">{t.nav.language}:</span>
+          <LanguageToggle />
+        </div>
         <ul className="grid gap-1 sm:grid-cols-2">
-          {NAV_LINKS.map((link) => {
+          {navLinks.map((link) => {
             const active = isActive(pathname, link.href);
             return (
               <li key={link.href}>
@@ -192,16 +224,16 @@ function MobileNav({ id, pathname, onNavigate }: { id: string; pathname: string;
                 }}
                 className="h-9 shrink-0 rounded-lg border border-border px-3 text-sm font-medium hover:bg-surface-2"
               >
-                Log out
+                {t.nav.logout}
               </button>
             </div>
           ) : (
             <div className="grid grid-cols-2 gap-2">
               <ButtonLink href="/login" variant="outline" onClick={onNavigate} leftIcon={<LogIn aria-hidden />}>
-                Log in
+                {t.nav.login}
               </ButtonLink>
               <ButtonLink href="/register" onClick={onNavigate} leftIcon={<UserPlus aria-hidden />}>
-                Sign up
+                {t.nav.register}
               </ButtonLink>
             </div>
           )}

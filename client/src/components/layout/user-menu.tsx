@@ -11,6 +11,7 @@ import { useProgress } from "@/components/providers/progress-provider";
 import { useToast } from "@/components/ui/toast";
 import { ButtonLink } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useT } from "@/i18n";
 
 export function Avatar({ name, className }: { name: string; className?: string }) {
   return (
@@ -30,13 +31,14 @@ export function Avatar({ name, className }: { name: string; className?: string }
 export function UserMenu() {
   const { user, loading } = useAuth();
   const pathname = usePathname();
+  const t = useT();
 
   if (loading) return <Skeleton className="size-8 rounded-full" />;
   if (!user) {
     const next = pathname && pathname !== "/" && !pathname.startsWith("/login") && !pathname.startsWith("/register") ? `?next=${encodeURIComponent(pathname)}` : "";
     return (
       <ButtonLink href={`/login${next}`} size="sm" variant="primary" leftIcon={<LogIn aria-hidden />}>
-        Log in
+        {t.nav.login}
       </ButtonLink>
     );
   }
@@ -44,6 +46,7 @@ export function UserMenu() {
 }
 
 function UserDropdown({ name, email }: { name: string; email: string }) {
+  const t = useT();
   const { logout } = useAuth();
   const { counts } = useProgress();
   const { toast } = useToast();
@@ -141,7 +144,7 @@ function UserDropdown({ name, email }: { name: string; email: string }) {
             </div>
             <div className="border-t border-border pt-1.5">
               <Link href="/dashboard" role="menuitem" tabIndex={-1} className={itemClass} onClick={() => setOpen(false)}>
-                <LayoutDashboard aria-hidden /> Dashboard
+                <LayoutDashboard aria-hidden /> {t.nav.dashboard}
               </Link>
               <Link
                 href="/questions?status=bookmarked"
@@ -150,18 +153,18 @@ function UserDropdown({ name, email }: { name: string; email: string }) {
                 className={itemClass}
                 onClick={() => setOpen(false)}
               >
-                <Bookmark aria-hidden /> Bookmarked questions
+                <Bookmark aria-hidden /> {t.question.bookmarked}
               </Link>
               <Link href="/roadmap" role="menuitem" tabIndex={-1} className={itemClass} onClick={() => setOpen(false)}>
-                <MapIcon aria-hidden /> My roadmap
+                <MapIcon aria-hidden /> {t.nav.roadmap}
               </Link>
               <Link href="/quiz" role="menuitem" tabIndex={-1} className={itemClass} onClick={() => setOpen(false)}>
-                <Target aria-hidden /> Quizzes
+                <Target aria-hidden /> {t.nav.quiz}
               </Link>
             </div>
             <div className="mt-1.5 border-t border-border pt-1.5">
               <button type="button" role="menuitem" tabIndex={-1} className={itemClass} onClick={onLogout}>
-                <LogOut aria-hidden /> Log out
+                <LogOut aria-hidden /> {t.nav.logout}
               </button>
             </div>
           </motion.div>

@@ -97,7 +97,7 @@ const components: Components = {
   },
   strong: (p) => {
     const { className, ...props } = clean(p);
-    return <strong className={cn("font-semibold text-foreground", className)} {...props} />;
+    return <strong className={cn("font-bold text-foreground", className)} {...props} />;
   },
   table: (p) => {
     const { className, ...props } = clean(p);
@@ -148,6 +148,51 @@ const components: Components = {
   },
 };
 
+export function sanitizeMarkdown(raw: string): string {
+  if (!raw || typeof raw !== "string") return raw;
+
+  let text = raw;
+
+  // 1. Pair-based bold fixing:
+  // - Strips internal whitespace: "** sliding window **" -> "**sliding window**"
+  // - Ensures outer space between words and "**": "শব্দ**বোল্ড**শব্দ" -> "শব্দ **বোল্ড** শব্দ"
+  // - Preserves punctuation attached outside: "(**বোল্ড**)" -> "(**বোল্ড**)"
+  text = text.replace(
+    /(^|[^\s*([{<`"']?)(\*\*)\s*([^*\n]+?)\s*(\*\*)([^\s*.,;:!?")\]}>`"']?|$)/g,
+    (match, before, _open, inner, _close, after) => {
+      const trimmed = inner.trim();
+      if (!trimmed) return match;
+      const prefix = before ? `${before} ` : "";
+      const suffix = after ? ` ${after}` : "";
+      return `${prefix}**${trimmed}**${suffix}`;
+    },
+  );
+
+  // 2. Ensure headings have newlines before them if collapsed:
+  // e.g. "কিছু টেক্সট। ## শিরোনাম" -> "কিছু টেক্সট।\n\n## শিরোনাম"
+  text = text.replace(/([^\n])\s*(#{1,6}\s+)/g, "$1\n\n$2");
+
+  // Fix lonely '#' lines: "#\n\n# শিরোনাম" -> "# শিরোনাম"
+  text = text.replace(/^#\s*\n+/gm, "");
+
+  // 3. Ensure bullet items are on their own lines:
+  // e.g. "হুক। - **ইভেন্ট লুপ**" -> "হুক।\n- **ইভেন্ট লুপ**"
+  text = text.replace(/([^\n])\s+-\s+/g, "$1\n- ");
+
+  // 4. Ensure numbered lists are on their own lines:
+  // e.g. "বলুন। 3. **একটি ইউটিলিটি..." -> "বলুন।\n\n3. **একটি ইউটিলিটি..."
+  text = text.replace(/([^\n])\s+(\d+\.\s+)/g, "$1\n\n$2");
+
+  // 5. Clean up table rows collapsed into one line:
+  text = text.replace(/\|\s*\|\s*([-:]{2,})/g, "|\n| $1");
+  text = text.replace(/\|\s*\|\s*([A-Za-z0-9\u0980-\u09FF`])/g, "|\n| $1");
+
+  // Clean up excessive newlines
+  text = text.replace(/\n{3,}/g, "\n\n");
+
+  return text.trim();
+}
+
 export interface MarkdownProps {
   children: string;
   className?: string;
@@ -160,6 +205,8 @@ export interface MarkdownProps {
  * Fenced code is highlighted (CodeBlock) with a copy button. Raw HTML is not rendered.
  */
 export function Markdown({ children, className, size = "base" }: MarkdownProps) {
+  const content = sanitizeMarkdown(children);
+
   return (
     <div
       className={cn(
@@ -169,7 +216,7 @@ export function Markdown({ children, className, size = "base" }: MarkdownProps) 
       )}
     >
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
-        {children}
+        {content}
       </ReactMarkdown>
     </div>
   );

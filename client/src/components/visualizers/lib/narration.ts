@@ -54,8 +54,16 @@ export function useNarration(): { on: boolean; supported: boolean; toggle: () =>
 
 let current: SpeechSynthesisUtterance | null = null; // kept referenced: Chrome drops `onend` for garbage-collected utterances
 
-function pickVoice(): SpeechSynthesisVoice | undefined {
+function pickVoice(isBangla = false): SpeechSynthesisVoice | undefined {
   const voices = window.speechSynthesis.getVoices();
+  if (isBangla) {
+    const bangla = voices.filter((v) => /^bn([-_]|$)/i.test(v.lang));
+    const chosen =
+      bangla.find((v) => /bn[-_]BD/i.test(v.lang)) ??
+      bangla.find((v) => /bn[-_]IN/i.test(v.lang)) ??
+      bangla[0];
+    if (chosen) return chosen;
+  }
   const english = voices.filter((v) => /^en([-_]|$)/i.test(v.lang));
   return (
     english.find((v) => /natural|neural|google/i.test(v.name) && /en[-_](US|GB)/i.test(v.lang)) ??
@@ -88,9 +96,14 @@ export function speak(text: string, rate: number, onDone?: () => void): () => vo
   const synth = window.speechSynthesis;
   synth.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  const voice = pickVoice();
-  if (voice) u.voice = voice;
-  u.lang = voice?.lang ?? "en-US";
+  const isBangla = typeof document !== "undefined" && document.documentElement.lang === "bn";
+  const voice = pickVoice(isBangla);
+  if (voice) {
+    u.voice = voice;
+    u.lang = voice.lang;
+  } else {
+    u.lang = isBangla ? "bn-BD" : "en-US";
+  }
   u.rate = rate;
   current = u;
 

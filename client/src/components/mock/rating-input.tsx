@@ -4,7 +4,14 @@ import { useId, useRef, type KeyboardEvent } from "react";
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toneStyle } from "@/components/ui/badge";
-import { RATING_DESCRIPTIONS, RATING_LABELS, ratingTone } from "./constants";
+import { useLanguage } from "@/components/providers";
+import {
+  RATING_DESCRIPTIONS,
+  RATING_DESCRIPTIONS_BN,
+  RATING_LABELS,
+  RATING_LABELS_BN,
+  ratingTone,
+} from "./constants";
 
 export interface RatingInputProps {
   value: number | null;
@@ -23,6 +30,9 @@ export interface RatingInputProps {
 export function RatingInput({ value, onChange, label, invalid, describedBy, className }: RatingInputProps) {
   const id = useId();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { lang } = useLanguage();
+  const labels = lang === "bn" ? RATING_LABELS_BN : RATING_LABELS;
+  const descriptions = lang === "bn" ? RATING_DESCRIPTIONS_BN : RATING_DESCRIPTIONS;
 
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     const current = value ?? 0;
@@ -61,7 +71,7 @@ export function RatingInput({ value, onChange, label, invalid, describedBy, clas
               type="button"
               role="radio"
               aria-checked={checked}
-              aria-label={`${n} – ${RATING_LABELS[n]}: ${RATING_DESCRIPTIONS[n]}`}
+              aria-label={`${n} – ${labels[n]}: ${descriptions[n]}`}
               tabIndex={tabbable ? 0 : -1}
               onClick={() => onChange(n)}
               style={checked ? toneStyle(ratingTone(n)) : undefined}
@@ -79,14 +89,14 @@ export function RatingInput({ value, onChange, label, invalid, describedBy, clas
                 />
               </span>
               <span className={cn("text-[11px] font-medium leading-tight sm:text-xs", !checked && "text-muted")} aria-hidden>
-                {RATING_LABELS[n]}
+                {labels[n]}
               </span>
             </button>
           );
         })}
       </div>
       <p id={`${id}-desc`} className="min-h-4 text-xs text-muted" aria-live="polite">
-        {value !== null ? RATING_DESCRIPTIONS[value] : ""}
+        {value !== null ? descriptions[value] : ""}
       </p>
     </div>
   );
