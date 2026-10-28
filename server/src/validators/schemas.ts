@@ -105,7 +105,35 @@ export const roadmapDayParams = z.object({
 });
 export const roadmapDayBody = z.object({ done: z.boolean({ error: 'must be a boolean' }) });
 
-// ---------------------------------------------------------------- mock sessions
+// ---------------------------------------------------------------- AI (Gemini)
+export const aiEvaluateBody = z.object({
+  questionTitle: requiredString().trim().min(1).max(200),
+  questionPrompt: requiredString().trim().min(1).max(10000),
+  questionKind: z.string().max(50).optional(),
+  modelAnswer: z.string().max(10000).optional(),
+  userNotes: requiredString().trim().min(5, 'must be at least 5 characters').max(10000),
+  lang: z.enum(['en', 'bn']).optional(),
+});
+export type AiEvaluateBody = z.infer<typeof aiEvaluateBody>;
+
+export const aiChatBody = z.object({
+  questionTitle: requiredString().trim().min(1).max(200),
+  questionPrompt: requiredString().trim().min(1).max(10000),
+  modelAnswer: z.string().max(10000).optional(),
+  message: requiredString().trim().min(1).max(4000),
+  history: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'model']),
+        text: z.string().max(4000),
+      }),
+    )
+    .max(10)
+    .optional(),
+  lang: z.enum(['en', 'bn']).optional(),
+});
+export type AiChatBody = z.infer<typeof aiChatBody>;
+
 export const mockSessionBody = z.object({
   config: z.object({
     count: z.number().int().min(1).max(20),

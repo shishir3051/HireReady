@@ -49,6 +49,9 @@ import type {
   TopicDetailResponse,
   TopicSummary,
   User,
+  AiEvaluation,
+  AiEvaluationInput,
+  AiChatInput,
 } from "@/lib/types";
 
 // ---------------------------------------------------------------- errors
@@ -461,6 +464,17 @@ export const api = {
       request<{ session: MockSession }>("/mock-sessions", { ...o, method: "POST", body: input }),
     /** GET /api/mock-sessions → latest 20 (auth) */
     list: (o?: RequestOptions) => request<{ items: MockSession[] }>("/mock-sessions", o),
+  },
+
+  ai: {
+    /** GET /api/ai/status → { enabled: boolean } */
+    status: (o?: RequestOptions) => request<{ enabled: boolean }>("/ai/status", o),
+    /** POST /api/ai/evaluate → evaluates mock interview notes/code with Gemini */
+    evaluate: (input: AiEvaluationInput, o?: RequestOptions) =>
+      request<{ evaluation: AiEvaluation }>("/ai/evaluate", { ...o, method: "POST", body: input }),
+    /** POST /api/ai/chat → Socratic AI tutor for problem clarity, hints and code review */
+    chat: (input: AiChatInput, o?: RequestOptions) =>
+      request<{ reply: string }>("/ai/chat", { ...o, method: "POST", body: input }),
   },
 } as const;
 

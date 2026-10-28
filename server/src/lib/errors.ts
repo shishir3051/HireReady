@@ -15,6 +15,7 @@ export const badRequest = (message: string, details?: unknown) => new HttpError(
 export const unauthenticated = (message = 'Authentication required') => new HttpError(401, message, 'UNAUTHENTICATED');
 export const notFound = (message = 'Not found') => new HttpError(404, message, 'NOT_FOUND');
 export const conflict = (message: string) => new HttpError(409, message, 'CONFLICT');
+export const serviceUnavailable = (message = 'Service unavailable') => new HttpError(503, message, 'SERVICE_UNAVAILABLE');
 
 /** Body shape of every error response (see docs/ARCHITECTURE.md). */
 export interface ErrorBody {

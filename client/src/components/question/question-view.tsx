@@ -22,6 +22,7 @@ import { CodeTabs } from "@/components/code-tabs";
 import { DifficultyBadge, FrequencyBadge, KindBadge, TagBadge, Badge } from "@/components/ui/badge";
 import { VisualTypeIcons } from "@/components/questions/visual-type-icons";
 import { PracticeGate, PracticeModeProvider, PracticeModeToggle } from "@/components/question/practice-mode";
+import { AiTutor } from "@/components/question/ai-tutor";
 import { MarkSolvedCta, QuestionActions } from "@/components/question/question-actions";
 import { Hints } from "@/components/question/hints";
 import { KeyPoints } from "@/components/question/key-points";
@@ -116,7 +117,10 @@ export function QuestionView({ data, related = [], dict = getDictionary("en") }:
           )}
           <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <QuestionActions slug={q.slug} title={q.title} />
-            <PracticeModeToggle className="self-start sm:self-auto" />
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <AiTutor question={q} topicTitle={topic.title} />
+              <PracticeModeToggle />
+            </div>
           </div>
         </header>
 

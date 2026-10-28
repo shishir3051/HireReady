@@ -35,6 +35,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/input";
 import { ProgressRing } from "@/components/ui/progress-ring";
 import { KIND_MINUTES } from "./constants";
+import { MockAiEvaluator } from "./mock-ai-evaluator";
 import { RatingInput } from "./rating-input";
 
 export interface MockRunItem {
@@ -336,6 +337,16 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
               }
               className="mt-3 min-h-36 font-mono text-[13px]"
               spellCheck={false}
+            />
+            <MockAiEvaluator
+              key={question.slug}
+              question={question}
+              notes={run.notes}
+              lang={lang}
+              onApplyRating={(r) => {
+                patchRun({ rating: r });
+                setRatingError(false);
+              }}
             />
           </Card>
 

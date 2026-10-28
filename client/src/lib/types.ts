@@ -435,3 +435,33 @@ export interface MockSessionInput {
   durationSec: number;
   items: Omit<MockSessionItem, "title" | "kind">[];
 }
+
+// ---------------------------------------------------------------- AI (Gemini)
+
+export interface AiEvaluation {
+  rating: number; // 1 to 5
+  verdict: 'Strong Hire' | 'Hire' | 'Lean Hire' | 'Lean No Hire' | 'No Hire';
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  missingEdgeCases: string[];
+}
+
+export interface AiEvaluationInput {
+  questionTitle: string;
+  questionPrompt: string;
+  questionKind?: string;
+  modelAnswer?: string;
+  userNotes: string;
+  lang?: 'en' | 'bn';
+}
+
+export interface AiChatInput {
+  questionTitle: string;
+  questionPrompt: string;
+  modelAnswer?: string;
+  message: string;
+  history?: Array<{ role: 'user' | 'model'; text: string }>;
+  lang?: 'en' | 'bn';
+}
+

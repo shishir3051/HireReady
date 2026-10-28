@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { aiRouter } from './ai.routes';
 import { authRouter } from './auth.routes';
 import { healthRouter } from './health.routes';
 import { mockSessionsRouter } from './mockSessions.routes';
@@ -18,3 +19,4 @@ apiRouter.use('/quiz', quizRouter);
 apiRouter.use('/roadmap', roadmapRouter);
 apiRouter.use('/progress', progressRouter);
 apiRouter.use('/mock-sessions', mockSessionsRouter);
+apiRouter.use('/ai', aiRouter);

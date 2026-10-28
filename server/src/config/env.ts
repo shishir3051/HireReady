@@ -60,6 +60,9 @@ const EnvSchema = z.object({
   /** Google OAuth client (Google Cloud Console → Credentials). Both set → "Continue with Google" is enabled. */
   GOOGLE_CLIENT_ID: optionalString,
   GOOGLE_CLIENT_SECRET: optionalString,
+  /** Google Gemini AI API key for mock interview evaluation and AI tutoring. */
+  GEMINI_API_KEY: optionalString,
+  GEMINI_MODEL: z.string().trim().default('gemini-3.5-flash-lite'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
@@ -81,3 +84,4 @@ export const isProduction = env.NODE_ENV === 'production';
 export const appUrl = (env.APP_URL ?? env.CLIENT_ORIGIN[0] ?? 'http://localhost:3000').replace(/\/+$/, '');
 export const smtpEnabled = Boolean(env.SMTP_HOST);
 export const googleEnabled = Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
+export const geminiEnabled = Boolean(env.GEMINI_API_KEY);
