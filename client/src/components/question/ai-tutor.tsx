@@ -22,6 +22,83 @@ interface AiTutorProps {
   topicTitle?: string;
 }
 
+/** Types out Markdown text progressively with a blinking cursor and auto-scroll */
+function TypewriterMarkdown({
+  content,
+  isTyping,
+  onTypingDone,
+  onStep,
+}: {
+  content: string;
+  isTyping: boolean;
+  onTypingDone?: () => void;
+  onStep?: () => void;
+}) {
+  const [length, setLength] = useState(isTyping ? 0 : content.length);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    if (!isTyping) {
+      setLength(content.length);
+      return;
+    }
+
+    setLength(0);
+    doneRef.current = false;
+    let curr = 0;
+    const total = content.length;
+    // Chunk size: for short replies ~3-5 chars per tick, for long replies ~15-20 chars per tick
+    const chunkSize = Math.max(3, Math.min(18, Math.ceil(total / 65)));
+
+    const timer = setInterval(() => {
+      curr += chunkSize;
+      if (curr >= total) {
+        curr = total;
+        setLength(total);
+        clearInterval(timer);
+        if (!doneRef.current) {
+          doneRef.current = true;
+          onTypingDone?.();
+        }
+      } else {
+        setLength(curr);
+      }
+      onStep?.();
+    }, 20);
+
+    return () => clearInterval(timer);
+  }, [content, isTyping]);
+
+  const displayed = isTyping ? content.slice(0, length) : content;
+  const stillTyping = isTyping && length < content.length;
+
+  return (
+    <div
+      onClick={() => {
+        if (stillTyping) {
+          setLength(content.length);
+          if (!doneRef.current) {
+            doneRef.current = true;
+            onTypingDone?.();
+          }
+        }
+      }}
+      title={stillTyping ? "Click to reveal full text" : undefined}
+      className={stillTyping ? "cursor-pointer select-text" : undefined}
+    >
+      <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>pre]:my-2 [&>pre]:bg-background/90 [&>pre]:p-2.5 [&>pre]:rounded-lg [&>pre]:text-xs [&>ul]:my-1.5 [&>ol]:my-1.5">
+        <Markdown>{displayed}</Markdown>
+        {stillTyping && (
+          <span
+            className="inline-block h-3.5 w-1.5 translate-y-0.5 rounded-xs bg-brand animate-pulse ml-0.5"
+            aria-hidden
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function AiTutor({ question }: AiTutorProps) {
   const { lang } = useLanguage();
   const isClient = useIsClient();
@@ -29,6 +106,7 @@ export function AiTutor({ question }: AiTutorProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -69,16 +147,21 @@ export function AiTutor({ question }: AiTutorProps) {
     };
   }, [isOpen]);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
+  // Scroll to bottom helper
+  const scrollToBottom = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
+  };
+
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    scrollToBottom();
   }, [messages, loading]);
 
   async function sendMessage(textToSend?: string) {
     const text = (textToSend ?? input).trim();
-    if (!text || loading) return;
+    if (!text || loading || typingMessageId) return;
 
     const userMsg: Message = { id: `u-${Date.now()}`, role: "user", text };
     const nextMessages = [...messages, userMsg];
@@ -100,7 +183,9 @@ export function AiTutor({ question }: AiTutorProps) {
         lang,
       });
 
-      setMessages((prev) => [...prev, { id: `m-${Date.now()}`, role: "model", text: res.reply }]);
+      const replyId = `m-${Date.now()}`;
+      setMessages((prev) => [...prev, { id: replyId, role: "model", text: res.reply }]);
+      setTypingMessageId(replyId);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -211,9 +296,12 @@ export function AiTutor({ question }: AiTutorProps) {
                       {m.role === "user" ? (
                         <p className="whitespace-pre-wrap">{m.text}</p>
                       ) : (
-                        <div className="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-2 [&>p:last-child]:mb-0 [&>pre]:my-2 [&>pre]:bg-background/90 [&>pre]:p-2.5 [&>pre]:rounded-lg [&>pre]:text-xs [&>ul]:my-1.5 [&>ol]:my-1.5">
-                          <Markdown>{m.text}</Markdown>
-                        </div>
+                        <TypewriterMarkdown
+                          content={m.text}
+                          isTyping={m.id === typingMessageId}
+                          onTypingDone={() => setTypingMessageId(null)}
+                          onStep={scrollToBottom}
+                        />
                       )}
                     </div>
                     {m.role === "user" && (
@@ -244,7 +332,7 @@ export function AiTutor({ question }: AiTutorProps) {
                     <button
                       key={idx}
                       type="button"
-                      disabled={loading}
+                      disabled={loading || !!typingMessageId}
                       onClick={() => sendMessage(chip.query)}
                       className="inline-flex items-center rounded-md border border-border bg-surface px-2.5 py-1 text-xs text-muted hover:border-brand/40 hover:bg-brand-soft/30 hover:text-foreground transition-colors disabled:opacity-50"
                     >
@@ -268,14 +356,14 @@ export function AiTutor({ question }: AiTutorProps) {
                         ? "প্রশ্ন সম্পর্কে কিছু জিজ্ঞাসা করুন…"
                         : "Ask a question about this problem…"
                     }
-                    disabled={loading}
+                    disabled={loading || !!typingMessageId}
                     className="h-10 w-full rounded-xl border border-border bg-background pl-3.5 pr-11 text-xs sm:text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-50"
                   />
                   <Button
                     size="icon-sm"
                     variant="primary"
                     onClick={() => sendMessage()}
-                    disabled={!input.trim() || loading}
+                    disabled={!input.trim() || loading || !!typingMessageId}
                     className="absolute right-1 size-8 rounded-lg"
                     aria-label="Send message"
                   >
