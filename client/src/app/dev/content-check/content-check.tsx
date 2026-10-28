@@ -299,7 +299,7 @@ export function ContentCheck() {
       <section aria-live="polite" className="mt-6 rounded-2xl border border-border bg-surface p-4 shadow-sm">
         <div className="flex items-center gap-2 text-sm font-medium">
           {status === "loading" ? (
-            <LoaderCircle aria-hidden className="size-4 animate-spin text-brand motion-reduce:animate-none" />
+            <LoaderCircle aria-hidden className="size-4 animate-spin text-brand motion-off:animate-none" />
           ) : failures.length ? (
             <CircleAlert aria-hidden className="size-4 text-viz-danger" />
           ) : (

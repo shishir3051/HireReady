@@ -43,25 +43,11 @@ export function LanguageProvider({
     [router],
   );
 
+  // The server already rendered with the cookie's language (and src/proxy.ts turns `?lang=` links into that cookie),
+  // so the client only keeps <html lang> in sync after a switch.
   useEffect(() => {
-    // Keep documentElement in sync
     document.documentElement.lang = lang;
-
-    // Sync from URL or cookie on mount if different
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const qLang = params.get("lang");
-      if ((qLang === "bn" || qLang === "en") && qLang !== lang) {
-        setLang(qLang);
-        return;
-      }
-      const match = document.cookie.match(/(?:^|; )hr-lang=([^;]+)/);
-      const cLang = match?.[1] as AppLang;
-      if ((cLang === "bn" || cLang === "en") && cLang !== lang) {
-        setLangState(cLang);
-      }
-    }
-  }, [lang, setLang]);
+  }, [lang]);
 
   const toggleLang = useCallback(() => {
     setLang(lang === "bn" ? "en" : "bn");

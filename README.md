@@ -20,7 +20,7 @@ Features:
 
 - **Visual walkthroughs** with play/pause, step scrubbing, a variable watch box, side panels (stacks, queues, hash maps) and the code line that runs at each step.
 - **Narrated walkthroughs**: press **Narrate** (or N) and the browser reads each step aloud, moving on when it finishes, like a video lesson (Web Speech API, works offline).
-- **Practice mode**: hide the solution, reveal hints one at a time.
+- **Practice mode** (on by default): the solution stays hidden until you reveal it; hints come one at a time.
 - **Topic quizzes** with instant feedback and saved scores.
 - **Timed mock interviews** with self-rating and a summary of weak areas.
 - **30-day roadmap** with daily goals and linked questions.

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Lock } from "lucide-react";
+import { useIsClient } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { usePracticeMode } from "./practice-mode";
 
@@ -15,6 +16,7 @@ export interface TocItem {
 /** Sticky "On this page" navigation with scroll-spy. */
 export function QuestionToc({ items }: { items: TocItem[] }) {
   const { hidden } = usePracticeMode();
+  const isClient = useIsClient();
   const [active, setActive] = useState<string | null>(null);
   const ids = items.map((i) => i.id).join(",");
 
@@ -45,7 +47,9 @@ export function QuestionToc({ items }: { items: TocItem[] }) {
       <p className="text-xs font-semibold uppercase tracking-wider text-muted">On this page</p>
       <ul className="mt-3 space-y-0.5 border-l border-border">
         {items.map((item) => {
-          const locked = hidden && item.gated;
+          const locked = isClient && hidden && item.gated;
+          // before hydration the boot script's <html data-practice> flag decides, like PracticeGate
+          const lockedByCss = !isClient && item.gated;
           const isActive = active === item.id && !locked;
           return (
             <li key={item.id}>
@@ -58,10 +62,16 @@ export function QuestionToc({ items }: { items: TocItem[] }) {
                     ? "border-brand font-medium text-foreground"
                     : "border-transparent text-muted hover:border-muted/50 hover:text-foreground",
                   locked && "text-muted/70",
+                  lockedByCss && "[html[data-practice=on]_&]:text-muted/70",
                 )}
               >
                 {item.label}
-                {locked && <Lock className="size-3" aria-label="hidden in practice mode" />}
+                {(locked || lockedByCss) && (
+                  <Lock
+                    className={cn("size-3", lockedByCss && "hidden [html[data-practice=on]_&]:inline-block")}
+                    aria-label="hidden in practice mode"
+                  />
+                )}
               </a>
             </li>
           );

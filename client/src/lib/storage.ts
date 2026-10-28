@@ -3,7 +3,7 @@ import { useSyncExternalStore } from "react";
 /**
  * Tiny localStorage-backed external store usable with useSyncExternalStore.
  *
- *   const practiceStore = createLocalStore("hr-practice-mode", false, parseBoolean);
+ *   const practiceStore = createLocalStore("hr-practice-mode-v2", true, parseBoolean);
  *   const on = practiceStore.useValue();   // SSR renders the fallback, the browser the stored value
  *   practiceStore.set(true);               // persists + notifies every subscriber (and other tabs)
  *
@@ -25,8 +25,10 @@ export function createLocalStore<T>(
   const listeners = new Set<() => void>();
   let cachedRaw: string | null | undefined;
   let cachedValue: T = fallback;
+  let memoryOnly = false; // a write failed (e.g. storage full): this session keeps the in-memory value
 
   function read(): T {
+    if (memoryOnly) return cachedValue;
     let raw: string | null;
     try {
       raw = window.localStorage.getItem(key);
@@ -63,8 +65,10 @@ export function createLocalStore<T>(
     set(value) {
       try {
         window.localStorage.setItem(key, serialize(value));
+        memoryOnly = false;
       } catch {
-        // storage unavailable — keep the in-memory value so the UI still updates this session
+        // storage unavailable or full — keep the in-memory value so the UI still updates this session
+        memoryOnly = true;
         cachedRaw = serialize(value);
         cachedValue = value;
       }

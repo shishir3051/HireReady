@@ -2,7 +2,8 @@
 
 import { useEffect, useId, useRef, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useMotionPreference } from "@/lib/motion-preference";
 import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsClient } from "@/lib/storage";
@@ -57,7 +58,7 @@ function DialogPanel({
   const panelRef = useRef<HTMLDivElement>(null);
   const titleId = useId();
   const descId = useId();
-  const reduce = useReducedMotion();
+  const reduce = useMotionPreference().reduce;
   const onOpenChangeRef = useRef(onOpenChange);
   useEffect(() => {
     onOpenChangeRef.current = onOpenChange;

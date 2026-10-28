@@ -16,6 +16,7 @@ export const unauthenticated = (message = 'Authentication required') => new Http
 export const notFound = (message = 'Not found') => new HttpError(404, message, 'NOT_FOUND');
 export const conflict = (message: string) => new HttpError(409, message, 'CONFLICT');
 export const serviceUnavailable = (message = 'Service unavailable') => new HttpError(503, message, 'SERVICE_UNAVAILABLE');
+export const tooManyRequests = (message: string) => new HttpError(429, message, 'RATE_LIMITED');
 
 /** Body shape of every error response (see docs/ARCHITECTURE.md). */
 export interface ErrorBody {

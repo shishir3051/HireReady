@@ -19,6 +19,7 @@ import {
   Waypoints,
 } from "lucide-react";
 import type { Question } from "@/lib/types";
+import { animationsReduced } from "@/lib/motion-preference";
 import { cn, formatDuration } from "@/lib/utils";
 import { useLanguage } from "@/components/providers";
 import { VisualWalkthrough } from "@/components/visualizers";
@@ -66,9 +67,8 @@ export interface MockSessionProps {
 
 type FocusTarget = "question" | "answer" | "rating" | null;
 
-function reducedMotion() {
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+// the app's "Reduce animations" choice, not the OS setting (see lib/motion-preference.ts)
+const reducedMotion = animationsReduced;
 
 /** The interview itself: prompt, timers, scratch notes, reveal, mandatory self-rating, next. */
 export function MockSessionView({ questions, topicTitles, startedAt, onFinish, onDiscard }: MockSessionProps) {

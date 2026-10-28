@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
-import { MotionConfig } from "motion/react";
 import type { Visual } from "@/lib/types";
 import { typeMeta } from "../lib/steps";
 import { asArray, clamp, cn, safeId } from "../lib/utils";
@@ -93,20 +92,18 @@ export function Walkthrough({ visuals, code, className }: { visuals: Visual[]; c
   }
 
   return (
-    <MotionConfig reducedMotion="never">
-      <div className={cn("flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-surface p-3 shadow-sm sm:p-4", className)}>
-        {list.length > 1 ? <Tabs visuals={list} active={active} onSelect={setActive} idBase={idBase} /> : null}
-        <div
-          id={`${idBase}-panel`}
-          role={list.length > 1 ? "tabpanel" : undefined}
-          aria-labelledby={list.length > 1 ? `${idBase}-tab-${active}` : undefined}
-          className="min-w-0"
-        >
-          <VisualErrorBoundary key={stageKey} label={typeMeta(visual.type).label.toLowerCase()}>
-            <VisualStage key={stageKey} visual={visual} code={code} initialStep={steps[stageKey] ?? 0} onStepChange={onStepChange} />
-          </VisualErrorBoundary>
-        </div>
+    <div className={cn("flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-surface p-3 shadow-sm sm:p-4", className)}>
+      {list.length > 1 ? <Tabs visuals={list} active={active} onSelect={setActive} idBase={idBase} /> : null}
+      <div
+        id={`${idBase}-panel`}
+        role={list.length > 1 ? "tabpanel" : undefined}
+        aria-labelledby={list.length > 1 ? `${idBase}-tab-${active}` : undefined}
+        className="min-w-0"
+      >
+        <VisualErrorBoundary key={stageKey} label={typeMeta(visual.type).label.toLowerCase()}>
+          <VisualStage key={stageKey} visual={visual} code={code} initialStep={steps[stageKey] ?? 0} onStepChange={onStepChange} />
+        </VisualErrorBoundary>
       </div>
-    </MotionConfig>
+    </div>
   );
 }

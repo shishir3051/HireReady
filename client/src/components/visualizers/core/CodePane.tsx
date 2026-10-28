@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { Highlight, themes } from "prism-react-renderer";
-import { useReducedMotion } from "motion/react";
+import { useMotionPreference } from "@/lib/motion-preference";
 import { FileCode } from "lucide-react";
 import { useIsDark } from "../lib/hooks";
 import { cn } from "../lib/utils";
@@ -28,7 +28,7 @@ export function CodePane({
   maxHeightClass?: string;
 }) {
   const dark = useIsDark();
-  const reduced = useReducedMotion();
+  const reduced = useMotionPreference().reduce;
   const scroller = useRef<HTMLDivElement>(null);
   const source = String(code ?? "").replace(/\r\n?/g, "\n").replace(/\n+$/, "");
   const lineCount = source.split("\n").length;

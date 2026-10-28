@@ -93,7 +93,7 @@ export function MermaidView({ source, className }: { source: string; className?:
           />
         </AnimatePresence>
       ) : (
-        <div className="flex min-h-48 w-full animate-pulse items-center justify-center rounded-lg bg-surface-2/70 text-xs text-muted motion-reduce:animate-none">
+        <div className="flex min-h-48 w-full animate-pulse items-center justify-center rounded-lg bg-surface-2/70 text-xs text-muted motion-off:animate-none">
           Rendering diagram…
         </div>
       )}

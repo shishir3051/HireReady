@@ -140,6 +140,11 @@ export const DEFAULT_LANG: AppLang = "en";
 export const STORAGE_KEYS = {
   theme: "hr-theme",
   codeLanguage: "hr-code-lang",
-  practiceMode: "hr-practice-mode",
+  /** "-v2" since practice mode became on by default: a new key starts every browser with it on once */
+  practiceMode: "hr-practice-mode-v2",
+  /** "off" when the learner chose "Reduce animations"; animations play otherwise, whatever the OS setting */
+  motion: "hr-motion",
+  /** width in px of Hira's chat panel, set by dragging its left edge */
+  hiraWidth: "hr-hira-width",
   lang: "hr-lang",
 } as const;

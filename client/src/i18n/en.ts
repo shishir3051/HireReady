@@ -129,7 +129,7 @@ export const en = {
   practiceModes: {
     eyebrow: "Practice like it's the real thing",
     title: "Reading is not preparing. Practising is.",
-    text: "Turn on practice mode to hide every answer until you've tried it yourself, then test yourself with quizzes and mock rounds.",
+    text: "Practice mode (on by default) hides every answer until you've tried it yourself. Then test yourself with quizzes and mock rounds.",
     open: "Open",
     quiz: {
       title: "Topic quizzes",
@@ -219,6 +219,9 @@ export const en = {
     of: "of",
     keyboardHint: "Focus the player, then use ← → to step, space to play/pause",
     keyboardHintNarrate: ", N to narrate",
+    motionReduced: "Animations are reduced.",
+    motionPlay: "Play animations",
+    motionReduce: "Reduce animations",
     noNote: "No note for this step.",
     noVisual: "No visual walkthrough for this question yet.",
     variables: "Variables",

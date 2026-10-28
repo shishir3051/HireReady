@@ -4,6 +4,7 @@ export * from './user';
 import { QuestionModel, QuizQuestionModel, RoadmapModel, TopicModel } from './content';
 import {
   ActivityModel,
+  AiUsageModel,
   MockSessionModel,
   QuestionProgressModel,
   QuizAttemptModel,
@@ -19,6 +20,7 @@ export const userModels = [
   QuizAttemptModel,
   MockSessionModel,
   ActivityModel,
+  AiUsageModel,
 ] as const;
 
 /** Builds every declared index (idempotent). */

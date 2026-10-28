@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 import { Shuffle } from "lucide-react";
 import type { QuizAttemptInput, QuizQuestion, QuizResponse } from "@/lib/types";
 import { api, getErrorMessage } from "@/lib/api";
+import { animationsReduced } from "@/lib/motion-preference";
 import { useAuth, useProgressStats, useToast } from "@/components/providers";
 import { Badge } from "@/components/ui/badge";
 import { QuizProgress, QuizQuestionCard, type QuizSelection } from "./quiz-question";
@@ -20,9 +21,8 @@ function shuffled<T>(list: T[]): T[] {
   return out;
 }
 
-function prefersReducedMotion() {
-  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
+// the app's "Reduce animations" choice, not the OS setting (see lib/motion-preference.ts)
+const prefersReducedMotion = animationsReduced;
 
 /** Scroll so `el` sits just below the sticky header when it is out of view. */
 function bringIntoView(el: HTMLElement | null) {

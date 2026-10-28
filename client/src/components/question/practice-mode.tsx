@@ -4,12 +4,15 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { motion } from "motion/react";
 import { Eye, EyeOff, GraduationCap, Lock } from "lucide-react";
 import { STORAGE_KEYS } from "@/lib/constants";
-import { createLocalStore, parseBoolean, useIsClient } from "@/lib/storage";
+import { createLocalStore, useIsClient } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/i18n";
 
-const practiceStore = createLocalStore<boolean>(STORAGE_KEYS.practiceMode, false, parseBoolean, String);
+// On by default: answers stay hidden until the student tries first. Only an explicit "false" turns it off,
+// matching the boot script in lib/init-scripts.ts.
+const parsePractice = (raw: string) => (raw === "false" ? false : raw === "true" ? true : undefined);
+const practiceStore = createLocalStore<boolean>(STORAGE_KEYS.practiceMode, true, parsePractice, String);
 
 function setHtmlFlag(on: boolean) {
   if (on) document.documentElement.setAttribute("data-practice", "on");
@@ -57,12 +60,17 @@ export function usePracticeMode(): PracticeModeValue {
 /** Switch in the question header. */
 export function PracticeModeToggle({ className }: { className?: string }) {
   const { enabled, setEnabled } = usePracticeMode();
+  const isClient = useIsClient();
   const t = useT();
+  // Until hydration React only knows the default (on); the boot script's <html data-practice> flag knows the
+  // stored choice, so CSS draws the switch from it and someone who turned practice mode off never sees it "on".
+  const track = isClient ? (enabled ? "bg-brand" : "bg-border") : "bg-border [html[data-practice=on]_&]:bg-brand";
+  const knob = isClient ? (enabled ? "ml-[18px]" : "ml-0.5") : "ml-0.5 [html[data-practice=on]_&]:ml-[18px]";
   return (
     <button
       type="button"
       role="switch"
-      aria-checked={enabled}
+      aria-checked={isClient ? enabled : undefined} // unknown until hydration; don't announce a guess
       onClick={() => setEnabled(!enabled)}
       title={t.question.practiceModeTitle}
       className={cn(
@@ -74,15 +82,12 @@ export function PracticeModeToggle({ className }: { className?: string }) {
       {t.question.practiceMode}
       <span
         aria-hidden
-        className={cn(
-          "relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
-          enabled ? "bg-brand" : "bg-border",
-        )}
+        className={cn("relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors", track)}
       >
         <motion.span
           layout
           transition={{ type: "spring", bounce: 0.2, duration: 0.25 }}
-          className={cn("size-4 rounded-full bg-surface shadow-sm", enabled ? "ml-[18px]" : "ml-0.5")}
+          className={cn("size-4 rounded-full bg-surface shadow-sm", knob)}
         />
       </span>
     </button>

@@ -12,7 +12,7 @@ interface NarrationToggle {
 }
 
 const iconBtn =
-  "inline-flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-foreground shadow-xs transition-[background-color,border-color,color,opacity,transform] duration-200 hover:bg-surface-2 active:scale-95 disabled:pointer-events-none disabled:opacity-40 motion-reduce:active:scale-100";
+  "inline-flex size-9 items-center justify-center rounded-lg border border-border bg-surface text-foreground shadow-xs transition-[background-color,border-color,color,opacity,transform] duration-200 hover:bg-surface-2 active:scale-95 disabled:pointer-events-none disabled:opacity-40 motion-off:active:scale-100";
 
 /** prev / play-pause / next / restart, narrate, speed, scrubber and "Step 3 / 9". */
 export function Controls({
@@ -86,7 +86,7 @@ export function Controls({
         <div className="group relative h-6 min-w-0 flex-1">
           <div className="absolute inset-x-0 top-1/2 h-1.5 -translate-y-1/2 overflow-hidden rounded-full bg-surface-2 ring-1 ring-inset ring-border">
             <div
-              className="h-full rounded-full bg-brand transition-[width] duration-250 ease-out motion-reduce:transition-none"
+              className="h-full rounded-full bg-brand transition-[width] duration-250 ease-out motion-off:transition-none"
               style={{ width: `${pct}%` }}
             />
           </div>
@@ -106,7 +106,7 @@ export function Controls({
           )}
           <div
             aria-hidden
-            className="pointer-events-none absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand bg-surface shadow-sm transition-[left] duration-250 ease-out group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-ring motion-reduce:transition-none"
+            className="pointer-events-none absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand bg-surface shadow-sm transition-[left] duration-250 ease-out group-has-[:focus-visible]:ring-2 group-has-[:focus-visible]:ring-ring motion-off:transition-none"
             style={{ left: `${pct}%` }}
           />
           <input

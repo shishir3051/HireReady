@@ -5,7 +5,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { LogIn, Menu, Search, UserPlus, X } from "lucide-react";
-import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useCommandPalette } from "@/components/command-palette";
 import { useAuth, useT } from "@/components/providers";

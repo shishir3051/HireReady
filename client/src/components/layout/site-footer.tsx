@@ -27,39 +27,6 @@ const YEAR = new Date().getFullYear();
 
 type FooterLink = { href: string; label: string; icon?: LucideIcon; topic?: string };
 
-const COLUMNS: { title: string; links: FooterLink[] }[] = [
-  {
-    title: "Learn",
-    links: [
-      { href: "/topics", label: "Topics", icon: Layers },
-      { href: "/questions", label: "Question bank", icon: ListChecks },
-      { href: "/roadmap", label: "30-day roadmap", icon: Route },
-    ],
-  },
-  {
-    title: "Practice",
-    links: [
-      { href: "/quiz", label: "Quizzes", icon: Target },
-      { href: "/mock-interview", label: "Mock interview", icon: Mic },
-      { href: "/dashboard", label: "Dashboard", icon: ChartColumn },
-    ],
-  },
-  {
-    title: "Categories",
-    links: CATEGORY_ORDER.map((c) => ({ href: `/topics#${c}`, label: CATEGORY_SHORT_LABELS[c], icon: CATEGORY_ICONS[c] })),
-  },
-  {
-    title: "Popular topics",
-    links: [
-      { href: "/topics/arrays-hashing", label: "Arrays & Hashing", topic: "arrays-hashing" },
-      { href: "/topics/dynamic-programming", label: "Dynamic Programming", topic: "dynamic-programming" },
-      { href: "/topics/sql", label: "SQL", topic: "sql" },
-      { href: "/topics/system-design", label: "System Design", topic: "system-design" },
-      { href: "/topics/behavioral", label: "Behavioral & HR", topic: "behavioral" },
-    ],
-  },
-];
-
 async function FooterStats() {
   const stats = await orFallback(api.stats({ revalidate: 300 }));
   if (!stats) return null;

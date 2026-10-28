@@ -11,7 +11,8 @@ import {
   type ReactNode,
 } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useMotionPreference } from "@/lib/motion-preference";
 import { CircleAlert, CircleCheck, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toneText } from "./badge";
@@ -119,7 +120,7 @@ const ICONS = {
 } as const;
 
 function ToastItem({ toast, onDismiss }: { toast: ToastRecord; onDismiss: (id: string) => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useMotionPreference().reduce;
   const [paused, setPaused] = useState(false);
   const Icon = ICONS[toast.variant];
   const { id, duration } = toast;

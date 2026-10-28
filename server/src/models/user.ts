@@ -168,3 +168,28 @@ const ActivitySchema = new Schema<ActivityDoc>(
 );
 ActivitySchema.index({ user: 1, date: 1 }, { unique: true });
 export const ActivityModel = model<ActivityDoc>('Activity', ActivitySchema);
+
+// ---------------------------------------------------------------- AI usage (per-user daily quota)
+export interface AiUsageDoc {
+  _id: Types.ObjectId;
+  user: Types.ObjectId;
+  /** YYYY-MM-DD (UTC) */
+  day: string;
+  chat: number;
+  evaluate: number;
+  createdAt: Date;
+}
+
+const AiUsageSchema = new Schema<AiUsageDoc>(
+  {
+    user: { type: ObjectId, ref: 'User', required: true },
+    day: { type: String, required: true },
+    chat: { type: Number, default: 0 },
+    evaluate: { type: Number, default: 0 },
+  },
+  { timestamps: { createdAt: true, updatedAt: false }, versionKey: false },
+);
+AiUsageSchema.index({ user: 1, day: 1 }, { unique: true });
+// only today's counter matters; old days are cleaned up automatically
+AiUsageSchema.index({ createdAt: 1 }, { expireAfterSeconds: 3 * 24 * 60 * 60 });
+export const AiUsageModel = model<AiUsageDoc>('AiUsage', AiUsageSchema);

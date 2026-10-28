@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Loader2, Sparkles, TrendingUp } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { AlertCircle, CheckCircle2, ChevronDown, ChevronUp, Gem, Loader2, LogIn, TrendingUp } from "lucide-react";
 import { api, getErrorMessage } from "@/lib/api";
 import type { AiEvaluation, Question } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { useAuth } from "@/components/providers";
 
 interface MockAiEvaluatorProps {
   question: Question;
@@ -19,6 +21,8 @@ export function MockAiEvaluator({ question, notes, lang = "en", onApplyRating }:
   const [evaluation, setEvaluation] = useState<AiEvaluation | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(true);
+  const { user, loading: authLoading } = useAuth();
+  const pathname = usePathname();
 
   const isBn = lang === "bn";
 
@@ -36,14 +40,8 @@ export function MockAiEvaluator({ question, notes, lang = "en", onApplyRating }:
     setError(null);
 
     try {
-      const res = await api.ai.evaluate({
-        questionTitle: question.title,
-        questionPrompt: question.prompt,
-        questionKind: question.kind,
-        modelAnswer: question.solution?.summary ?? "",
-        userNotes: notes,
-        lang,
-      });
+      // the server loads the question itself from the slug
+      const res = await api.ai.evaluate({ slug: question.slug, userNotes: notes, lang });
       setEvaluation(res.evaluation);
       setOpen(true);
     } catch (err) {
@@ -66,11 +64,11 @@ export function MockAiEvaluator({ question, notes, lang = "en", onApplyRating }:
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <span className="grid size-7 place-items-center rounded-lg bg-brand-soft text-brand">
-            <Sparkles className="size-4" aria-hidden />
+            <Gem className="size-4" aria-hidden />
           </span>
           <div>
             <h4 className="text-sm font-semibold tracking-tight">
-              {isBn ? "Gemini AI উত্তর মূল্যায়ন" : "Gemini AI Answer Review"}
+              {isBn ? "হীরার উত্তর মূল্যায়ন" : "Hira's answer review"}
             </h4>
             <p className="text-xs text-muted">
               {isBn ? "আপনার খসড়া নোট ও কোডের ওপর তাৎক্ষণিক ফিডব্যাক" : "Instant feedback on your notes & logic"}
@@ -78,25 +76,37 @@ export function MockAiEvaluator({ question, notes, lang = "en", onApplyRating }:
           </div>
         </div>
 
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={handleEvaluate}
-          disabled={loading}
-          leftIcon={loading ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Sparkles className="size-3.5 text-brand" aria-hidden />}
-        >
-          {loading
-            ? isBn
-              ? "বিশ্লেষণ হচ্ছে…"
-              : "Reviewing…"
-            : evaluation
+        {!authLoading && !user ? (
+          // AI feedback needs an account (protects the shared Gemini quota)
+          <ButtonLink
+            href={`/login?next=${encodeURIComponent(pathname)}`}
+            size="sm"
+            variant="outline"
+            leftIcon={<LogIn className="size-3.5" aria-hidden />}
+          >
+            {isBn ? "হীরার মূল্যায়নের জন্য লগ ইন" : "Log in for Hira's review"}
+          </ButtonLink>
+        ) : (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleEvaluate}
+            disabled={loading}
+            leftIcon={loading ? <Loader2 className="size-3.5 animate-spin" aria-hidden /> : <Gem className="size-3.5 text-brand" aria-hidden />}
+          >
+            {loading
               ? isBn
-                ? "পুনরায় মূল্যায়ন"
-                : "Re-evaluate"
-              : isBn
-                ? "AI মূল্যায়ন নিন"
-                : "Get AI Feedback"}
-        </Button>
+                ? "হীরা দেখছে…"
+                : "Hira is reviewing…"
+              : evaluation
+                ? isBn
+                  ? "পুনরায় মূল্যায়ন"
+                  : "Review again"
+                : isBn
+                  ? "হীরার মূল্যায়ন নিন"
+                  : "Ask Hira to review"}
+          </Button>
+        )}
       </div>
 
       {error && (

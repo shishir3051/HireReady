@@ -74,15 +74,6 @@ const CATEGORY_TOPICS: Record<Category, { slug: string; title: string }[]> = {
 
 const TOPIC_COUNT: Record<Category, number> = { dsa: 15, "cs-fundamentals": 6, web: 5, engineering: 2, career: 1 };
 
-const ANATOMY = [
-  { icon: MessageSquareQuote, title: "Say this first", text: "The 1–2 sentence answer you open with, so you never freeze." },
-  { icon: Lightbulb, title: "Progressive hints", text: "Vaguest first. Unlock one at a time when you're stuck." },
-  { icon: Waypoints, title: "Visual walkthrough", text: "Step through the algorithm and watch every variable change, synced to the code." },
-  { icon: Route, title: "Brute force → optimal", text: "The path interviewers want to hear, with time and space for each step." },
-  { icon: Code, title: "JavaScript, Python & Java", text: "Idiomatic, tested solutions with line numbers and one-click copy." },
-  { icon: TriangleAlert, title: "Pitfalls & follow-ups", text: "The mistakes that cost offers, and what they'll ask next." },
-];
-
 const FALLBACK_WEEKS = [
   { week: 1, title: "Foundations", items: ["Big-O", "Arrays & hashing", "Two pointers", "Sliding window", "Stack & queue"] },
   { week: 2, title: "Core data structures", items: ["Binary search", "Linked lists", "Trees & BST", "Heaps", "Graphs"] },

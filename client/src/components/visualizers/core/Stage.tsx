@@ -7,6 +7,7 @@ import type { Visual } from "@/lib/types";
 import { useT } from "@/i18n";
 import { useStepPlayer } from "../lib/hooks";
 import { useNarration } from "../lib/narration";
+import { useMotionPreference } from "@/lib/motion-preference";
 import { stepCount, stepMeta, typeMeta, usedColors, visualFeatures } from "../lib/steps";
 import { cn, plainText } from "../lib/utils";
 import { T_FAST } from "../lib/motion";
@@ -74,6 +75,7 @@ export function VisualStage({
   const count = stepCount(visual);
   const features = useMemo(() => visualFeatures(visual), [visual]);
   const narration = useNarration();
+  const motionPref = useMotionPreference();
   const narrationText = useCallback(
     (i: number) => {
       const note = plainText(stepMeta(visual, i).note) || `Step ${i + 1}.`;
@@ -156,16 +158,17 @@ export function VisualStage({
           <VisualErrorBoundary resetKey={index} label={`${label.toLowerCase()} step`}>
             {/* flex-1: the canvas takes any extra row height so its box lines up with the code pane */}
             <div className="flex min-h-32 w-full flex-1 items-center justify-center">
-              <StepCanvas visual={visual} index={index} />
+              {/* keyed on the motion setting: motion reads it once per element, so a change must rebuild them */}
+              <StepCanvas key={motionPref.pref} visual={visual} index={index} />
             </div>
           </VisualErrorBoundary>
         </div>
 
         {hasSide ? (
           <div className="grid min-w-0 content-start gap-2.5 [grid-area:side] [grid-template-columns:repeat(auto-fill,minmax(min(100%,12rem),1fr))]">
-            {features.vars ? <VarsBox vars={meta.vars} prevVars={prevMeta?.vars} /> : null}
+            {features.vars ? <VarsBox key={motionPref.pref} vars={meta.vars} prevVars={prevMeta?.vars} /> : null}
             {meta.panels.map((p, i) => (
-              <VisualErrorBoundary key={`${i}-${p?.kind}-${p?.title}`} resetKey={index} label="panel">
+              <VisualErrorBoundary key={`${motionPref.pref}-${i}-${p?.kind}-${p?.title}`} resetKey={index} label="panel">
                 <PanelCard panel={p} />
               </VisualErrorBoundary>
             ))}
@@ -205,6 +208,21 @@ export function VisualStage({
               <Keyboard aria-hidden className="size-3.5" />
               {t.visualPlayer.keyboardHint}{narration.supported ? t.visualPlayer.keyboardHintNarrate : ""}.
             </p>
+            {/* animations play by default; offered to people whose device asks for less motion, or who turned them off */}
+            {motionPref.reduce ? (
+              <p className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-muted">
+                {t.visualPlayer.motionReduced}
+                <button type="button" onClick={() => motionPref.setPref("on")} className="font-medium text-brand hover:underline">
+                  {t.visualPlayer.motionPlay}
+                </button>
+              </p>
+            ) : motionPref.systemReduces ? (
+              <p className="text-[11px]">
+                <button type="button" onClick={() => motionPref.setPref("off")} className="font-medium text-muted hover:text-brand hover:underline">
+                  {t.visualPlayer.motionReduce}
+                </button>
+              </p>
+            ) : null}
           </div>
         ) : null}
       </div>

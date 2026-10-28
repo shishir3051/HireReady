@@ -447,21 +447,29 @@ export interface AiEvaluation {
   missingEdgeCases: string[];
 }
 
+/** The server loads the question text itself from `slug`. */
 export interface AiEvaluationInput {
-  questionTitle: string;
-  questionPrompt: string;
-  questionKind?: string;
-  modelAnswer?: string;
+  slug: string;
   userNotes: string;
   lang?: 'en' | 'bn';
 }
 
 export interface AiChatInput {
-  questionTitle: string;
-  questionPrompt: string;
-  modelAnswer?: string;
+  slug: string;
   message: string;
   history?: Array<{ role: 'user' | 'model'; text: string }>;
   lang?: 'en' | 'bn';
+}
+
+/** Today's AI usage for one feature (resets at midnight UTC). */
+export interface AiUsage {
+  used: number;
+  limit: number;
+}
+
+export interface AiStatus {
+  enabled: boolean;
+  /** present when logged in */
+  usage?: { chat: AiUsage; evaluate: AiUsage };
 }
 

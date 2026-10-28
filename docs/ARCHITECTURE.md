@@ -104,6 +104,69 @@ Types referenced below are defined in `client/src/lib/types.ts` — the server M
 | GET | `/api/auth/google?next=/path` | – | 302 to Google (authorization code + PKCE, `state` in a signed 10-min `hr_oauth` cookie); 404 when Google is not configured |
 | GET | `/api/auth/google/callback` | – | 302 to `APP_URL + next` with a session cookie, or to `/login?error=google`. Links to an existing account with the same Google-verified email (removing its unverified password) or creates one |
 
+### AI (Gemini)
+
+| Method | Path | Auth | Response |
+|---|---|---|---|
+| GET | `/api/ai/status` | optional | `{ enabled, usage? }`; `usage` = today's `{ chat, evaluate }` as `{ used, limit }` when logged in |
+| POST | `/api/ai/chat` | required | body `{ slug, message, history?, lang? }`; **streams** the tutor's reply as `text/plain` (`X-AI-Usage: used/limit` header). Errors before the first word are normal JSON errors |
+| POST | `/api/ai/evaluate` | required | body `{ slug, userNotes, lang? }` → `{ evaluation, usage }` |
+
+The server loads the question text from `slug` (Bangla overlay for `lang: bn`), never from the browser, so the endpoints
+can't be used as a general Gemini proxy. Limits: 10 chat / 5 evaluate requests per minute per user, plus daily caps per user
+stored in MongoDB (`AI_DAILY_CHAT_LIMIT`, `AI_DAILY_EVAL_LIMIT`; 429 `RATE_LIMITED` when used up). A failed Gemini call gives
+the request back. The API key is sent to Google in the `x-goog-api-key` header; Gemini error details are only logged.
+
+Accuracy: both endpoints give Gemini the question's own verified content as a `<reference>` block in the system
+instruction (problem, examples, constraints, hint ladder, approaches with complexities, key points, walkthrough, first code
+snippet, pitfalls, follow-ups; long parts clipped to keep a request around 3k tokens). The prompts tell Hira to treat it as
+ground truth, trace code on its examples, give hints one rung at a time, and write complexities as `O(n)` code, not LaTeX.
+Thinking is on: `low` for chat (quick replies start in ~1–2 s, harder ones think longer), `medium` for reviews. Thinking
+tokens count against `maxOutputTokens`, so both allow 4000. Gemini 3.5 ignores `temperature`, so none is sent. Reviews use
+a JSON `responseSchema`, and the verdict is derived from the 1–5 rating. In the browser the reply is typed out at a
+steady pace (about 65–165 characters a second, depending on its length). Clicking it shows the rest at once, and the
+view stops following new text while the reader scrolls up.
+
+Gemini limits (`services/gemini-client.ts`): free-tier limits apply per Google Cloud project and per model, not per
+API key, so extra keys would not help, and spreading free keys across projects to get around limits goes against
+Google's API terms. Instead, every call goes through `withGemini`, which works out why a call failed:
+- **Daily limit** (429 whose QuotaFailure `quotaId` contains `PerDay`): switch to `GEMINI_BACKUP_MODEL` on the same key
+  (default `gemini-3.1-flash-lite`; empty turns it off). That model is then skipped until Google's reset (midnight
+  Pacific time), with a recheck every 30 minutes.
+- **Per-minute limit**: wait the `RetryInfo` delay when it is 5 s or less, then retry; for a longer wait, switch models.
+- **Overloaded** (5xx, 408, Google unreachable, a connection that breaks before any text), or an **empty** answer
+  (Gemini sometimes ends with `MALFORMED_RESPONSE` and no text): retry once, then switch models.
+- **Stalled** (an attempt with no text after 10 s for chat, or no answer after 12 s for a review): switch models
+  without retrying.
+- **Blocked** by Google's safety filters (`blockReason`, or finish reasons such as `SAFETY` or `LANGUAGE`): stop at once
+  with a 422 asking the student to rephrase, because any model would give the same result.
+- **No text because of `MAX_TOKENS`** (thinking used the whole allowance), or **other 4xx**: switch models without
+  retrying.
+- **Stopped part-way** (`MAX_TOKENS` or a filter after some text was sent): the reply ends with the "cut off" note.
+
+Time budgets: everything, waits included, must finish inside 28 s for chat and 25 s for a review. Both budgets count
+from when the request arrives, so the login check and database calls are included. Both the Next.js `/api` proxy (30 s
+without bytes) and Vercel (`maxDuration: 30`) cut requests off at 30 s. `trackAiRequest`, the first middleware on
+both routes (ahead of `requireAuth`), records the arrival time and starts watching for a disconnect.
+
+The browser sends only the last 6 chat turns. The server also trims instead of rejecting (it keeps the last 10 turns,
+each cut to 4,000 characters), so a long conversation never breaks the chat.
+
+When every model fails, the student gets a message in their language, chosen from what happened to each model:
+- **Busy:** a 429 with roughly how many seconds to wait.
+- **Daily limit:** when a model is out for the day and the others are out too or misconfigured, a 429 with the reset
+  time in Bangladesh time. It adds "tomorrow" when the reset falls on the next day there.
+- **Otherwise:** a 503 "unavailable".
+
+The per-user count is refunded on any failure, and also when the student leaves before any text arrives. A student who
+has already left by the time the controller runs is not charged at all, and Gemini is not called. Once any text of a streamed reply has been
+sent, a failure is never retried, since the student would see the answer twice; the reply ends with a "cut off" note
+instead. The per-user limit messages are in Bangla too.
+
+Practice mode is on by default. Its choice is stored under `hr-practice-mode-v2`; the key changed when the default did,
+so every browser starts with it on once. Before hydration, the switch and the "On this page" locks are drawn from the
+boot script's `html[data-practice]` flag, so a student who turned it off never sees it flash on.
+
 Rate limits (per IP, 15 min): register, login, reset-password, google, google/callback 20 each; forgot-password 5.
 
 ### Content (public)

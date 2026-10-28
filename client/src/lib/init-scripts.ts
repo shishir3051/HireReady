@@ -14,12 +14,20 @@ export const themeInitScript = `(function(){try{var t=localStorage.getItem(${JSO
   DARK_QUERY,
 )}).matches);var c=document.documentElement.classList;if(d){c.add("dark")}else{c.remove("dark")}}catch(e){}})();`;
 
-/** Marks `<html data-practice="on">` when practice mode is stored, so gated answers never flash. */
-export const practiceInitScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(
+/**
+ * Marks `<html data-practice="on">` unless practice mode was turned off (it is on by default), so gated answers
+ * never flash. If storage is blocked the store falls back to "on" as well.
+ */
+export const practiceInitScript = `(function(){var on=true;try{on=localStorage.getItem(${JSON.stringify(
   STORAGE_KEYS.practiceMode,
-)})==="true"){document.documentElement.setAttribute("data-practice","on")}}catch(e){}})();`;
+)})!=="false"}catch(e){}if(on){document.documentElement.setAttribute("data-practice","on")}})();`;
+
+/** Marks `<html data-motion="off">` when the learner chose "Reduce animations", for the `motion-off:` CSS variant. */
+export const motionInitScript = `(function(){try{if(localStorage.getItem(${JSON.stringify(
+  STORAGE_KEYS.motion,
+)})==="off"){document.documentElement.setAttribute("data-motion","off")}}catch(e){}})();`;
 
 /** Applies the stored language (`hr-lang` cookie) to <html lang="..."> before first paint. */
 export const langInitScript = `(function(){try{var m=document.cookie.match(/(?:^|; )hr-lang=([^;]+)/);if(m&&m[1]==="bn"){document.documentElement.lang="bn"}}catch(e){}})();`;
 
-export const bootScript = themeInitScript + practiceInitScript + langInitScript;
+export const bootScript = themeInitScript + practiceInitScript + motionInitScript + langInitScript;

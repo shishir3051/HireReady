@@ -4,6 +4,22 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
+ * "Reduce animations" is the app's own setting (lib/motion-preference.ts), not the OS one: animations play by default.
+ * Use motion-off: instead of motion-reduce: so CSS transitions follow the same choice as motion components.
+ */
+@custom-variant motion-off (&:where([data-motion=off], [data-motion=off] *));
+
+/* "Reduce animations" stops every CSS animation and transition too (pulses, spinners' loops, hover slides). */
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/*
  * Design tokens. Use the Tailwind utilities generated from @theme below
  * (bg-background, bg-surface, bg-surface-2, border-border, text-muted, bg-brand, text-viz-success, ...)
  * instead of raw palette colors so light/dark both work.
@@ -113,6 +129,29 @@
   html[lang="bn"] h3,
   html[lang="bn"] h4 {
     line-height: 1.35;
+  }
+  /*
+   * Bengali glyphs are much taller and heavier than Geist's at the same font size, so Bangla headings looked oversized.
+   * Headings (text-2xl and up) are about 20–25% smaller in Bangla, and subheadings (text-lg / text-xl leads) about
+   * 8–10% smaller. text-base and below stay as they are: body text, Markdown "###" headings (which must stay larger
+   * than 15px paragraphs) and 16px inputs (smaller ones make iOS Safari zoom). Every text-* utility reads these
+   * variables, so one block covers all of them. Wrapping Bengali lines need more room than Tailwind's Latin line
+   * heights, and negative tracking crowds Bengali conjuncts.
+   */
+  html[lang="bn"] {
+    --text-lg: 1.04rem;
+    --text-xl: 1.12rem;
+    --text-2xl: 1.2rem;
+    --text-2xl--line-height: 1.4;
+    --text-3xl: 1.45rem;
+    --text-3xl--line-height: 1.35;
+    --text-4xl: 1.72rem;
+    --text-4xl--line-height: 1.32;
+    --text-5xl: 2.25rem;
+    --text-5xl--line-height: 1.28;
+    --text-6xl: 2.75rem;
+    --text-6xl--line-height: 1.25;
+    --tracking-tight: 0em;
   }
   body {
     background: var(--background);

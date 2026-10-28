@@ -63,6 +63,11 @@ const EnvSchema = z.object({
   /** Google Gemini AI API key for mock interview evaluation and AI tutoring. */
   GEMINI_API_KEY: optionalString,
   GEMINI_MODEL: z.string().trim().default('gemini-3.5-flash-lite'),
+  /** Used with the same key when GEMINI_MODEL is out of quota or overloaded (each model has its own limits); empty = off. */
+  GEMINI_BACKUP_MODEL: z.string().trim().default('gemini-3.1-flash-lite'),
+  /** Per-user daily AI limits (UTC day); protect the Gemini quota/bill. */
+  AI_DAILY_CHAT_LIMIT: z.coerce.number().int().min(0).default(40),
+  AI_DAILY_EVAL_LIMIT: z.coerce.number().int().min(0).default(15),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -106,29 +106,31 @@ export const roadmapDayParams = z.object({
 export const roadmapDayBody = z.object({ done: z.boolean({ error: 'must be a boolean' }) });
 
 // ---------------------------------------------------------------- AI (Gemini)
+// The browser sends only the question slug; the server loads the real question text, so these endpoints
+// can't be used as a general-purpose Gemini proxy.
 export const aiEvaluateBody = z.object({
-  questionTitle: requiredString().trim().min(1).max(200),
-  questionPrompt: requiredString().trim().min(1).max(10000),
-  questionKind: z.string().max(50).optional(),
-  modelAnswer: z.string().max(10000).optional(),
-  userNotes: requiredString().trim().min(5, 'must be at least 5 characters').max(10000),
+  slug,
+  userNotes: requiredString().trim().min(5, 'must be at least 5 characters').max(6000, 'must be at most 6000 characters'),
   lang: z.enum(['en', 'bn']).optional(),
 });
 export type AiEvaluateBody = z.infer<typeof aiEvaluateBody>;
 
 export const aiChatBody = z.object({
-  questionTitle: requiredString().trim().min(1).max(200),
-  questionPrompt: requiredString().trim().min(1).max(10000),
-  modelAnswer: z.string().max(10000).optional(),
-  message: requiredString().trim().min(1).max(4000),
+  slug,
+  message: requiredString().trim().min(1).max(2000, 'must be at most 2000 characters'),
+  // trimmed rather than rejected, so a long conversation never breaks the chat (the tutor uses the last 6 turns)
   history: z
     .array(
       z.object({
         role: z.enum(['user', 'model']),
-        text: z.string().max(4000),
+        text: z
+          .string()
+          .max(20000)
+          .transform((t) => t.slice(0, 4000)),
       }),
     )
-    .max(10)
+    .max(100)
+    .transform((h) => h.slice(-10))
     .optional(),
   lang: z.enum(['en', 'bn']).optional(),
 });

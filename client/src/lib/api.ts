@@ -52,6 +52,8 @@ import type {
   AiEvaluation,
   AiEvaluationInput,
   AiChatInput,
+  AiStatus,
+  AiUsage,
 } from "@/lib/types";
 
 // ---------------------------------------------------------------- errors
@@ -185,6 +187,74 @@ function buildQuery(query?: Query) {
 
 type FetchInit = RequestInit & { next?: { revalidate?: number | false; tags?: string[] } };
 
+/** ApiError for a non-2xx response, using the API's error envelope when present. */
+function errorFromResponse(res: Response, data: unknown): ApiError {
+  const envelope = (data as Partial<ApiErrorBody> | undefined)?.error;
+  const fallbackMessage =
+    res.status === 401
+      ? "Please log in to continue."
+      : res.status === 404
+        ? "Not found."
+        : res.status === 429
+          ? "Too many requests. Please wait a moment and try again."
+          : res.status >= 500
+            ? "The server had a problem. Please try again shortly."
+            : res.statusText || "Request failed.";
+  const code =
+    envelope?.code ??
+    ({ 400: "VALIDATION_ERROR", 401: "UNAUTHENTICATED", 404: "NOT_FOUND", 409: "CONFLICT", 429: "RATE_LIMITED" } as Record<
+      number,
+      string
+    >)[res.status] ??
+    (res.status >= 500 ? "INTERNAL" : "BAD_RESPONSE");
+  return new ApiError(res.status, code, envelope?.message || fallbackMessage, envelope?.details);
+}
+
+/**
+ * Browser only: POSTs JSON and streams a plain-text response into `onText` as it arrives.
+ * A non-2xx response (sent before any text) throws the usual ApiError.
+ */
+async function streamText(path: string, body: unknown, onText: (text: string) => void, signal?: AbortSignal): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(`${apiBase()}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "text/plain, application/json" },
+      body: JSON.stringify(body),
+      credentials: "include",
+      cache: "no-store",
+      signal,
+    });
+  } catch (e) {
+    if (isAbortError(e)) throw e;
+    throw new ApiError(0, "NETWORK_ERROR", "Could not reach the HireReady API. Check your connection and try again.");
+  }
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    let data: unknown;
+    try {
+      data = text ? JSON.parse(text) : undefined;
+    } catch {
+      data = undefined;
+    }
+    throw errorFromResponse(res, data);
+  }
+  if (!res.body) {
+    onText(await res.text());
+    return;
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const text = decoder.decode(value, { stream: true });
+    if (text) onText(text);
+  }
+  const rest = decoder.decode();
+  if (rest) onText(rest);
+}
+
 async function request<T>(path: string, opts: InternalOptions = {}): Promise<T> {
   const { method = "GET", query, body, content = false, signal, cookie, revalidate, cache } = opts;
   const headers = new Headers(opts.headers);
@@ -257,27 +327,7 @@ async function request<T>(path: string, opts: InternalOptions = {}): Promise<T> 
     }
   }
 
-  if (!res.ok) {
-    const envelope = (data as Partial<ApiErrorBody> | undefined)?.error;
-    const fallbackMessage =
-      res.status === 401
-        ? "Please log in to continue."
-        : res.status === 404
-          ? "Not found."
-          : res.status === 429
-            ? "Too many requests. Please wait a moment and try again."
-            : res.status >= 500
-              ? "The server had a problem. Please try again shortly."
-              : res.statusText || "Request failed.";
-    const code =
-      envelope?.code ??
-      ({ 400: "VALIDATION_ERROR", 401: "UNAUTHENTICATED", 404: "NOT_FOUND", 409: "CONFLICT", 429: "RATE_LIMITED" } as Record<
-        number,
-        string
-      >)[res.status] ??
-      (res.status >= 500 ? "INTERNAL" : "BAD_RESPONSE");
-    throw new ApiError(res.status, code, envelope?.message || fallbackMessage, envelope?.details);
-  }
+  if (!res.ok) throw errorFromResponse(res, data);
 
   if (data === undefined && text) {
     throw new ApiError(res.status, "BAD_RESPONSE", "The API returned an unexpected response.");
@@ -467,14 +517,14 @@ export const api = {
   },
 
   ai: {
-    /** GET /api/ai/status → { enabled: boolean } */
-    status: (o?: RequestOptions) => request<{ enabled: boolean }>("/ai/status", o),
-    /** POST /api/ai/evaluate → evaluates mock interview notes/code with Gemini */
+    /** GET /api/ai/status → { enabled, usage? } (today's usage only when logged in) */
+    status: (o?: RequestOptions) => request<AiStatus>("/ai/status", o),
+    /** POST /api/ai/evaluate → Gemini feedback on mock-interview notes (login required; daily limit) */
     evaluate: (input: AiEvaluationInput, o?: RequestOptions) =>
-      request<{ evaluation: AiEvaluation }>("/ai/evaluate", { ...o, method: "POST", body: input }),
-    /** POST /api/ai/chat → Socratic AI tutor for problem clarity, hints and code review */
-    chat: (input: AiChatInput, o?: RequestOptions) =>
-      request<{ reply: string }>("/ai/chat", { ...o, method: "POST", body: input }),
+      request<{ evaluation: AiEvaluation; usage: AiUsage }>("/ai/evaluate", { ...o, method: "POST", body: input }),
+    /** POST /api/ai/chat → streams the tutor's reply; `onText` receives each piece as it arrives (login required) */
+    chatStream: (input: AiChatInput, onText: (text: string) => void, o?: { signal?: AbortSignal }) =>
+      streamText("/ai/chat", input, onText, o?.signal),
   },
 } as const;
 
