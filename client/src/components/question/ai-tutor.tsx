@@ -47,8 +47,9 @@ function TypewriterMarkdown({
     doneRef.current = false;
     let curr = 0;
     const total = content.length;
-    // Chunk size: for short replies ~3-5 chars per tick, for long replies ~15-20 chars per tick
-    const chunkSize = Math.max(3, Math.min(18, Math.ceil(total / 65)));
+    // Standard comfortable typing & reading rhythm (~60-70 characters/sec)
+    const chunkSize = total > 1200 ? Math.max(2, Math.min(4, Math.ceil(total / 400))) : 2;
+    const tickInterval = 30; // 30ms per tick for a smooth, natural typing cadence
 
     const timer = setInterval(() => {
       curr += chunkSize;
@@ -64,7 +65,7 @@ function TypewriterMarkdown({
         setLength(curr);
       }
       onStep?.();
-    }, 20);
+    }, tickInterval);
 
     return () => clearInterval(timer);
   }, [content, isTyping]);
