@@ -25,53 +25,53 @@
  * instead of raw palette colors so light/dark both work.
  */
 :root {
-  --background: oklch(0.985 0.003 265);
-  --foreground: oklch(0.22 0.025 265);
-  --surface: oklch(1 0 0);
-  --surface-2: oklch(0.965 0.006 265);
-  --border: oklch(0.91 0.01 265);
-  --muted: oklch(0.52 0.02 265);
-  --brand: oklch(0.54 0.21 277);
-  --brand-foreground: oklch(0.99 0 0);
-  --brand-soft: oklch(0.95 0.035 277);
-  --ring: oklch(0.62 0.19 277);
+  --background: #f8f9fa;
+  --foreground: #141517;
+  --surface: #ffffff;
+  --surface-2: #f1f3f5;
+  --border: #e4e7eb;
+  --muted: #5c6370;
+  --brand: #059669;
+  --brand-foreground: #ffffff;
+  --brand-soft: #ecfdf5;
+  --ring: #10b981;
 
   /* Semantic visualizer colors (see ColorKey in lib/types.ts) */
-  --viz-primary: oklch(0.6 0.19 255);
-  --viz-success: oklch(0.64 0.16 152);
-  --viz-warning: oklch(0.76 0.15 75);
-  --viz-danger: oklch(0.62 0.21 25);
-  --viz-info: oklch(0.66 0.12 200);
-  --viz-muted: oklch(0.72 0.01 265);
+  --viz-primary: #059669;
+  --viz-success: #16a34a;
+  --viz-warning: #ffa116;
+  --viz-danger: #ef4743;
+  --viz-info: #0284c7;
+  --viz-muted: #9ca3af;
 
-  /* Difficulty */
-  --easy: oklch(0.62 0.15 152);
-  --medium: oklch(0.72 0.15 70);
-  --hard: oklch(0.6 0.21 25);
+  /* Difficulty (LeetCode / Supabase official tones) */
+  --easy: #00b8a3;
+  --medium: #ffa116;
+  --hard: #ef4743;
 }
 
 .dark {
-  --background: oklch(0.16 0.015 270);
-  --foreground: oklch(0.94 0.008 265);
-  --surface: oklch(0.205 0.018 270);
-  --surface-2: oklch(0.245 0.02 270);
-  --border: oklch(0.32 0.02 270);
-  --muted: oklch(0.7 0.02 265);
-  --brand: oklch(0.68 0.17 277);
-  --brand-foreground: oklch(0.16 0.015 270);
-  --brand-soft: oklch(0.3 0.07 277);
-  --ring: oklch(0.7 0.16 277);
+  --background: #0f1012;
+  --foreground: #f3f4f6;
+  --surface: #17181c;
+  --surface-2: #212329;
+  --border: #2c2f36;
+  --muted: #9ca3af;
+  --brand: #3ecf8e;
+  --brand-foreground: #09130e;
+  --brand-soft: #132a20;
+  --ring: #3ecf8e;
 
-  --viz-primary: oklch(0.7 0.16 255);
-  --viz-success: oklch(0.72 0.15 152);
-  --viz-warning: oklch(0.8 0.14 75);
-  --viz-danger: oklch(0.68 0.19 25);
-  --viz-info: oklch(0.74 0.11 200);
-  --viz-muted: oklch(0.55 0.015 265);
+  --viz-primary: #3ecf8e;
+  --viz-success: #2cbb5d;
+  --viz-warning: #ffa116;
+  --viz-danger: #ef4743;
+  --viz-info: #38bdf8;
+  --viz-muted: #6b7280;
 
-  --easy: oklch(0.72 0.15 152);
-  --medium: oklch(0.8 0.14 75);
-  --hard: oklch(0.68 0.19 25);
+  --easy: #00b8a3;
+  --medium: #ffc01e;
+  --hard: #ff375f;
 }
 
 @theme inline {

@@ -18,10 +18,10 @@ const PERKS = [
 // The brand panel uses fixed colours (not theme tokens) so it reads the same in light and dark mode.
 const PANEL_STYLE: CSSProperties = {
   background:
-    "radial-gradient(120% 80% at 0% 0%, oklch(0.56 0.2 277) 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, oklch(0.5 0.17 300) 0%, transparent 55%), linear-gradient(160deg, oklch(0.42 0.19 277), oklch(0.28 0.12 285))",
+    "radial-gradient(120% 80% at 0% 0%, rgba(62, 207, 142, 0.24) 0%, transparent 60%), radial-gradient(90% 70% at 100% 100%, rgba(255, 161, 22, 0.14) 0%, transparent 55%), linear-gradient(160deg, #14171a 0%, #0b0d0e 100%)",
 };
-// LogoMark draws with --brand / --brand-foreground; invert it on the purple panel.
-const INVERTED_MARK = { "--brand": "#ffffff", "--brand-foreground": "oklch(0.42 0.19 277)" } as CSSProperties;
+// LogoMark draws with --brand / --brand-foreground; style it on the dark obsidian panel.
+const INVERTED_MARK = { "--brand": "#3ecf8e", "--brand-foreground": "#09130e" } as CSSProperties;
 
 /** Split auth card: brand panel (desktop) + form panel with a Log in / Sign up switch (omitted when `mode` is not set). */
 export async function AuthShell({

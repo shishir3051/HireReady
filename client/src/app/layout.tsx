@@ -28,7 +28,7 @@ const hindSiliguri = Hind_Siliguri({
 
 export const metadata: Metadata = {
   title: {
-    default: "HireReady — Crack your first software engineering interview",
+    default: "HireReady · Software Engineering Interview Prep",
     template: `%s · ${SITE_NAME}`,
   },
   description: SITE_DESCRIPTION,
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     "interview preparation",
   ],
   openGraph: {
-    title: "HireReady — Crack your first software engineering interview",
+    title: "HireReady · Software Engineering Interview Prep",
     description: SITE_DESCRIPTION,
     siteName: SITE_NAME,
     type: "website",

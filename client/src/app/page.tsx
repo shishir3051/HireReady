@@ -122,6 +122,8 @@ export default async function HomePage() {
 // ---------------------------------------------------------------- hero
 
 function Hero({ stats, t }: { stats: PlatformStats | null; t: Dictionary }) {
+  const [afterFirstWord, ...afterRestWords] = t.hero.titleAfter.split(" ");
+  const afterRest = afterRestWords.join(" ");
   const items = stats
     ? [
         { value: formatNumber(stats.topics), label: t.hero.statTopics },
@@ -164,20 +166,28 @@ function Hero({ stats, t }: { stats: PlatformStats | null; t: Dictionary }) {
             {t.hero.tagAction}
             <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-0.5" aria-hidden />
           </Link>
-          <h1 className="mt-5 text-balance text-3xl font-semibold tracking-tight sm:text-4xl lg:text-5xl 2xl:text-6xl leading-[1.3] sm:leading-[1.25]">
-            {t.hero.titleBefore}{" "}
-            <span className="relative inline-block whitespace-nowrap text-brand pb-2">
-              {t.hero.titleHighlight}
-              <svg
-                aria-hidden
-                viewBox="0 0 120 12"
-                preserveAspectRatio="none"
-                className="absolute bottom-0 left-0 h-2 w-full"
-              >
-                <path d="M2 8 C 30 2, 60 2, 118 7" fill="none" stroke="var(--viz-warning)" strokeWidth="3.5" strokeLinecap="round" />
-              </svg>
-            </span>{" "}
-            {t.hero.titleAfter}
+          <h1 className="mt-5 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.65rem] xl:text-5xl 2xl:text-[3.5rem] leading-[1.28] sm:leading-[1.22]">
+            <span className="sm:whitespace-nowrap">
+              {t.hero.titleBefore}{" "}
+              <span className="relative inline-block whitespace-nowrap text-brand pb-1.5">
+                {t.hero.titleHighlight}
+                <svg
+                  aria-hidden
+                  viewBox="0 0 120 12"
+                  preserveAspectRatio="none"
+                  className="absolute bottom-0 left-0 h-2 w-full"
+                >
+                  <path d="M2 8 C 30 2, 60 2, 118 7" fill="none" stroke="var(--viz-warning)" strokeWidth="3.5" strokeLinecap="round" />
+                </svg>
+              </span>
+              {afterFirstWord ? ` ${afterFirstWord}` : ""}
+            </span>
+            {afterRest && (
+              <>
+                <br className="hidden sm:inline" />{" "}
+                <span className="sm:whitespace-nowrap">{afterRest}</span>
+              </>
+            )}
           </h1>
           <p className="mt-4 max-w-xl xl:max-w-2xl 2xl:max-w-3xl text-pretty text-base leading-relaxed text-muted sm:text-lg">
             {t.hero.subtitle}
@@ -490,39 +500,39 @@ function FinalCta({ t }: { t: Dictionary }) {
     <section aria-labelledby="cta-heading" className="py-12 sm:py-14">
       <Container size="wide">
         <div
-          className="relative overflow-hidden rounded-3xl px-6 py-10 text-center sm:px-12 sm:py-14 lg:py-16 xl:py-20"
+          className="relative overflow-hidden rounded-3xl border border-border px-6 py-10 text-center text-white sm:px-12 sm:py-14 lg:py-16 xl:py-20"
           style={{
             background:
-              "radial-gradient(80% 120% at 0% 0%, color-mix(in oklch, var(--brand) 85%, var(--viz-info)), var(--brand) 60%)",
+              "radial-gradient(80% 120% at 15% 0%, rgba(62, 207, 142, 0.28), transparent 60%), radial-gradient(70% 100% at 85% 100%, rgba(255, 161, 22, 0.16), transparent 60%), linear-gradient(160deg, #14171a 0%, #0b0d0e 100%)",
           }}
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-0 opacity-25"
+            className="pointer-events-none absolute inset-0 opacity-15"
             style={{
               backgroundImage:
-                "linear-gradient(to right, var(--brand-foreground) 1px, transparent 1px), linear-gradient(to bottom, var(--brand-foreground) 1px, transparent 1px)",
+                "linear-gradient(to right, #ffffff 1px, transparent 1px), linear-gradient(to bottom, #ffffff 1px, transparent 1px)",
               backgroundSize: "36px 36px",
               maskImage: "radial-gradient(ellipse 60% 70% at 50% 100%, black, transparent)",
               WebkitMaskImage: "radial-gradient(ellipse 60% 70% at 50% 100%, black, transparent)",
             }}
           />
-          <h2 id="cta-heading" className="relative mx-auto max-w-2xl xl:max-w-3xl 2xl:max-w-4xl text-balance text-2xl font-semibold tracking-tight text-brand-foreground sm:text-3xl xl:text-4xl">
+          <h2 id="cta-heading" className="relative mx-auto max-w-2xl xl:max-w-3xl 2xl:max-w-4xl text-balance text-2xl font-semibold tracking-tight text-white sm:text-3xl xl:text-4xl">
             {t.finalCta.title}
           </h2>
-          <p className="relative mx-auto mt-3 max-w-xl xl:max-w-2xl 2xl:max-w-3xl text-pretty text-brand-foreground/85 sm:text-base xl:text-lg">
+          <p className="relative mx-auto mt-3 max-w-xl xl:max-w-2xl 2xl:max-w-3xl text-pretty text-white/75 sm:text-base xl:text-lg">
             {t.finalCta.subtitle}
           </p>
-          <div className="relative mt-5 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="relative mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/register"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-brand-foreground px-5 text-base font-semibold text-brand shadow-lg transition-transform hover:-translate-y-0.5"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#3ecf8e] px-5 text-base font-semibold text-[#09130e] shadow-lg transition-transform hover:-translate-y-0.5 hover:bg-[#34b87d]"
             >
               <UserPlus className="size-5" aria-hidden /> {t.finalCta.button}
             </Link>
             <Link
               href="/topics/arrays-hashing"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-brand-foreground/30 px-5 text-base font-medium text-brand-foreground transition-colors hover:bg-brand-foreground/10"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/5 px-5 text-base font-medium text-white transition-colors hover:bg-white/10"
             >
               <BookOpen className="size-5" aria-hidden /> Arrays &amp; Hashing
             </Link>

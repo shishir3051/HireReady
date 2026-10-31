@@ -13,6 +13,7 @@ import { ButtonLink } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { QuizOverview, QuizStatsProvider } from "@/components/quiz/quiz-stats";
 import { QuizTopicCard } from "@/components/quiz/quiz-topic-card";
+import { CategoryTabs } from "@/components/topics/category-tabs";
 
 export const revalidate = 60;
 
@@ -99,29 +100,14 @@ export default async function QuizPage() {
         </div>
 
         {groups.length > 1 && (
-          <nav
-            aria-label={dict.quizPage.categoriesNav}
-            className="sticky top-14 z-30 -mx-4 mb-5 border-b border-border bg-background/85 px-4 py-2.5 backdrop-blur-lg sm:-mx-6 sm:px-6 md:-mx-8 md:px-8 lg:-mx-12 lg:px-12 xl:-mx-16 xl:px-16 2xl:-mx-20 2xl:px-20"
-          >
-            <ul className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
-              {groups.map(({ category, quizzes: list }) => {
-                const Icon = CATEGORY_ICONS[category];
-                const catLabel = dict.categories.labels[category] ?? category;
-                return (
-                  <li key={category} className="shrink-0">
-                    <a
-                      href={`#${category}`}
-                      className="inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-surface px-3 text-xs font-medium text-muted transition-colors hover:border-brand/40 hover:text-foreground"
-                    >
-                      <Icon className="size-3.5" aria-hidden />
-                      {catLabel}
-                      <span className="tabular-nums opacity-70">{list.length}</span>
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </nav>
+          <CategoryTabs
+            ariaLabel={dict.quizPage.categoriesNav}
+            items={groups.map(({ category, quizzes: list }) => ({
+              category,
+              label: dict.categories.labels[category] ?? category,
+              count: list.length,
+            }))}
+          />
         )}
 
         <div className="space-y-8">
