@@ -7,6 +7,7 @@ import type { QuestionListQuery, RandomQuery } from '../validators/schemas';
 import { QUESTION_SUMMARY_PROJECTION, toQuestion, toQuestionSummary, type QuestionSummarySource } from './mappers';
 import { getTopicRefs } from './topic.service';
 import { dbState } from '../db/connect';
+import { findBanglaMatchingQuestionSlugs } from '../content/overlay';
 import {
   getLocalQuestionDetail,
   getLocalQuestionRefs,
@@ -35,8 +36,21 @@ export async function listQuestions(query: QuestionListQuery): Promise<Paginated
     if (query.frequency) match.frequency = { $in: query.frequency };
     if (query.tag) match.tags = { $in: query.tag };
     if (query.q) {
-      const re = new RegExp(escapeRegex(query.q), 'i');
-      match.$or = [{ title: re }, { tags: re }, { pattern: re }, { prompt: re }];
+      const pattern = escapeRegex(query.q.trim()).replace(/[\s\-]+/g, '[\\s\\-]*');
+      const re = new RegExp(pattern, 'i');
+      const bnSlugs = findBanglaMatchingQuestionSlugs(re);
+      const orClauses: Record<string, unknown>[] = [
+        { slug: re },
+        { title: re },
+        { tags: re },
+        { pattern: re },
+        { prompt: re },
+        { topic: re },
+      ];
+      if (bnSlugs.length > 0) {
+        orClauses.push({ slug: { $in: bnSlugs } });
+      }
+      match.$or = orClauses;
     }
 
     const { page, limit, sort } = query;

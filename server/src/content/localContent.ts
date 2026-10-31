@@ -26,6 +26,7 @@ import { toQuestion, toQuestionSummary, toQuizQuestion, toRoadmap, toTopic } fro
 import type { TopicRef } from '../services/topic.service';
 import type { ContentFileT, RoadmapT } from './schema';
 import { CONTENT_DIR, ROADMAP_FILE } from './validate';
+import { findBanglaMatchingQuestionSlugs } from './overlay';
 
 export interface LocalStore {
   topics: (TopicDoc & { stats: TopicStats })[];
@@ -214,9 +215,18 @@ export function getLocalQuestions(query: QuestionListQuery): Paginated<QuestionS
     matched = matched.filter((q) => q.tags?.some((t) => tagsSet.has(t)));
   }
   if (query.q) {
-    const re = new RegExp(escapeRegex(query.q), 'i');
+    const pattern = escapeRegex(query.q.trim()).replace(/[\s\-]+/g, '[\\s\\-]*');
+    const re = new RegExp(pattern, 'i');
+    const bnSlugs = new Set(findBanglaMatchingQuestionSlugs(re));
     matched = matched.filter(
-      (q) => re.test(q.title) || q.tags?.some((t) => re.test(t)) || (q.pattern && re.test(q.pattern)) || re.test(q.prompt),
+      (q) =>
+        bnSlugs.has(q.slug) ||
+        re.test(q.slug) ||
+        re.test(q.title) ||
+        re.test(q.topic) ||
+        q.tags?.some((t) => re.test(t)) ||
+        (q.pattern && re.test(q.pattern)) ||
+        re.test(q.prompt),
     );
   }
 

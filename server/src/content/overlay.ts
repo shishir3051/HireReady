@@ -330,3 +330,25 @@ export function applyRoadmapOverlay(rm: ApiRoadmap, lang?: string): ApiRoadmap {
     }),
   };
 }
+
+/** Find question slugs whose Bengali overlay title, prompt, or summary matches `re`. */
+export function findBanglaMatchingQuestionSlugs(re: RegExp): string[] {
+  if (!fs.existsSync(CONTENT_BN_DIR)) return [];
+  const matched: string[] = [];
+  const files = fs.readdirSync(CONTENT_BN_DIR).filter((f) => f.endsWith('.json'));
+  for (const file of files) {
+    const topicSlug = file.replace(/\.json$/, '');
+    const overlay = getBanglaOverlay(topicSlug);
+    if (!overlay?.questions) continue;
+    for (const [qSlug, qOver] of Object.entries(overlay.questions)) {
+      if (
+        (qOver.title && re.test(qOver.title)) ||
+        (qOver.prompt && re.test(qOver.prompt)) ||
+        (qOver.solution?.summary && re.test(qOver.solution.summary))
+      ) {
+        matched.push(qSlug);
+      }
+    }
+  }
+  return matched;
+}

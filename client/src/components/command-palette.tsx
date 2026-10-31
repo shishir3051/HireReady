@@ -32,7 +32,7 @@ import { useApiQuery, useDebouncedValue } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import { KIND_ICONS } from "@/lib/icons";
 import { Dialog } from "@/components/ui/dialog";
-import { DifficultyBadge } from "@/components/ui/badge";
+import { Badge, DifficultyBadge, type Tone } from "@/components/ui/badge";
 import { Kbd } from "@/components/ui/kbd";
 
 // ---------------------------------------------------------------- context
@@ -94,16 +94,75 @@ interface PaletteItem {
   href: string;
   icon: LucideIcon;
   difficulty?: "easy" | "medium" | "hard";
+  badge?: string;
+  badgeTone?: Tone;
+  keywords?: string[];
 }
 
 const PAGES: PaletteItem[] = [
-  { id: "page-topics", label: "Browse topics", hint: "All 29 topics by category", href: "/topics", icon: BookOpen },
-  { id: "page-questions", label: "All questions", hint: "Search and filter", href: "/questions", icon: ListChecks },
-  { id: "page-quiz", label: "Take a quiz", hint: "Topic MCQs", href: "/quiz", icon: Target },
-  { id: "page-mock", label: "Start a mock interview", hint: "Timed practice", href: "/mock-interview", icon: Mic },
-  { id: "page-roadmap", label: "30-day roadmap", hint: "Study plan", href: "/roadmap", icon: MapIcon },
-  { id: "page-dashboard", label: "Dashboard", hint: "Your progress", href: "/dashboard", icon: LayoutDashboard },
+  {
+    id: "page-topics",
+    label: "Browse topics",
+    hint: "All 29 topics by category",
+    href: "/topics",
+    icon: BookOpen,
+    badge: "Page",
+    badgeTone: "neutral",
+    keywords: ["topics", "topic", "browse", "categories", "dsa", "cs", "web", "টপিক", "বিষয়"],
+  },
+  {
+    id: "page-questions",
+    label: "All questions",
+    hint: "Search and filter 340+ interview questions",
+    href: "/questions",
+    icon: ListChecks,
+    badge: "Page",
+    badgeTone: "neutral",
+    keywords: ["questions", "question", "problems", "coding", "theory", "প্রশ্ন", "সমস্যা"],
+  },
+  {
+    id: "page-quiz",
+    label: "Take a quiz",
+    hint: "Topic MCQs — timed or practice mode",
+    href: "/quiz",
+    icon: Target,
+    badge: "Quiz",
+    badgeTone: "info",
+    keywords: ["quiz", "quizzes", "mcq", "mcqs", "test", "practice", "কুইজ", "এমসিকিউ", "পরীক্ষা"],
+  },
+  {
+    id: "page-mock",
+    label: "Start a mock interview",
+    hint: "Timed interview simulation with rubric",
+    href: "/mock-interview",
+    icon: Mic,
+    badge: "Mock",
+    badgeTone: "warning",
+    keywords: ["mock", "interview", "timed", "simulation", "মক", "ইন্টারভিউ", "সাক্ষাৎকার"],
+  },
+  {
+    id: "page-roadmap",
+    label: "30-day roadmap",
+    hint: "Day-by-day structured study plan",
+    href: "/roadmap",
+    icon: MapIcon,
+    badge: "Page",
+    badgeTone: "neutral",
+    keywords: ["roadmap", "plan", "30 day", "30-day", "study", "schedule", "রোডম্যাপ", "প্ল্যান"],
+  },
+  {
+    id: "page-dashboard",
+    label: "Dashboard",
+    hint: "Your progress, streak & bookmarks",
+    href: "/dashboard",
+    icon: LayoutDashboard,
+    badge: "Page",
+    badgeTone: "neutral",
+    keywords: ["dashboard", "progress", "stats", "streak", "bookmarks", "ড্যাশবোর্ড", "প্রগ্রেস"],
+  },
 ];
+
+const MODE_STRIP_RE = /\b(quiz|quizzes|mcq|mcqs|mock|interviews?|topics?|questions?|কুইজ|মক|ইন্টারভিউ|টপিক|প্রশ্ন)\b/gi;
 
 function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (open: boolean) => void }) {
   return (
@@ -111,7 +170,7 @@ function CommandPalette({ open, onOpenChange }: { open: boolean; onOpenChange: (
       open={open}
       onOpenChange={onOpenChange}
       title="Search HireReady"
-      description="Search questions by title, tag or pattern, or jump to a page."
+      description="Search topics, questions, quizzes, mock interviews, or jump to a page."
       hideHeader
       position="top"
       size="lg"
@@ -130,38 +189,159 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
   const listId = useId();
   const q = useDebouncedValue(query.trim(), 200);
 
+  const effectiveQ = useMemo(() => {
+    if (!q) return "";
+    const stripped = q.replace(MODE_STRIP_RE, "").trim();
+    return stripped || q;
+  }, [q]);
+
+  const { data: topicsData } = useApiQuery(
+    "palette:topics",
+    (signal) => api.topics.list({ signal }),
+  );
+
   const { data, loading, error } = useApiQuery(
-    q ? `palette:${q}` : null,
-    (signal) => api.questions.list({ q, limit: 8 }, { signal }),
+    effectiveQ ? `palette:q:${effectiveQ}` : null,
+    (signal) => api.questions.list({ q: effectiveQ, limit: 8 }, { signal }),
     { keepPrevious: true },
   );
 
-  const items = useMemo<PaletteItem[]>(() => {
+  const { items, hasMatches } = useMemo(() => {
     const typed = query.trim();
-    if (!typed) return PAGES;
+    if (!typed) return { items: PAGES, hasMatches: true };
+
     const lower = typed.toLowerCase();
-    const pages = PAGES.filter((p) => p.label.toLowerCase().includes(lower));
-    const questions: PaletteItem[] = q
-      ? (data?.items ?? []).map((item) => ({
-          id: `q-${item.slug}`,
-          label: item.title,
-          hint: item.topicTitle + (item.pattern ? ` · ${item.pattern}` : ""),
-          href: `/questions/${item.slug}`,
-          icon: KIND_ICONS[item.kind],
-          difficulty: item.difficulty,
-        }))
-      : [];
-    return [
-      ...questions,
-      ...pages,
-      {
-        id: "search-all",
-        label: `Search all questions for “${typed}”`,
-        href: `/questions?q=${encodeURIComponent(typed)}`,
-        icon: Search,
-      },
-    ];
-  }, [query, q, data]);
+    const norm = lower.replace(/[-_]+/g, " ").trim();
+    const wantsQuiz = /\b(quiz|quizzes|mcq|mcqs|কুইজ|এমসিকিউ)\b/i.test(lower);
+    const wantsMock = /\b(mock|interviews?|মক|ইন্টারভিউ)\b/i.test(lower);
+    const wantsTopic = /\b(topics?|টপিক)\b/i.test(lower);
+    const topicTerm = norm.replace(MODE_STRIP_RE, "").replace(/\s+/g, " ").trim();
+
+    const pages = PAGES.filter(
+      (p) =>
+        p.label.toLowerCase().includes(lower) ||
+        (p.hint && p.hint.toLowerCase().includes(lower)) ||
+        (p.keywords && p.keywords.some((k) => k.includes(lower) || lower.includes(k))),
+    );
+
+    const allTopics = topicsData?.items ?? [];
+    const matchedTopics = topicTerm
+      ? allTopics.filter((t) => {
+          const title = t.title.toLowerCase();
+          const slug = t.slug.toLowerCase();
+          const slugWords = slug.replace(/-/g, " ");
+          const summary = t.summary.toLowerCase();
+          return (
+            title.includes(topicTerm) ||
+            slug.includes(topicTerm) ||
+            slugWords.includes(topicTerm) ||
+            summary.includes(topicTerm) ||
+            t.category.toLowerCase().includes(topicTerm)
+          );
+        })
+      : wantsTopic
+        ? allTopics.slice(0, 5)
+        : [];
+
+    const topicItems: PaletteItem[] = [];
+    for (const t of matchedTopics.slice(0, 4)) {
+      if (!wantsQuiz && !wantsMock) {
+        topicItems.push({
+          id: `topic-${t.slug}`,
+          label: t.title,
+          hint: `${t.questionCount} questions · ${t.quizCount} quiz MCQs`,
+          href: `/topics/${t.slug}`,
+          icon: BookOpen,
+          badge: "Topic",
+          badgeTone: "brand",
+        });
+      }
+      if (t.quizCount > 0 && (wantsQuiz || !wantsMock)) {
+        topicItems.push({
+          id: `quiz-${t.slug}`,
+          label: `${t.title} — Quiz`,
+          hint: `${t.quizCount} MCQs · Timed or practice`,
+          href: `/quiz/${t.slug}`,
+          icon: Target,
+          badge: "Quiz",
+          badgeTone: "info",
+        });
+      }
+      if (wantsMock || (!wantsQuiz && matchedTopics.length <= 2)) {
+        topicItems.push({
+          id: `mock-${t.slug}`,
+          label: `${t.title} — Mock Interview`,
+          hint: `Timed interview simulation · ${t.questionCount} questions pool`,
+          href: `/mock-interview?topics=${encodeURIComponent(t.slug)}`,
+          icon: Mic,
+          badge: "Mock",
+          badgeTone: "warning",
+        });
+      }
+    }
+
+    // When user types "quiz" or "mock" without a specific topic, surface popular topic quizzes / mocks
+    if (!topicTerm && wantsQuiz) {
+      for (const t of allTopics.filter((x) => x.quizCount > 0).slice(0, 4)) {
+        topicItems.push({
+          id: `quiz-${t.slug}`,
+          label: `${t.title} — Quiz`,
+          hint: `${t.quizCount} MCQs · Timed or practice`,
+          href: `/quiz/${t.slug}`,
+          icon: Target,
+          badge: "Quiz",
+          badgeTone: "info",
+        });
+      }
+    } else if (!topicTerm && wantsMock) {
+      for (const t of allTopics.slice(0, 4)) {
+        topicItems.push({
+          id: `mock-${t.slug}`,
+          label: `${t.title} — Mock Interview`,
+          hint: `Timed interview simulation · ${t.questionCount} questions pool`,
+          href: `/mock-interview?topics=${encodeURIComponent(t.slug)}`,
+          icon: Mic,
+          badge: "Mock",
+          badgeTone: "warning",
+        });
+      }
+    }
+
+    const showQuestions = !(
+      !topicTerm &&
+      (wantsQuiz || wantsMock || wantsTopic)
+    );
+
+    const questions: PaletteItem[] =
+      effectiveQ && showQuestions
+        ? (data?.items ?? []).map((item) => ({
+            id: `q-${item.slug}`,
+            label: item.title,
+            hint: item.topicTitle + (item.pattern ? ` · ${item.pattern}` : ""),
+            href: `/questions/${item.slug}`,
+            icon: KIND_ICONS[item.kind],
+            difficulty: item.difficulty,
+          }))
+        : [];
+
+    const combined: PaletteItem[] =
+      wantsQuiz || wantsMock || wantsTopic
+        ? [...pages, ...topicItems, ...questions]
+        : [...topicItems, ...questions, ...pages];
+
+    return {
+      items: [
+        ...combined,
+        {
+          id: "search-all",
+          label: `Search all questions for “${typed}”`,
+          href: `/questions?q=${encodeURIComponent(typed)}`,
+          icon: Search,
+        },
+      ],
+      hasMatches: combined.length > 0,
+    };
+  }, [query, effectiveQ, data, topicsData]);
 
   const activeIndex = Math.min(active, items.length - 1);
   const activeItem = items[activeIndex];
@@ -193,7 +373,6 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
   }
 
   const searching = query.trim() !== "" && (loading || q !== query.trim());
-  const questionCount = query.trim() && q ? (data?.items.length ?? 0) : 0;
 
   return (
     <div className="flex max-h-[min(70vh,560px)] flex-col">
@@ -212,8 +391,8 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
             setActive(0);
           }}
           onKeyDown={onKeyDown}
-          placeholder="Search questions, patterns, tags…"
-          aria-label="Search questions and pages"
+          placeholder="Search topics, questions, quizzes, mock interviews…"
+          aria-label="Search topics, questions, quizzes, mock interviews and pages"
           role="combobox"
           aria-expanded="true"
           aria-controls={listId}
@@ -237,9 +416,9 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
             Couldn&apos;t search questions: {getErrorMessage(error)}
           </p>
         )}
-        {query.trim() !== "" && !searching && error == null && questionCount === 0 && (
+        {query.trim() !== "" && !searching && error == null && !hasMatches && (
           <div className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted">
-            <SearchX className="size-4" aria-hidden /> No questions match “{query.trim()}”.
+            <SearchX className="size-4" aria-hidden /> No results match “{query.trim()}”.
           </div>
         )}
         <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-muted" aria-hidden>
@@ -277,7 +456,13 @@ function PaletteBody({ onClose }: { onClose: () => void }) {
                   <span className="block truncate font-medium">{item.label}</span>
                   {item.hint && <span className="block truncate text-xs text-muted">{item.hint}</span>}
                 </span>
-                {item.difficulty && <DifficultyBadge difficulty={item.difficulty} className="hidden sm:inline-flex" />}
+                {item.difficulty ? (
+                  <DifficultyBadge difficulty={item.difficulty} className="hidden sm:inline-flex" />
+                ) : item.badge ? (
+                  <Badge tone={item.badgeTone ?? "neutral"} className="hidden sm:inline-flex">
+                    {item.badge}
+                  </Badge>
+                ) : null}
                 {selected ? (
                   <CornerDownLeft className="size-4 shrink-0 text-muted" aria-hidden />
                 ) : (
