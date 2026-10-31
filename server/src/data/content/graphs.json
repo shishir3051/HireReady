@@ -15437,6 +15437,283 @@
         "shortest-path-in-binary-matrix",
         "network-delay-time-dijkstra"
       ]
+    },
+    {
+      "slug": "alien-dictionary",
+      "title": "Alien Dictionary (Topological Sort)",
+      "topic": "graphs",
+      "difficulty": "hard",
+      "kind": "coding",
+      "frequency": "high",
+      "tags": [
+        "graph",
+        "topological-sort",
+        "bfs",
+        "string"
+      ],
+      "pattern": "Topological Sort (Kahn's BFS)",
+      "prompt": "There is a new alien language that uses the English alphabet, but the order among letters is unknown. You are given a list of strings `words` from the alien dictionary, where the strings in `words` are **sorted lexicographically** by the rules of this new language.\n\nReturn a string of the unique letters in the new alien language sorted in **lexicographically increasing order** by the new language’s rules. If there is no valid ordering, return `\"\"`. If there are multiple valid solutions, return any of them.",
+      "examples": [
+        {
+          "input": "words = [\"wrt\", \"wrf\", \"er\", \"ett\", \"rftt\"]",
+          "output": "\"wertf\"",
+          "explanation": "From \"wrt\" < \"wrf\" we get t -> f; from \"wrf\" < \"er\" we get w -> e; from \"er\" < \"ett\" we get r -> t; from \"ett\" < \"rftt\" we get e -> r. Topological order: \"wertf\"."
+        },
+        {
+          "input": "words = [\"abc\", \"ab\"]",
+          "output": "\"\"",
+          "explanation": "A longer word (\"abc\") cannot appear before its own prefix (\"ab\") in any valid dictionary."
+        }
+      ],
+      "constraints": [
+        "1 <= words.length <= 100",
+        "1 <= words[i].length <= 100",
+        "words[i] consists of only lowercase English letters."
+      ],
+      "hints": [
+        "How do you determine relative letter order in a normal dictionary? By comparing adjacent words and finding the **first index** where their characters differ.",
+        "Wait—what if `word1` is longer than `word2` and `word2` is a prefix of `word1` (like `[\"abc\", \"ab\"]`)? That dictionary is invalid (`\"\"`).",
+        "Each first-mismatch `(u, v)` gives a directed edge `u -> v`. Run Kahn’s BFS topological sort; if the output length is less than the number of unique letters, there is a cycle (`\"\"`)."
+      ],
+      "approaches": [
+        {
+          "name": "DFS post-order with 3-color cycle detection",
+          "idea": "Build the directed graph of characters and run DFS marking nodes visiting (1) or visited (2). Reverse the post-order if no cycle is found.",
+          "time": "O(C)",
+          "space": "O(U + min(U², N))"
+        },
+        {
+          "name": "Kahn's BFS Topological Sort with in-degrees (Optimal)",
+          "idea": "Initialize in-degree 0 for every unique letter. Compare each adjacent pair `(words[i], words[i+1])` to add at most one directed edge at their first differing character. Push 0-in-degree letters into a queue and pop in BFS order.",
+          "time": "O(C)",
+          "space": "O(1) (at most 26 letters)"
+        }
+      ],
+      "solution": {
+        "summary": "Collect all unique characters, compare adjacent words to extract a directed edge `u -> v` from the first differing character (checking the invalid prefix edge case `[\"abc\", \"ab\"]`), and run Kahn’s BFS topological sort. If the result contains fewer letters than unique characters, a cycle exists so return `\"\"`.",
+        "explanation": "Let `C` be the total number of characters across all words and `U <= 26` be the number of unique letters:\n\n1. **Initialize graph**: For every character in every word, set `adj.get(ch) = new Set()` and `inDegree.get(ch) = 0`.\n2. **Extract edges from adjacent words**: For `i = 0..words.length - 2`, compare `w1 = words[i]` and `w2 = words[i + 1]`:\n   - If `w1.length > w2.length && w1.startsWith(w2)`, return `\"\"` immediately (invalid prefix order).\n   - Find the first index `j` where `w1[j] !== w2[j]`, add edge `w1[j] -> w2[j]` (if not already present), and `break` (later characters in `w1, w2` tell us nothing).\n3. **Kahn’s BFS**: Enqueue all characters with `inDegree === 0`. Pop `u`, append to `res`, decrement `inDegree` of each neighbor `v`, and enqueue `v` when its in-degree hits 0.\n4. Return `res.length === inDegree.size ? res.join(\"\") : \"\"`.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "function alienOrder(words) {\n  const adj = new Map();\n  const inDegree = new Map();\n  for (const w of words) {\n    for (const ch of w) {\n      if (!adj.has(ch)) {\n        adj.set(ch, new Set());\n        inDegree.set(ch, 0);\n      }\n    }\n  }\n\n  for (let i = 0; i < words.length - 1; i++) {\n    const w1 = words[i], w2 = words[i + 1];\n    if (w1.length > w2.length && w1.startsWith(w2)) return \"\";\n    const len = Math.min(w1.length, w2.length);\n    for (let j = 0; j < len; j++) {\n      if (w1[j] !== w2[j]) {\n        if (!adj.get(w1[j]).has(w2[j])) {\n          adj.get(w1[j]).add(w2[j]);\n          inDegree.set(w2[j], inDegree.get(w2[j]) + 1);\n        }\n        break;\n      }\n    }\n  }\n\n  const queue = [];\n  for (const [ch, deg] of inDegree) {\n    if (deg === 0) queue.push(ch);\n  }\n\n  const res = [];\n  while (queue.length > 0) {\n    const u = queue.shift();\n    res.push(u);\n    for (const v of adj.get(u)) {\n      inDegree.set(v, inDegree.get(v) - 1);\n      if (inDegree.get(v) === 0) queue.push(v);\n    }\n  }\n\n  return res.length === inDegree.size ? res.join(\"\") : \"\";\n}"
+          },
+          {
+            "language": "python",
+            "code": "from collections import deque\n\ndef alien_order(words: list[str]) -> str:\n    adj = {ch: set() for w in words for ch in w}\n    in_deg = {ch: 0 for ch in adj}\n\n    for w1, w2 in zip(words, words[1:]):\n        if len(w1) > len(w2) and w1.startswith(w2):\n            return \"\"\n        for c1, c2 in zip(w1, w2):\n            if c1 != c2:\n                if c2 not in adj[c1]:\n                    adj[c1].add(c2)\n                    in_deg[c2] += 1\n                break\n\n    q = deque([ch for ch, d in in_deg.items() if d == 0])\n    res = []\n    while q:\n        u = q.popleft()\n        res.append(u)\n        for v in adj[u]:\n            in_deg[v] -= 1\n            if in_deg[v] == 0:\n                q.append(v)\n\n    return \"\".join(res) if len(res) == len(in_deg) else \"\""
+          },
+          {
+            "language": "java",
+            "code": "import java.util.*;\n\nclass Solution {\n    public String alienOrder(String[] words) {\n        Map<Character, Set<Character>> adj = new HashMap<>();\n        Map<Character, Integer> inDegree = new HashMap<>();\n        for (String w : words) {\n            for (char c : w.toCharArray()) {\n                adj.putIfAbsent(c, new HashSet<>());\n                inDegree.putIfAbsent(c, 0);\n            }\n        }\n\n        for (int i = 0; i < words.length - 1; i++) {\n            String w1 = words[i], w2 = words[i + 1];\n            if (w1.length() > w2.length() && w1.startsWith(w2)) return \"\";\n            int len = Math.min(w1.length(), w2.length());\n            for (int j = 0; j < len; j++) {\n                char c1 = w1.charAt(j), c2 = w2.charAt(j);\n                if (c1 != c2) {\n                    if (adj.get(c1).add(c2)) {\n                        inDegree.put(c2, inDegree.get(c2) + 1);\n                    }\n                    break;\n                }\n            }\n        }\n\n        Queue<Character> q = new ArrayDeque<>();\n        for (var e : inDegree.entrySet()) {\n            if (e.getValue() == 0) q.offer(e.getKey());\n        }\n\n        StringBuilder sb = new StringBuilder();\n        while (!q.isEmpty()) {\n            char u = q.poll();\n            sb.append(u);\n            for (char v : adj.get(u)) {\n                inDegree.put(v, inDegree.get(v) - 1);\n                if (inDegree.get(v) == 0) q.offer(v);\n            }\n        }\n        return sb.length() == inDegree.size() ? sb.toString() : \"\";\n    }\n}"
+          }
+        ],
+        "complexity": {
+          "time": "O(C) where C is the total length of all words combined.",
+          "space": "O(1) or O(U + min(U², N)) since there are at most U <= 26 lowercase letters."
+        },
+        "keyPoints": [
+          "Only the **first** differing character between `words[i]` and `words[i + 1]` defines an edge — remember to `break` right after!",
+          "Always check the invalid prefix case `w1.length > w2.length && w1.startsWith(w2)` (e.g. `[\"abc\", \"ab\"]` → `\"\"`).",
+          "Deduplicate edges with a `Set` so in-degrees are not incremented twice for the same pair of characters."
+        ]
+      },
+      "visuals": [
+        {
+          "type": "graph",
+          "title": "Alien Dictionary Graph for [\"wrt\", \"wrf\", \"er\", \"ett\", \"rftt\"]",
+          "caption": "Adjacent word comparisons yield edges w → e → r → t → f; Kahn’s BFS produces \"wertf\".",
+          "directed": true,
+          "nodes": [
+            {
+              "id": "w",
+              "label": "w",
+              "x": 10,
+              "y": 50
+            },
+            {
+              "id": "e",
+              "label": "e",
+              "x": 30,
+              "y": 50
+            },
+            {
+              "id": "r",
+              "label": "r",
+              "x": 50,
+              "y": 50
+            },
+            {
+              "id": "t",
+              "label": "t",
+              "x": 70,
+              "y": 50
+            },
+            {
+              "id": "f",
+              "label": "f",
+              "x": 90,
+              "y": 50
+            }
+          ],
+          "edges": [
+            {
+              "from": "w",
+              "to": "e"
+            },
+            {
+              "from": "e",
+              "to": "r"
+            },
+            {
+              "from": "r",
+              "to": "t"
+            },
+            {
+              "from": "t",
+              "to": "f"
+            }
+          ],
+          "steps": [
+            {
+              "note": "Compare adjacent words to build the DAG: `\"wrt\"<\"wrf\"` (`t→f`), `\"wrf\"<\"er\"` (`w→e`), `\"er\"<\"ett\"` (`r→t`), `\"ett\"<\"rftt\"` (`e→r`). Only `w` has in-degree 0.",
+              "vars": {
+                "queue": "w",
+                "res": ""
+              },
+              "codeLine": 30,
+              "nodeHighlights": [
+                {
+                  "ids": [
+                    "w"
+                  ],
+                  "color": "primary"
+                }
+              ],
+              "nodeBadges": {
+                "w": "in:0",
+                "e": "in:1",
+                "r": "in:1",
+                "t": "in:1",
+                "f": "in:1"
+              }
+            },
+            {
+              "note": "Pop `w`, append to `res` (`\"w\"`), and decrement `e`’s in-degree to 0. Pop `e`, then `r`, following the chain.",
+              "vars": {
+                "queue": "t",
+                "res": "wer"
+              },
+              "codeLine": 36,
+              "nodeHighlights": [
+                {
+                  "ids": [
+                    "w",
+                    "e",
+                    "r"
+                  ],
+                  "color": "success"
+                },
+                {
+                  "ids": [
+                    "t"
+                  ],
+                  "color": "primary"
+                }
+              ],
+              "edgeHighlights": [
+                {
+                  "edges": [
+                    [
+                      "w",
+                      "e"
+                    ],
+                    [
+                      "e",
+                      "r"
+                    ],
+                    [
+                      "r",
+                      "t"
+                    ]
+                  ],
+                  "color": "success"
+                }
+              ],
+              "nodeBadges": {
+                "w": "done",
+                "e": "done",
+                "r": "done",
+                "t": "in:0",
+                "f": "in:1"
+              }
+            },
+            {
+              "note": "Pop `t` and finally `f`. All 5 unique characters are output in topological order `\"wertf\"`.",
+              "vars": {
+                "queue": "",
+                "res": "wertf"
+              },
+              "codeLine": 44,
+              "nodeHighlights": [
+                {
+                  "ids": [
+                    "w",
+                    "e",
+                    "r",
+                    "t",
+                    "f"
+                  ],
+                  "color": "success"
+                }
+              ],
+              "edgeHighlights": [
+                {
+                  "edges": [
+                    [
+                      "w",
+                      "e"
+                    ],
+                    [
+                      "e",
+                      "r"
+                    ],
+                    [
+                      "r",
+                      "t"
+                    ],
+                    [
+                      "t",
+                      "f"
+                    ]
+                  ],
+                  "color": "success"
+                }
+              ],
+              "nodeBadges": {
+                "w": "1st",
+                "e": "2nd",
+                "r": "3rd",
+                "t": "4th",
+                "f": "5th"
+              }
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Forgetting to initialize `inDegree` for characters that never appear in any mismatch edge — those characters must still appear in the final output.",
+        "Not breaking after the first differing character between `w1` and `w2`, adding bogus edges from later positions.",
+        "Missing the prefix trap `[\"abc\", \"ab\"]`, which produces 0 edges and would falsely return `\"abc\"` without an explicit check."
+      ],
+      "followUps": [
+        {
+          "question": "Why don’t we need to compare non-adjacent words like `words[0]` and `words[2]`?",
+          "answer": "Lexicographical order is transitive: if `words[0] < words[1]` and `words[1] < words[2]`, any ordering constraints implied between `words[0]` and `words[2]` are already captured by adjacent pairs."
+        }
+      ],
+      "related": [
+        "course-schedule",
+        "course-schedule-ii-topological-sort"
+      ]
     }
   ],
   "quiz": [

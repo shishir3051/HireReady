@@ -15778,6 +15778,308 @@
         "longest-increasing-subsequence",
         "what-is-dynamic-programming"
       ]
+    },
+    {
+      "slug": "combination-sum-iv",
+      "title": "Combination Sum IV",
+      "topic": "dynamic-programming",
+      "difficulty": "medium",
+      "kind": "coding",
+      "frequency": "high",
+      "tags": [
+        "dynamic-programming",
+        "memoization",
+        "array"
+      ],
+      "pattern": "1D Unbounded Knapsack (Order Matters)",
+      "prompt": "Given an array of **distinct** positive integers `nums` and a target integer `target`, return the number of possible combinations that add up to `target`.\n\nNote that **different sequences are counted as different combinations** (for example, `(1, 1, 2)` and `(1, 2, 1)` count as two separate ways).",
+      "examples": [
+        {
+          "input": "nums = [1, 2, 3], target = 4",
+          "output": "7",
+          "explanation": "The 7 ordered ways are: (1,1,1,1), (1,1,2), (1,2,1), (1,3), (2,1,1), (2,2), (3,1)."
+        },
+        {
+          "input": "nums = [9], target = 3",
+          "output": "0",
+          "explanation": "No positive combination of 9s can sum to 3."
+        }
+      ],
+      "constraints": [
+        "1 <= nums.length <= 200",
+        "1 <= nums[i] <= 1000",
+        "All elements of nums are unique.",
+        "1 <= target <= 1000",
+        "The answer is guaranteed to fit in a 32-bit signed integer."
+      ],
+      "hints": [
+        "Notice that order matters (`(1, 3)` and `(3, 1)` are both counted). How is this similar to **Climbing Stairs** where you can take steps of size `num` for any `num` in `nums`?",
+        "Define `dp[t]` as the number of ordered sequences that sum to `t`, with base case `dp[0] = 1` (one way to make 0: pick nothing).",
+        "If the last number picked to reach sum `t` was `num`, the remaining prefix must sum to `t - num`. So `dp[t] = sum(dp[t - num])` for all `num <= t`."
+      ],
+      "approaches": [
+        {
+          "name": "Brute-force recursion",
+          "idea": "At each step try subtracting every `num <= remaining` and recurse. Exponentially repeats identical subproblems.",
+          "time": "O(N^target)",
+          "space": "O(target)"
+        },
+        {
+          "name": "Bottom-up 1D DP — target outer loop (Optimal)",
+          "idea": "Create `dp[0..target]` with `dp[0] = 1`. Loop `t` from `1` to `target` in the outer loop and `num` of `nums` in the inner loop: `dp[t] += dp[t - num]` whenever `t >= num`.",
+          "time": "O(target · N)",
+          "space": "O(target)"
+        }
+      ],
+      "solution": {
+        "summary": "Use a 1D DP array `dp[0..target]` with `dp[0] = 1`. Put `t` (`1..target`) as the outer loop and `num` of `nums` as the inner loop so different orderings are counted: `dp[t] += dp[t - num]`.",
+        "explanation": "Although the problem is named \"Combination Sum IV\", it actually counts **permutations** (ordered sequences) that sum to `target` — identical to **Climbing Stairs** where your allowed step sizes are `nums`:\n\n1. Initialize `dp = new Array(target + 1).fill(0)` and set `dp[0] = 1`.\n2. **Outer loop** over `t` from `1` to `target`:\n   - **Inner loop** over each `num` in `nums`:\n     - If `t >= num`, add `dp[t - num]` to `dp[t]` (choosing `num` as the last element of a sequence summing to `t`).\n3. Return `dp[target]`.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "function combinationSum4(nums, target) {\n  const dp = new Array(target + 1).fill(0);\n  dp[0] = 1;\n  for (let t = 1; t <= target; t++) {\n    for (const num of nums) {\n      if (t >= num) {\n        dp[t] += dp[t - num];\n      }\n    }\n  }\n  return dp[target];\n}"
+          },
+          {
+            "language": "python",
+            "code": "def combination_sum4(nums: list[int], target: int) -> int:\n    dp = [0] * (target + 1)\n    dp[0] = 1\n    for t in range(1, target + 1):\n        for num in nums:\n            if t >= num:\n                dp[t] += dp[t - num]\n    return dp[target]"
+          },
+          {
+            "language": "java",
+            "code": "class Solution {\n    public int combinationSum4(int[] nums, int target) {\n        int[] dp = new int[target + 1];\n        dp[0] = 1;\n        for (int t = 1; t <= target; t++) {\n            for (int num : nums) {\n                if (t >= num) {\n                    dp[t] += dp[t - num];\n                }\n            }\n        }\n        return dp[target];\n    }\n}"
+          }
+        ],
+        "complexity": {
+          "time": "O(target · N) — for each sum from 1 to target we iterate over N numbers.",
+          "space": "O(target) — a single 1D array of size target + 1."
+        },
+        "keyPoints": [
+          "Loop order is crucial: **target on the outside, coins/nums on the inside** counts ordered permutations (`(1, 2)` and `(2, 1)` are distinct); flipping the loops (coins outside, target inside) counts unordered combinations (Coin Change II).",
+          "Base case `dp[0] = 1` represents the single empty sequence that sums to 0.",
+          "If `nums` is sorted, you can `break` early in the inner loop as soon as `num > t`."
+        ]
+      },
+      "visuals": [
+        {
+          "type": "array",
+          "title": "Filling dp[0..4] for nums = [1, 2, 3], target = 4",
+          "caption": "For each sum t, dp[t] = dp[t - 1] + dp[t - 2] + dp[t - 3] (for valid indices >= 0).",
+          "steps": [
+            {
+              "note": "Initialize `dp[0] = 1` (1 way to make sum 0: empty sequence) and `dp[1..4] = 0`.",
+              "vars": {
+                "t": 0,
+                "dp[0]": 1
+              },
+              "codeLine": 3,
+              "arrays": [
+                {
+                  "name": "dp[0..4]",
+                  "values": [
+                    1,
+                    0,
+                    0,
+                    0,
+                    0
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        0
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "`t = 1`: only `num = 1` fits. `dp[1] = dp[0] = 1` (sequence: `(1)`).",
+              "vars": {
+                "t": 1,
+                "dp[1]": 1
+              },
+              "codeLine": 7,
+              "arrays": [
+                {
+                  "name": "dp[0..4]",
+                  "values": [
+                    1,
+                    1,
+                    0,
+                    0,
+                    0
+                  ],
+                  "pointers": [
+                    {
+                      "name": "t",
+                      "index": 1,
+                      "color": "primary"
+                    }
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        0
+                      ],
+                      "color": "info"
+                    },
+                    {
+                      "indices": [
+                        1
+                      ],
+                      "color": "primary"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "`t = 2`: `num = 1, 2` fit. `dp[2] = dp[1] + dp[0] = 1 + 1 = 2` (`(1,1)`, `(2)`).",
+              "vars": {
+                "t": 2,
+                "dp[2]": 2
+              },
+              "codeLine": 7,
+              "arrays": [
+                {
+                  "name": "dp[0..4]",
+                  "values": [
+                    1,
+                    1,
+                    2,
+                    0,
+                    0
+                  ],
+                  "pointers": [
+                    {
+                      "name": "t",
+                      "index": 2,
+                      "color": "primary"
+                    }
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        0,
+                        1
+                      ],
+                      "color": "info"
+                    },
+                    {
+                      "indices": [
+                        2
+                      ],
+                      "color": "primary"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "`t = 3`: `num = 1, 2, 3` fit. `dp[3] = dp[2] + dp[1] + dp[0] = 2 + 1 + 1 = 4`.",
+              "vars": {
+                "t": 3,
+                "dp[3]": 4
+              },
+              "codeLine": 7,
+              "arrays": [
+                {
+                  "name": "dp[0..4]",
+                  "values": [
+                    1,
+                    1,
+                    2,
+                    4,
+                    0
+                  ],
+                  "pointers": [
+                    {
+                      "name": "t",
+                      "index": 3,
+                      "color": "primary"
+                    }
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        0,
+                        1,
+                        2
+                      ],
+                      "color": "info"
+                    },
+                    {
+                      "indices": [
+                        3
+                      ],
+                      "color": "primary"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "`t = 4`: `dp[4] = dp[3] + dp[2] + dp[1] = 4 + 2 + 1 = 7`. Return `dp[4] = 7`!",
+              "vars": {
+                "t": 4,
+                "dp[4]": 7,
+                "answer": 7
+              },
+              "codeLine": 11,
+              "arrays": [
+                {
+                  "name": "dp[0..4]",
+                  "values": [
+                    1,
+                    1,
+                    2,
+                    4,
+                    7
+                  ],
+                  "pointers": [
+                    {
+                      "name": "t",
+                      "index": 4,
+                      "color": "success"
+                    }
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "color": "info"
+                    },
+                    {
+                      "indices": [
+                        4
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Putting the `nums` loop on the outside and `target` on the inside — that ignores order and solves Coin Change II instead.",
+        "Setting `dp[0] = 0`, which leaves every entry at 0."
+      ],
+      "followUps": [
+        {
+          "question": "What if negative numbers are allowed in `nums`? What limitation must be added?",
+          "answer": "If both positive and negative numbers exist (e.g. `[1, -1]`), there can be infinitely many sequences of arbitrary length that sum to `target` (`1 + (-1) + 1 + ...`). To make the problem well-defined, we must bound the **maximum sequence length** `L` and use a 2D state `dp[len][sum]`."
+        }
+      ],
+      "related": [
+        "climbing-stairs",
+        "coin-change",
+        "combination-sum"
+      ]
     }
   ],
   "quiz": [

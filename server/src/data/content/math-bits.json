@@ -8538,6 +8538,320 @@
         "single-number-xor",
         "reverse-integer"
       ]
+    },
+    {
+      "slug": "reverse-bits",
+      "title": "Reverse Bits",
+      "topic": "math-bits",
+      "difficulty": "easy",
+      "kind": "coding",
+      "frequency": "high",
+      "tags": [
+        "bit-manipulation",
+        "divide-and-conquer"
+      ],
+      "pattern": "Bit Manipulation (Shift & Mask)",
+      "prompt": "Reverse the bits of a given **32-bit unsigned integer** `n` and return the resulting unsigned integer.\n\nIn JavaScript, bitwise operators treat numbers as signed 32-bit integers, so coerce the final result to an unsigned 32-bit integer using `>>> 0`.",
+      "examples": [
+        {
+          "input": "n = 00000010100101000001111010011100 (43261596)",
+          "output": "964176192 (00111001011110000010100101000000)",
+          "explanation": "Reading the 32 bits of 43261596 from right to left produces 964176192."
+        },
+        {
+          "input": "n = 11111111111111111111111111111101 (4294967293)",
+          "output": "3221225471 (10111111111111111111111111111111)",
+          "explanation": "The single 0 at bit position 1 moves to bit position 30."
+        }
+      ],
+      "constraints": [
+        "The input must be a binary string of length 32 (or a 32-bit unsigned integer)."
+      ],
+      "hints": [
+        "How do you extract the least-significant (rightmost) bit of `n`? Use `n & 1`.",
+        "How do you append that bit to the right of your result `res`? Shift `res` left by 1 (`res << 1`) and OR the bit (`| (n & 1)`).",
+        "Repeat this 32 times, shifting `n` right by 1 (`n >>>= 1`) on every iteration."
+      ],
+      "approaches": [
+        {
+          "name": "Convert to binary string & reverse",
+          "idea": "Convert `n` to a 32-character binary string padded with leading zeros, reverse the characters, and parse back in base 2. Simple, but allocates strings.",
+          "time": "O(32) = O(1)",
+          "space": "O(32) = O(1)"
+        },
+        {
+          "name": "Bit-by-bit shift and mask (Optimal)",
+          "idea": "Loop 32 times. In each iteration, shift `res` left by 1, copy the lowest bit of `n` into `res` via `res = (res << 1) | (n & 1)`, and logical-shift `n` right by 1 (`n >>>= 1`).",
+          "time": "O(1)",
+          "space": "O(1)"
+        }
+      ],
+      "solution": {
+        "summary": "Iterate 32 times: on each step, shift the result left by 1, OR in the lowest bit of `n` (`n & 1`), and unsigned-shift `n` right by 1. Runs in O(1) time and O(1) space.",
+        "explanation": "Think of reversing a decimal number digit by digit (`res = res * 10 + n % 10; n = Math.floor(n / 10)`), except in base 2:\n\n1. Start with `res = 0`.\n2. Repeat **exactly 32 times** (even if `n` becomes 0 early, because leading zeros in `n` must become trailing zeros in `res`):\n   - Shift `res` left by 1 to make room for the next bit: `res = (res << 1) | (n & 1)`.\n   - Unsigned right-shift `n` by 1: `n >>>= 1`.\n3. In JavaScript, return `res >>> 0` so the 32-bit pattern is interpreted as an unsigned integer.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "function reverseBits(n) {\n  let res = 0;\n  for (let i = 0; i < 32; i++) {\n    res = (res << 1) | (n & 1);\n    n >>>= 1;\n  }\n  return res >>> 0;\n}"
+          },
+          {
+            "language": "python",
+            "code": "def reverse_bits(n: int) -> int:\n    res = 0\n    for _ in range(32):\n        res = (res << 1) | (n & 1)\n        n >>= 1\n    return res"
+          },
+          {
+            "language": "java",
+            "code": "public class Solution {\n    public int reverseBits(int n) {\n        int res = 0;\n        for (int i = 0; i < 32; i++) {\n            res = (res << 1) | (n & 1);\n            n >>>= 1;\n        }\n        return res;\n    }\n}"
+          }
+        ],
+        "complexity": {
+          "time": "O(1) — always performs a fixed 32 iterations.",
+          "space": "O(1) — uses only two integer variables."
+        },
+        "keyPoints": [
+          "Loop all 32 bits, not `while (n > 0)` — otherwise leading 0s aren’t shifted into the high bits of `res`.",
+          "Use unsigned right shift (`>>>` in JS/Java) so the sign bit does not smear 1s when `n` has its 31st bit set.",
+          "Follow-up optimization: if called millions of times, cache reversed 8-bit bytes in a 256-entry lookup table or use divide-and-conquer bit masks in 5 steps."
+        ]
+      },
+      "visuals": [
+        {
+          "type": "array",
+          "title": "Bit-by-bit reversal (illustrated on a 4-bit nibble n = 1101₂ → 1011₂)",
+          "caption": "Each step pops the rightmost bit of n (n & 1) and pushes it onto the right of res (res << 1 | bit).",
+          "steps": [
+            {
+              "note": "Initial state: `n = 1101₂` (13) and `res = 0000₂` (0). We will process 4 bits from right to left.",
+              "vars": {
+                "i": 0,
+                "n (bin)": "1101",
+                "res (bin)": "0000"
+              },
+              "codeLine": 2,
+              "arrays": [
+                {
+                  "name": "n bits",
+                  "values": [
+                    1,
+                    1,
+                    0,
+                    1
+                  ],
+                  "pointers": [
+                    {
+                      "name": "LSB",
+                      "index": 3,
+                      "color": "primary"
+                    }
+                  ]
+                },
+                {
+                  "name": "res bits",
+                  "values": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Step 1: `n & 1 = 1`. Shift `res` left and append `1` → `res = 0001₂`. Shift `n` right → `0110₂`.",
+              "vars": {
+                "i": 1,
+                "bit": 1,
+                "n (bin)": "0110",
+                "res (bin)": "0001"
+              },
+              "codeLine": 4,
+              "arrays": [
+                {
+                  "name": "n bits",
+                  "values": [
+                    0,
+                    1,
+                    1,
+                    0
+                  ],
+                  "pointers": [
+                    {
+                      "name": "LSB",
+                      "index": 3,
+                      "color": "primary"
+                    }
+                  ]
+                },
+                {
+                  "name": "res bits",
+                  "values": [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        3
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Step 2: `n & 1 = 0`. Shift `res` left and append `0` → `res = 0010₂`. Shift `n` right → `0011₂`.",
+              "vars": {
+                "i": 2,
+                "bit": 0,
+                "n (bin)": "0011",
+                "res (bin)": "0010"
+              },
+              "codeLine": 4,
+              "arrays": [
+                {
+                  "name": "n bits",
+                  "values": [
+                    0,
+                    0,
+                    1,
+                    1
+                  ],
+                  "pointers": [
+                    {
+                      "name": "LSB",
+                      "index": 3,
+                      "color": "primary"
+                    }
+                  ]
+                },
+                {
+                  "name": "res bits",
+                  "values": [
+                    0,
+                    0,
+                    1,
+                    0
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        2,
+                        3
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Step 3: `n & 1 = 1`. Shift `res` left and append `1` → `res = 0101₂`. Shift `n` right → `0001₂`.",
+              "vars": {
+                "i": 3,
+                "bit": 1,
+                "n (bin)": "0001",
+                "res (bin)": "0101"
+              },
+              "codeLine": 4,
+              "arrays": [
+                {
+                  "name": "n bits",
+                  "values": [
+                    0,
+                    0,
+                    0,
+                    1
+                  ],
+                  "pointers": [
+                    {
+                      "name": "LSB",
+                      "index": 3,
+                      "color": "primary"
+                    }
+                  ]
+                },
+                {
+                  "name": "res bits",
+                  "values": [
+                    0,
+                    1,
+                    0,
+                    1
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        1,
+                        2,
+                        3
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "note": "Step 4: `n & 1 = 1`. Shift `res` left and append `1` → `res = 1011₂` (11). All bits reversed!",
+              "vars": {
+                "i": 4,
+                "bit": 1,
+                "n (bin)": "0000",
+                "res (bin)": "1011"
+              },
+              "codeLine": 7,
+              "arrays": [
+                {
+                  "name": "n bits",
+                  "values": [
+                    0,
+                    0,
+                    0,
+                    0
+                  ]
+                },
+                {
+                  "name": "res bits",
+                  "values": [
+                    1,
+                    0,
+                    1,
+                    1
+                  ],
+                  "highlights": [
+                    {
+                      "indices": [
+                        0,
+                        1,
+                        2,
+                        3
+                      ],
+                      "color": "success"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Stopping when `n === 0` instead of looping all 32 iterations — this fails to shift the already-collected bits into their high-order positions.",
+        "Forgetting `>>> 0` in JavaScript, which causes numbers with bit 31 set to be returned as negative signed 32-bit integers."
+      ],
+      "followUps": [
+        {
+          "question": "How would you optimize this if `reverseBits` is called millions of times?",
+          "answer": "Precompute the reversed value for every 8-bit byte (`0..255`) in a lookup table `cache[256]`. Then split the 32-bit integer into 4 bytes, reverse each via `cache[byte]`, and stitch them back together in 4 lookups."
+        }
+      ],
+      "related": [
+        "number-of-1-bits",
+        "counting-bits",
+        "reverse-integer"
+      ]
     }
   ],
   "quiz": [

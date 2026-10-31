@@ -6049,6 +6049,174 @@
         "what-is-dynamic-programming",
         "knapsack-0-1"
       ]
+    },
+    {
+      "slug": "meeting-rooms",
+      "title": "Meeting Rooms (Can a Person Attend All?)",
+      "topic": "greedy-intervals",
+      "difficulty": "easy",
+      "kind": "coding",
+      "frequency": "high",
+      "tags": [
+        "intervals",
+        "sorting",
+        "greedy"
+      ],
+      "pattern": "Interval Sorting",
+      "prompt": "Given an array of meeting time intervals `intervals` where `intervals[i] = [start_i, end_i]`, determine if a single person could attend **all** meetings without any overlap.\n\nTwo meetings that touch at an endpoint (such as `[0, 8]` and `[8, 10]`) are **not** considered overlapping.",
+      "examples": [
+        {
+          "input": "intervals = [[0, 30], [5, 10], [15, 20]]",
+          "output": "false",
+          "explanation": "The meeting [0, 30] overlaps with both [5, 10] and [15, 20]."
+        },
+        {
+          "input": "intervals = [[7, 10], [2, 4]]",
+          "output": "true",
+          "explanation": "After sorting to [[2, 4], [7, 10]], the first ends at 4 before the second starts at 7."
+        }
+      ],
+      "constraints": [
+        "0 <= intervals.length <= 10^4",
+        "intervals[i].length == 2",
+        "0 <= start_i < end_i <= 10^6"
+      ],
+      "hints": [
+        "Checking every pair takes O(n²). How can ordering the meetings make overlap detection adjacent?",
+        "Sort the intervals by start time ascending.",
+        "Once sorted, just check if any meeting starts strictly before the previous meeting ends (`intervals[i][0] < intervals[i - 1][1]`)."
+      ],
+      "approaches": [
+        {
+          "name": "Brute-force all pairs",
+          "idea": "Compare every pair of intervals `(i, j)` and check if `max(start_i, start_j) < min(end_i, end_j)`.",
+          "time": "O(n²)",
+          "space": "O(1)"
+        },
+        {
+          "name": "Sort by start time + linear scan (Optimal)",
+          "idea": "Sort intervals by `start` time. Walk from index `1` to `n - 1`; if `intervals[i][0] < intervals[i - 1][1]`, two consecutive meetings overlap, so return `false`.",
+          "time": "O(n log n)",
+          "space": "O(1)"
+        }
+      ],
+      "solution": {
+        "summary": "Sort meetings by start time in O(n log n), then scan adjacent pairs: if any meeting starts before the previous one ends (`curr.start < prev.end`), return `false`; otherwise return `true`.",
+        "explanation": "If a schedule has any conflict at all, then after sorting meetings by start time, there **must** be a conflict between two consecutive meetings in the sorted order.\n\n1. Sort `intervals` ascending by `start` (`a[0] - b[0]`).\n2. Loop `i` from `1` to `intervals.length - 1`:\n   - Compare `intervals[i][0]` (current start) with `intervals[i - 1][1]` (previous end).\n   - If `intervals[i][0] < intervals[i - 1][1]`, they overlap — return `false` immediately.\n3. If the loop finishes without conflicts, return `true`.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "function canAttendMeetings(intervals) {\n  intervals.sort((a, b) => a[0] - b[0]);\n  for (let i = 1; i < intervals.length; i++) {\n    if (intervals[i][0] < intervals[i - 1][1]) {\n      return false;\n    }\n  }\n  return true;\n}"
+          },
+          {
+            "language": "python",
+            "code": "def can_attend_meetings(intervals: list[list[int]]) -> bool:\n    intervals.sort(key=lambda x: x[0])\n    for i in range(1, len(intervals)):\n        if intervals[i][0] < intervals[i - 1][1]:\n            return False\n    return True"
+          },
+          {
+            "language": "java",
+            "code": "import java.util.Arrays;\n\nclass Solution {\n    public boolean canAttendMeetings(int[][] intervals) {\n        Arrays.sort(intervals, (a, b) -> Integer.compare(a[0], b[0]));\n        for (int i = 1; i < intervals.length; i++) {\n            if (intervals[i][0] < intervals[i - 1][1]) {\n                return false;\n            }\n        }\n        return true;\n    }\n}"
+          }
+        ],
+        "complexity": {
+          "time": "O(n log n) — dominated by sorting the intervals.",
+          "space": "O(1) auxiliary (or O(log n) stack space used by the built-in sort)."
+        },
+        "keyPoints": [
+          "Clarify boundary touching: `[0, 8]` and `[8, 10]` do NOT overlap, so use strict `<` (`intervals[i][0] < intervals[i - 1][1]`).",
+          "Empty or single-element arrays naturally return `true` because the loop body never executes.",
+          "This is the warm-up to **Meeting Rooms II**, where instead of returning a boolean you count the minimum number of rooms needed."
+        ]
+      },
+      "visuals": [
+        {
+          "type": "timeline",
+          "title": "Overlap check on [[0, 30], [5, 10], [15, 20]]",
+          "caption": "Sort by start time and compare each meeting’s start with the previous meeting’s end.",
+          "unit": "min",
+          "steps": [
+            {
+              "note": "Sort meetings by start time: `[0, 30]`, `[5, 10]`, `[15, 20]`. Start scanning at `i = 1`.",
+              "vars": {
+                "i": 1,
+                "prevEnd": 30,
+                "currStart": 5
+              },
+              "codeLine": 2,
+              "segments": [
+                {
+                  "label": "[0, 30]",
+                  "start": 0,
+                  "end": 30,
+                  "lane": "M0",
+                  "color": "primary"
+                },
+                {
+                  "label": "[5, 10]",
+                  "start": 5,
+                  "end": 10,
+                  "lane": "M1",
+                  "color": "muted"
+                },
+                {
+                  "label": "[15, 20]",
+                  "start": 15,
+                  "end": 20,
+                  "lane": "M2",
+                  "color": "muted"
+                }
+              ]
+            },
+            {
+              "note": "Compare M1 `[5, 10]` with M0 `[0, 30]`: since `currStart (5) < prevEnd (30)`, the two meetings overlap! Return `false`.",
+              "vars": {
+                "i": 1,
+                "currStart": 5,
+                "prevEnd": 30,
+                "canAttend": false
+              },
+              "codeLine": 5,
+              "segments": [
+                {
+                  "label": "[0, 30]",
+                  "start": 0,
+                  "end": 30,
+                  "lane": "M0",
+                  "color": "danger"
+                },
+                {
+                  "label": "[5, 10] OVERLAP",
+                  "start": 5,
+                  "end": 10,
+                  "lane": "M1",
+                  "color": "danger"
+                },
+                {
+                  "label": "[15, 20]",
+                  "start": 15,
+                  "end": 20,
+                  "lane": "M2",
+                  "color": "muted"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Using `<=` instead of `<` when checking overlap — back-to-back meetings like `[2, 4]` and `[4, 7]` are valid.",
+        "Using `a[0] > b[0]` in JavaScript `.sort()` instead of `a[0] - b[0]`."
+      ],
+      "followUps": [
+        {
+          "question": "What if you need to find the minimum number of conference rooms required to hold all meetings?",
+          "answer": "That is **Meeting Rooms II**: use a min-heap of end times or a two-pointer sweep over sorted start and end arrays in O(n log n) time."
+        }
+      ],
+      "related": [
+        "meeting-rooms-ii",
+        "merge-intervals",
+        "non-overlapping-intervals"
+      ]
     }
   ],
   "quiz": [

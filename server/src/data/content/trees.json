@@ -18190,6 +18190,327 @@
         "level-order-traversal",
         "subtree-of-another-tree"
       ]
+    },
+    {
+      "slug": "add-and-search-word",
+      "title": "Design Add and Search Words Data Structure",
+      "topic": "trees",
+      "difficulty": "medium",
+      "kind": "coding",
+      "frequency": "high",
+      "tags": [
+        "trie",
+        "dfs",
+        "backtracking",
+        "design"
+      ],
+      "pattern": "Trie + DFS Wildcard Search",
+      "prompt": "Design a data structure that supports adding new words and checking if a string matches any previously added word:\n\n- `WordDictionary()` initializes the object.\n- `addWord(word)` adds `word` to the data structure.\n- `search(word)` returns `true` if there is any string in the data structure that matches `word`, or `false` otherwise. `word` may contain dots `.` where a dot can match **any single letter**.",
+      "examples": [
+        {
+          "input": "addWord(\"bad\"), addWord(\"dad\"), addWord(\"mad\"), search(\"pad\"), search(\"bad\"), search(\".ad\"), search(\"b..\")",
+          "output": "false, true, true, true",
+          "explanation": "\".ad\" matches \"bad\", \"dad\", or \"mad\". \"b..\" matches \"bad\"."
+        }
+      ],
+      "constraints": [
+        "1 <= word.length <= 25",
+        "word in addWord consists of lowercase English letters.",
+        "word in search consists of \".\" or lowercase English letters (at most 2 dots per query).",
+        "At most 10^4 calls will be made to addWord and search."
+      ],
+      "hints": [
+        "A standard Trie handles exact prefix/word lookups in O(L) time. How does `.` change the traversal?",
+        "When the current character is a regular letter `ch`, follow the single child `node.children[ch]` as usual.",
+        "When the current character is `.`, recursively DFS across **all** children of the current Trie node and return `true` if any branch succeeds."
+      ],
+      "approaches": [
+        {
+          "name": "Group words by length + linear regex scan",
+          "idea": "Store words in a bucket by length and compare character by character on each `search`. Slow when many words share the same length.",
+          "time": "O(N · L) per search",
+          "space": "O(N · L)"
+        },
+        {
+          "name": "Trie with recursive DFS on \".\" wildcard (Optimal)",
+          "idea": "Insert each word into a Trie in O(L). For `search`, walk deterministically on normal characters and branch via DFS across all existing child nodes whenever you encounter `.`.",
+          "time": "O(L) exact, O(26^d · L) with d dots",
+          "space": "O(T) Trie nodes"
+        }
+      ],
+      "solution": {
+        "summary": "Back the dictionary with a Trie. `addWord` inserts characters in O(L). `search` runs a helper `dfs(node, index)` that steps into `node.children[ch]` for a normal letter or tries every child of `node` when the character is `.`.",
+        "explanation": "A **Trie (Prefix Tree)** shares common prefixes across words, making exact steps O(1) per character:\n\n1. **TrieNode**: holds a map/object `children` and a boolean `isWord = false`.\n2. **`addWord(word)`**: walk from `root`, creating child nodes as needed, and set `node.isWord = true` at the end.\n3. **`search(word)`**: call `dfs(root, 0)`:\n   - Base case: if `i === word.length`, return `node.isWord`.\n   - If `word[i] === \".\"`, loop over every child in `Object.values(node.children)` and if `dfs(child, i + 1)` is `true`, return `true`.\n   - Otherwise, look up `next = node.children[word[i]]`; if missing return `false`, else return `dfs(next, i + 1)`.",
+        "code": [
+          {
+            "language": "javascript",
+            "code": "class TrieNode {\n  constructor() {\n    this.children = {};\n    this.isWord = false;\n  }\n}\n\nclass WordDictionary {\n  constructor() {\n    this.root = new TrieNode();\n  }\n\n  addWord(word) {\n    let node = this.root;\n    for (const ch of word) {\n      if (!node.children[ch]) node.children[ch] = new TrieNode();\n      node = node.children[ch];\n    }\n    node.isWord = true;\n  }\n\n  search(word) {\n    const dfs = (node, i) => {\n      if (i === word.length) return node.isWord;\n      const ch = word[i];\n      if (ch === \".\") {\n        for (const child of Object.values(node.children)) {\n          if (dfs(child, i + 1)) return true;\n        }\n        return false;\n      }\n      if (!node.children[ch]) return false;\n      return dfs(node.children[ch], i + 1);\n    };\n    return dfs(this.root, 0);\n  }\n}"
+          },
+          {
+            "language": "python",
+            "code": "class TrieNode:\n    def __init__(self):\n        self.children = {}\n        self.is_word = False\n\nclass WordDictionary:\n    def __init__(self):\n        self.root = TrieNode()\n\n    def addWord(self, word: str) -> None:\n        node = self.root\n        for ch in word:\n            if ch not in node.children:\n                node.children[ch] = TrieNode()\n            node = node.children[ch]\n        node.is_word = True\n\n    def search(self, word: str) -> bool:\n        def dfs(node: TrieNode, i: int) -> bool:\n            if i == len(word):\n                return node.is_word\n            ch = word[i]\n            if ch == \".\":\n                return any(dfs(child, i + 1) for child in node.children.values())\n            if ch not in node.children:\n                return False\n            return dfs(node.children[ch], i + 1)\n\n        return dfs(self.root, 0)"
+          },
+          {
+            "language": "java",
+            "code": "class WordDictionary {\n    private static class Node {\n        Node[] children = new Node[26];\n        boolean isWord;\n    }\n\n    private final Node root = new Node();\n\n    public void addWord(String word) {\n        Node cur = root;\n        for (int i = 0; i < word.length(); i++) {\n            int idx = word.charAt(i) - 'a';\n            if (cur.children[idx] == null) cur.children[idx] = new Node();\n            cur = cur.children[idx];\n        }\n        cur.isWord = true;\n    }\n\n    public boolean search(String word) {\n        return dfs(root, word, 0);\n    }\n\n    private boolean dfs(Node node, String word, int i) {\n        if (node == null) return false;\n        if (i == word.length()) return node.isWord;\n        char ch = word.charAt(i);\n        if (ch == '.') {\n            for (Node child : node.children) {\n                if (child != null && dfs(child, word, i + 1)) return true;\n            }\n            return false;\n        }\n        return dfs(node.children[ch - 'a'], word, i + 1);\n    }\n}"
+          }
+        ],
+        "complexity": {
+          "time": "O(L) for addWord and exact search; O(26^d · L) when the query has d wildcard dots.",
+          "space": "O(T) to store T total Trie nodes, plus O(L) recursion stack during search."
+        },
+        "keyPoints": [
+          "A `.` only branches across children that actually exist in `node.children`, not all 26 letters if sparse.",
+          "Always check `node.isWord` at `i === word.length` so prefixes of longer words don’t falsely match.",
+          "Iterative traversal works for exact characters, while recursion cleanly handles branching at `.`."
+        ]
+      },
+      "visuals": [
+        {
+          "type": "tree",
+          "title": "Searching \".ad\" in a Trie containing \"bad\" and \"dad\"",
+          "caption": "At index 0, \".\" branches to children \"b\" and \"d\"; the first branch to reach a word-end at index 3 returns true.",
+          "steps": [
+            {
+              "note": "Trie after inserting `\"bad\"` and `\"dad\"`. We start `search(\".ad\")` at `root` with index `i = 0`.",
+              "vars": {
+                "query": ".ad",
+                "i": 0,
+                "char": "."
+              },
+              "codeLine": 23,
+              "root": "root",
+              "nodes": [
+                {
+                  "id": "root",
+                  "value": "root",
+                  "children": [
+                    "b",
+                    "d"
+                  ]
+                },
+                {
+                  "id": "b",
+                  "value": "b",
+                  "children": [
+                    "ba"
+                  ]
+                },
+                {
+                  "id": "ba",
+                  "value": "a",
+                  "children": [
+                    "bad"
+                  ]
+                },
+                {
+                  "id": "bad",
+                  "value": "d*"
+                },
+                {
+                  "id": "d",
+                  "value": "d",
+                  "children": [
+                    "da"
+                  ]
+                },
+                {
+                  "id": "da",
+                  "value": "a",
+                  "children": [
+                    "dad"
+                  ]
+                },
+                {
+                  "id": "dad",
+                  "value": "d*"
+                }
+              ],
+              "pointers": [
+                {
+                  "name": "cur",
+                  "nodeId": "root",
+                  "color": "primary"
+                }
+              ],
+              "highlights": [
+                {
+                  "ids": [
+                    "root"
+                  ],
+                  "color": "primary"
+                }
+              ]
+            },
+            {
+              "note": "Since `word[0] === \".\"`, we branch into the first child `\"b\"` and advance to `i = 1` (`\"a\"`).",
+              "vars": {
+                "query": ".ad",
+                "i": 1,
+                "char": "a"
+              },
+              "codeLine": 27,
+              "root": "root",
+              "nodes": [
+                {
+                  "id": "root",
+                  "value": "root",
+                  "children": [
+                    "b",
+                    "d"
+                  ]
+                },
+                {
+                  "id": "b",
+                  "value": "b",
+                  "children": [
+                    "ba"
+                  ]
+                },
+                {
+                  "id": "ba",
+                  "value": "a",
+                  "children": [
+                    "bad"
+                  ]
+                },
+                {
+                  "id": "bad",
+                  "value": "d*"
+                },
+                {
+                  "id": "d",
+                  "value": "d",
+                  "children": [
+                    "da"
+                  ]
+                },
+                {
+                  "id": "da",
+                  "value": "a",
+                  "children": [
+                    "dad"
+                  ]
+                },
+                {
+                  "id": "dad",
+                  "value": "d*"
+                }
+              ],
+              "pointers": [
+                {
+                  "name": "cur",
+                  "nodeId": "b",
+                  "color": "primary"
+                }
+              ],
+              "highlights": [
+                {
+                  "ids": [
+                    "b"
+                  ],
+                  "color": "primary"
+                },
+                {
+                  "ids": [
+                    "d"
+                  ],
+                  "color": "warning"
+                }
+              ]
+            },
+            {
+              "note": "At `i = 1` (`\"a\"`) and `i = 2` (`\"d\"`), we follow exact children `b → a → d*` where `isWord = true`. Search returns `true`!",
+              "vars": {
+                "query": ".ad",
+                "i": 3,
+                "isWord": true,
+                "result": true
+              },
+              "codeLine": 24,
+              "root": "root",
+              "nodes": [
+                {
+                  "id": "root",
+                  "value": "root",
+                  "children": [
+                    "b",
+                    "d"
+                  ]
+                },
+                {
+                  "id": "b",
+                  "value": "b",
+                  "children": [
+                    "ba"
+                  ]
+                },
+                {
+                  "id": "ba",
+                  "value": "a",
+                  "children": [
+                    "bad"
+                  ]
+                },
+                {
+                  "id": "bad",
+                  "value": "d*"
+                },
+                {
+                  "id": "d",
+                  "value": "d",
+                  "children": [
+                    "da"
+                  ]
+                },
+                {
+                  "id": "da",
+                  "value": "a",
+                  "children": [
+                    "dad"
+                  ]
+                },
+                {
+                  "id": "dad",
+                  "value": "d*"
+                }
+              ],
+              "pointers": [
+                {
+                  "name": "cur",
+                  "nodeId": "bad",
+                  "color": "success"
+                }
+              ],
+              "highlights": [
+                {
+                  "ids": [
+                    "root",
+                    "b",
+                    "ba",
+                    "bad"
+                  ],
+                  "color": "success"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "pitfalls": [
+        "Returning `true` when `i === word.length` without checking `node.isWord` (matches a prefix instead of a full word).",
+        "Continuing the loop without returning `true` when one `.` DFS branch succeeds."
+      ],
+      "followUps": [
+        {
+          "question": "How would you speed up searches like `\"....a\"` where all wildcards are at the beginning?",
+          "answer": "Maintain a second Trie of **reversed** words, or partition Tries by word length so searches that fail length checks bail out in O(1)."
+        }
+      ],
+      "related": [
+        "implement-trie",
+        "word-search-ii"
+      ]
     }
   ],
   "quiz": [
