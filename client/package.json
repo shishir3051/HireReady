@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@andresaya/edge-tts": "^1.9.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.61.0",
     "mermaid": "^12.2.0",

@@ -1,21 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-function splitText(text: string, maxLen = 150): string[] {
-  const chunks: string[] = [];
-  const parts = text.match(/[^।?!,;:.\n]+[।?!,;:.\n]*/g) || [text];
-  let current = "";
-
-  for (const part of parts) {
-    if ((current + part).length > maxLen) {
-      if (current.trim()) chunks.push(current.trim());
-      current = part;
-    } else {
-      current += part;
-    }
-  }
-  if (current.trim()) chunks.push(current.trim());
-  return chunks.length ? chunks : [text];
-}
+import { EdgeTTS } from "@andresaya/edge-tts";
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -26,37 +10,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: { message: "Missing text parameter" } }, { status: 400 });
   }
 
+  // Use natural Male voices: bn-BD-PradeepNeural for Bangla, en-US-ChristopherNeural for English
+  const voice = lang === "en" ? "en-US-ChristopherNeural" : "bn-BD-PradeepNeural";
+
   try {
-    const chunks = splitText(text);
-    const audioBuffers: Uint8Array[] = [];
+    const tts = new EdgeTTS();
+    await tts.synthesize(text, voice);
+    const audioBuffer = tts.toBuffer();
 
-    for (const chunk of chunks) {
-      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(chunk)}&tl=${lang}&client=tw-ob`;
-      const res = await fetch(url, {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error(`Google TTS status: ${res.status}`);
-      }
-
-      const arrayBuf = await res.arrayBuffer();
-      audioBuffers.push(new Uint8Array(arrayBuf));
-    }
-
-    // Merge audio chunks
-    const totalLength = audioBuffers.reduce((acc, b) => acc + b.length, 0);
-    const merged = new Uint8Array(totalLength);
-    let offset = 0;
-    for (const b of audioBuffers) {
-      merged.set(b, offset);
-      offset += b.length;
-    }
-
-    return new Response(merged, {
+    return new Response(new Uint8Array(audioBuffer), {
       status: 200,
       headers: {
         "Content-Type": "audio/mpeg",
@@ -64,7 +26,26 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("TTS generation error:", error);
+    console.warn("EdgeTTS error, falling back to Google TTS:", error);
+    try {
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text.slice(0, 150))}&tl=${lang}&client=tw-ob`;
+      const res = await fetch(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        },
+      });
+      if (res.ok) {
+        const arrayBuf = await res.arrayBuffer();
+        return new Response(new Uint8Array(arrayBuf), {
+          status: 200,
+          headers: {
+            "Content-Type": "audio/mpeg",
+            "Cache-Control": "public, max-age=31536000, immutable",
+          },
+        });
+      }
+    } catch {}
     return NextResponse.json({ error: { message: "Failed to generate TTS audio" } }, { status: 502 });
   }
 }
