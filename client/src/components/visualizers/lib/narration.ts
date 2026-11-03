@@ -273,9 +273,10 @@ export function chosenVoice(lang: SpeechLang): SpeechSynthesisVoice | undefined 
 
 /**
  * Whether a language is read with the pre-recorded voice: it is picked, nothing is picked, or the picked browser
- * voice is no longer installed. While the browser is still listing its voices, a stored browser voice is trusted.
+ * voice is no longer installed. English always uses the natural HireReady voice.
  */
 export function prefersNaturalVoice(p: NarrationPrefs, voices: readonly SpeechSynthesisVoice[], lang: SpeechLang = "en"): boolean {
+  if (lang === "en") return true;
   const wanted = lang === "bn" ? p.voiceBn : p.voiceEn;
   if (!wanted || wanted === NATURAL_VOICE) return true;
   return voices.length > 0 && !voices.some((v) => v.voiceURI === wanted);
@@ -414,7 +415,7 @@ function clipFor(spoken: string, lang: SpeechLang = "en"): { url: string; ms: nu
   // When a static clip is not present for Bangla, use dynamic TTS endpoint so all browsers can listen!
   if (lang === "bn") {
     return {
-      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn&v=female-v2`,
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
       ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
     };
   }
@@ -676,7 +677,7 @@ function speakAloud(spoken: string, lang: SpeechLang, rate: number, id: number, 
   if (lang === "bn" && !voice) {
     // Dynamic fallback for browsers without local Bangla voice (Brave, Chrome, Firefox)
     const clip = {
-      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn&v=female-v2`,
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
       ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
     };
     playClip(clip, rate, id, later, finish, () => later(finish, pieces.length ? readingMs(pieces.join(" "), 1) : 0));
