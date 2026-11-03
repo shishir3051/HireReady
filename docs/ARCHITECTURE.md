@@ -232,6 +232,69 @@ collections are never touched.
 | `/login`, `/register` | Auth |
 | `/dev/visuals`, `/dev/content-check` | Developer pages: visualizer gallery and an automated check that renders every visual in the DB |
 
+### Narrated walkthroughs (`client/src/components/visualizers/lib/`)
+
+Each step's note is read aloud. English steps play a pre-recorded clip in a natural voice when one exists (next section). Everything else goes to the browser's Web Speech API, which is free and needs no server:
+- Bangla notes.
+- Notes without a clip.
+- A browser voice the learner picked.
+- A clip that fails to play.
+
+For the browser voices, clarity comes from three parts.
+
+- **`speech-text.ts` rewrites the note into words a voice can say**, in English or Bangla. It handles:
+  - **Arrows:** `→` is read as "to" between values (`50 → 60`) and as ", so" after a clause.
+  - **Comparisons:** `a < b` is read as "a is less than b" / "a, b-এর চেয়ে ছোট".
+  - **Code:** `nums[i]` becomes "nums at i" / "nums-এর i", `dp[i][j]` "dp at i, j", `maxSum` "max Sum", `node.left` "node dot left", and `f(x)` "f of x".
+  - **Maths:** `O(n²)` is always "big O of n squared", and powers, `×`, `−`, `÷` and `≤` become words.
+
+  It also cuts each note into pieces of at most 150 characters, because Chrome's Google voices stop after about 15 s of one utterance. A check over all 6,254 notes leaves no symbol unread.
+- **`narration.ts` ranks the installed voices:** natural/neural (Edge, Windows 11) first, then enhanced/premium (Apple), then Google, then the rest. macOS novelty voices are excluded. It speaks the pieces one after another with a short pause and a watchdog. The watchdog waits while a slow voice is still talking and never cuts a sentence. A Bangla note is never given to an English voice. The learner's voice, speed (Slow 0.8 / Normal 0.95 / Fast 1.12) and listen language are stored in `hr-narrate-prefs` and followed by other tabs.
+- **`NarrationSettings.tsx`** shows a row under the player while narration is on: Listen in (Bangla pages), Voice, Speed and Test voice. Picking a voice plays a sample.
+- **Bangla wording.** Comparisons put the verb last ("a, b-এর চেয়ে ছোট"); a word joiner keeps one code term together, so `nums[mid]` stays "nums-এর mid". Sequences read ", তারপর" and single mappings "থেকে". A number's sign is "মাইনাস" and subtraction "বিয়োগ"; counts are "বার"; bitwise `&` is "AND".
+- **Reliability:**
+  - Pieces shrink at slower speeds.
+  - A stuck utterance is cancelled by the watchdog.
+  - A failing voice is retried once with a voice on the device, then paced silently.
+  - Other tabs follow "off" but never "on".
+  - Arrow keys inside the Speed and Listen-in controls don't move the step.
+  - A step is read again when its text changes while it is being read (for example, when its English version arrives).
+- **Tests** (in the session scratchpad):
+  - `speech-regression.test.ts`: 75 reviewer examples with must / must-not checks.
+  - `speech-text.test.ts`: a whole-corpus leftover check.
+  - `narration-engine.test.ts`: a fake `speechSynthesis` covering voice errors, stalls and silent Bangla.
+- **Limits.** Browser voices differ by browser: Chrome desktop has no Bangla voice, and Firefox uses robotic system voices. English avoids this with the recorded clips below. Bangla still depends on the browser.
+
+Bangla pages without a Bangla voice read the English notes instead. Chrome on Windows has no Bangla voice, while Edge and Android do. `english-notes.ts` fetches `/api/questions/:slug?lang=en` once per question, and the player shows a short note explaining why. `VisualWalkthrough` takes an optional `slug` for this. Content that has no slug passes its English copies as `englishVisuals` instead. The homepage demo does this: on Bangla pages it shows `TWO_SUM_VISUAL_BN` from `demo-content.ts`, with Bangla notes, and passes `TWO_SUM_VISUAL` for English listening.
+
+#### Pre-recorded English narration (`narration-audio.ts`, `tools/narration/`)
+
+Every English step line is recorded once, offline, as an MP3 in one natural voice, so English sounds the same in every browser. The voice is Kokoro-82M `af_heart` (Apache-2.0), run on the owner's PC with sherpa-onnx; no cloud service, account or card is needed.
+
+- **What is recorded:** `narrationLine(visual, i, "en")` from `steps.ts`, which is also what the player speaks: the note, or "Step 3." when there is none, after the visual's title on the first step. It is rewritten by `speechText()` and named by `clipKey()`, a cyrb53 hash of that text plus `CLIP_VOICE`. The player and recorder share these functions, so an edited note simply has no clip until it is recorded again, and the browser voice reads it meanwhile. Bumping `CLIP_VOICE` re-records everything.
+- **Files:** `client/public/narration/en/<key>.mp3` (mono, 24 kHz, 40 kbps) plus `manifest.json` (`{ version, voice, format, clips: { key: ms } }`). The whole set is about 3,100 clips and roughly 100 MB. The folder is git-ignored.
+- **Serving:** the files are served from `/narration` by default. To use another host (for example a GitHub Pages site), set `NEXT_PUBLIC_NARRATION_AUDIO_URL` at build time. The manifest is fetched with `fetch`, so a cross-origin host must send CORS headers (GitHub Pages does). Without a manifest, narration quietly uses the browser voices.
+- **Player (`narration.ts`):**
+  - The clip list is fetched once, only when narration is on. The first step waits up to 1.5 s for it.
+  - Clips play in one shared `<audio>` element at the learner's pace, with pitch kept. `defaultPlaybackRate` is set too, because a new source resets the rate.
+  - The next step's clip is prefetched during autoplay.
+  - **Fallbacks:** an error, a refused `play()`, a stall, or a clip that hasn't started after 4 s reads the note with a browser voice instead. A clip that ends without an `ended` event still finishes. A clip paused from the system's media controls waits for the learner.
+  - **Stopping:** every new reading stops the previous clip first, so two voices never overlap. A stopped clip's source is released, so a headset button or the lock screen can't resume an old sentence.
+  - **Safari and iOS:** they only let script start audio or speech that has already played during a tap or key press. So on the first gesture while narration is on:
+    - A moment of silence is played muted in the clip element. Muted, so it doesn't take over iOS's audio session and pause the learner's music.
+    - An empty utterance is spoken, so a later browser-voice fallback is heard.
+    - A touch counts on `pointerup`, a mouse on `pointerdown`. A refused attempt is retried on the next gesture.
+  - **CORS:** the element uses `crossOrigin="anonymous"`, like the prefetch, so a prefetched clip is reused from the cache. A cross-origin host must therefore send CORS headers for the MP3s too.
+  - **Network errors:** a network or server error on the clip list is retried a minute later.
+  - **No speech synthesis:** browsers without it (many in-app Android WebViews) still get narration through the clips.
+- **Voice picker:** the natural voice is listed first and is the default. Its value in `hr-narrate-prefs` is `hireready:natural`. A browser voice the learner picked still wins. While the natural voice is selected, an "AI-generated voice" label is shown.
+- **Recording (`tools/narration/README.md`):** `npx tsx generate-en.ts` forks 2–3 workers at below-normal priority. On a 6-core laptop it takes about 2.5 h; 3 workers × 2 threads runs at about 0.45× real time. It is resumable, skips clips that exist, keeps the manifest written as it goes and can `--prune` stale clips.
+  - It needs **sherpa-onnx-node 1.13.x**: version 2.x dropped espeak-ng and silently skips numbers.
+  - lamejs is loaded from its single-file build, because its CommonJS entry fails under Node.
+- **Tests** (session scratchpad):
+  - `narration-clips.test.ts`: 16 fake-`<audio>` checks covering the wait, rate, fallbacks, cancel, stall, sample and prefetch.
+  - `clip-parity.ts`: the live API's lines give the same clip names as the content files.
+
 ## Code ownership (parallel build)
 
 | Area | Owner |

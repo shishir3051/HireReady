@@ -35,6 +35,16 @@ export function stepCount(v: Visual): number {
   }
 }
 
+/**
+ * What narration says on step i: the raw note (the speech pipeline strips markdown and spells out symbols itself),
+ * or "Step 3." when there is none, after the visual's title on the first step. tools/narration records the English
+ * clips from exactly this text, so both must keep using this function.
+ */
+export function narrationLine(v: Visual, i: number, lang: "en" | "bn"): string {
+  const note = stepMeta(v, i).note || `${lang === "bn" ? "ধাপ" : "Step"} ${i + 1}.`;
+  return i === 0 && v?.title ? `${v.title}. ${note}` : note;
+}
+
 export function stepMeta(v: Visual, i: number): StepMeta {
   if (v.type === "comparison") return { note: "", panels: [] };
   if (v.type === "diagram") {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { speak, speechRate } from "./narration";
+import { prefetchSpeech, speak } from "./narration";
 import { clamp } from "./utils";
 
 // ------------------------------------------------------------------ dark mode (.dark on <html>)
@@ -92,9 +92,10 @@ export function useStepPlayer(
     if (narrate && narrationText) {
       // narrated: move on when the voice has finished this step (the last step is read by the effect below)
       let gap: number | undefined;
-      const cancel = speak(narrationText(index), speechRate(speed), () => {
+      const cancel = speak(narrationText(index), { speed }, () => {
         gap = window.setTimeout(advance, NARRATION_GAP_MS);
       });
+      if (index < last) prefetchSpeech(narrationText(index + 1));
       return () => {
         cancel();
         window.clearTimeout(gap);
@@ -104,16 +105,26 @@ export function useStepPlayer(
     return () => window.clearTimeout(t);
   }, [playing, index, speed, last, setClamped, narrate, narrationText]);
 
-  // While paused, read each step the user moves to (or the current one when narration is switched on);
-  // stay quiet on first render and when merely pausing on a step that was already read.
-  const heard = useRef<{ index: number; narrate: boolean } | null>(null);
+  // While paused, read each step the user moves to, the current one when narration is switched on, and the current one
+  // again when its text changes while it is being read here (e.g. its English version arrives, or the learner switches
+  // the listen language). Stay quiet on first render and when autoplay pauses on a step it already read. Speech is
+  // cancelled only when another read starts or the player goes away: a speed change must not cut a sentence off.
+  const heard = useRef<{ index: number; narrate: boolean; text: string | null } | null>(null);
+  const readHere = useRef<number | null>(null); // the step this effect last started reading
+  const cancelRead = useRef<(() => void) | null>(null);
   useEffect(() => {
     const prev = heard.current;
-    heard.current = { index, narrate };
-    if (!prev || !narrate || !narrationText || playing) return;
-    if (prev.index === index && prev.narrate) return;
-    return speak(narrationText(index), speechRate(speed));
+    const text = narrate && narrationText ? narrationText(index) : null;
+    heard.current = { index, narrate, text };
+    if (!prev || !text || playing) return;
+    if (prev.index === index && prev.narrate) {
+      if (prev.text === text || readHere.current !== index) return;
+    }
+    cancelRead.current?.();
+    cancelRead.current = speak(text, { speed });
+    readHere.current = index;
   }, [index, narrate, narrationText, playing, speed]);
+  useEffect(() => () => cancelRead.current?.(), []);
 
   const next = useCallback(() => {
     setPlaying(false);

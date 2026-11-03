@@ -371,6 +371,27 @@ export const TWO_SUM_VISUAL: ArrayVisual = {
 
 export const TWO_SUM_SUMMARY: string = "Scan once with a hash map from value to index; for each number check if its complement (target − x) was already seen.";
 
+// Bangla homepage: the same walkthrough with Bangla text, written like the Bangla question content (code terms stay
+// English), so a Bangla voice reads it in Bangla
+const TWO_SUM_NOTES_BN = [
+  "একটি খালি map `seen` (value → index) দিয়ে শুরু করি।",
+  "i = 0: need = 10 − 3 = 7। 7 `seen`-এ নেই, তাই 3 → 0 স্টোর করি।",
+  "i = 1: need = 10 − 8 = 2। 2 এখনো দেখা যায়নি, তাই 8 → 1 স্টোর করি।",
+  "i = 2: need = 10 − 4 = 6। 6 নেই, তাই 4 → 2 স্টোর করি।",
+  "i = 3: need = 10 − 1 = 9। 9 নেই, তাই 1 → 3 স্টোর করি।",
+  "i = 4: need = 10 − 6 = 4, আর **4 `seen`-এ আছে index 2-এ**! উত্তর [2, 4]।",
+];
+
+export const TWO_SUM_VISUAL_BN: ArrayVisual = {
+  ...TWO_SUM_VISUAL,
+  title: "nums = [3, 8, 4, 1, 6], target = 10-এর উপর One-pass hash map",
+  caption: "নীল = বর্তমান index, সবুজ = উত্তর পেয়ার। ডানের map-এ এ পর্যন্ত দেখা সব value থাকে।",
+  steps: TWO_SUM_VISUAL.steps.map((s, i) => ({ ...s, note: TWO_SUM_NOTES_BN[i] ?? s.note })),
+};
+
+export const TWO_SUM_SUMMARY_BN: string =
+  "value থেকে index-এর একটি hash map নিয়ে একবারই স্ক্যান করুন; প্রতিটি সংখ্যার complement (target − x) আগে দেখা গেছে কি না, তা যাচাই করুন।";
+
 export const TWO_SUM_APPROACHES = [
   {
     "name": "Brute force",

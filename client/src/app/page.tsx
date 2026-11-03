@@ -21,7 +21,7 @@ import type { Category, PlatformStats, Roadmap } from "@/lib/types";
 import { api, orFallback } from "@/lib/api";
 import { CATEGORY_DESCRIPTIONS, CATEGORY_LABELS, CATEGORY_ORDER, LANG_COOKIE } from "@/lib/constants";
 import { CATEGORY_ICONS } from "@/lib/icons";
-import { TWO_SUM_JS, TWO_SUM_SUMMARY, TWO_SUM_VISUAL } from "@/lib/demo-content";
+import { TWO_SUM_JS, TWO_SUM_SUMMARY, TWO_SUM_SUMMARY_BN, TWO_SUM_VISUAL, TWO_SUM_VISUAL_BN } from "@/lib/demo-content";
 import { cn, formatNumber } from "@/lib/utils";
 import { getDictionary, type Dictionary } from "@/i18n/dictionary";
 import { VisualWalkthrough } from "@/components/visualizers";
@@ -111,7 +111,7 @@ export default async function HomePage() {
     <div className="flex flex-col">
       <Hero stats={stats} t={t} />
       <Categories stats={stats} t={t} />
-      <HowItWorks t={t} />
+      <HowItWorks t={t} lang={lang} />
       <RoadmapTeaser weeks={plan.weeks} days={plan.days} hours={plan.hours} t={t} />
       <PracticeModes t={t} />
       <FinalCta t={t} />
@@ -296,7 +296,7 @@ function Categories({ stats, t }: { stats: PlatformStats | null; t: Dictionary }
 
 // ---------------------------------------------------------------- how it works
 
-function HowItWorks({ t }: { t: Dictionary }) {
+function HowItWorks({ t, lang }: { t: Dictionary; lang?: string }) {
   const anatomyItems = [
     { icon: MessageSquareQuote, title: t.howItWorks.anatomy.sayFirstTitle, text: t.howItWorks.anatomy.sayFirstText },
     { icon: Lightbulb, title: t.howItWorks.anatomy.hintsTitle, text: t.howItWorks.anatomy.hintsText },
@@ -357,9 +357,13 @@ function HowItWorks({ t }: { t: Dictionary }) {
                   <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-brand">
                     <MessageSquareQuote className="size-3.5" aria-hidden /> {t.howItWorks.sayThisFirst}
                   </p>
-                  <p className="mt-1 text-sm leading-relaxed">{TWO_SUM_SUMMARY}</p>
+                  <p className="mt-1 text-sm leading-relaxed">{lang === "bn" ? TWO_SUM_SUMMARY_BN : TWO_SUM_SUMMARY}</p>
                 </div>
-                <VisualWalkthrough visuals={[TWO_SUM_VISUAL]} code={TWO_SUM_JS} />
+                {lang === "bn" ? (
+                  <VisualWalkthrough visuals={[TWO_SUM_VISUAL_BN]} englishVisuals={[TWO_SUM_VISUAL]} code={TWO_SUM_JS} />
+                ) : (
+                  <VisualWalkthrough visuals={[TWO_SUM_VISUAL]} code={TWO_SUM_JS} />
+                )}
               </div>
             </div>
             <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">

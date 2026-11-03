@@ -13,12 +13,16 @@ export interface VisualWalkthroughProps {
   visuals: Visual[];
   /** the question's javascript solution; steps with `codeLine` highlight that line in a synced code pane */
   code?: string;
+  /** optional question slug: on a Bangla page, narration in English (e.g. no Bangla voice) reads the English notes */
+  slug?: string;
+  /** optional English copies of `visuals`, for content without a slug (the homepage demo); used like `slug` */
+  englishVisuals?: Visual[];
   className?: string;
 }
 
 /** Interactive, step-by-step player for a question's visuals (prev/next/play/speed/keyboard). */
-export function VisualWalkthrough({ visuals, code, className }: VisualWalkthroughProps) {
-  return <Walkthrough visuals={visuals} code={code} className={className} />;
+export function VisualWalkthrough({ visuals, code, slug, englishVisuals, className }: VisualWalkthroughProps) {
+  return <Walkthrough visuals={visuals} code={code} slug={slug} englishVisuals={englishVisuals} className={className} />;
 }
 
 export interface VisualThumbnailProps {

@@ -167,7 +167,7 @@ export function QuestionView({ data, related = [], dict = getDictionary("en") }:
                       <VisualTypeIcons types={q.visuals.map((v) => v.type)} />
                     </div>
                     <div className="p-2 sm:p-3">
-                      <VisualWalkthrough visuals={q.visuals} code={jsCode} />
+                      <VisualWalkthrough visuals={q.visuals} code={jsCode} slug={q.slug} />
                     </div>
                   </div>
                 </section>

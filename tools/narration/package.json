@@ -1,0 +1,15 @@
+{
+  "name": "hireready-narration-tools",
+  "private": true,
+  "description": "Offline recorder for HireReady's pre-recorded English narration (Kokoro via sherpa-onnx)",
+  "scripts": {
+    "record:en": "tsx generate-en.ts"
+  },
+  "dependencies": {
+    "lamejs": "1.2.1",
+    "sherpa-onnx-node": "1.13.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

@@ -19,7 +19,11 @@ loop draining queues, TCP handshakes, ...).
 Features:
 
 - **Visual walkthroughs** with play/pause, step scrubbing, a variable watch box, side panels (stacks, queues, hash maps) and the code line that runs at each step.
-- **Narrated walkthroughs**: press **Narrate** (or N) and the browser reads each step aloud, moving on when it finishes, like a video lesson (Web Speech API, works offline).
+- **Narrated walkthroughs**: press **Narrate** (or N) and each step is read aloud, moving on when it finishes, like a video lesson.
+  - **English:** plays clips pre-recorded in one natural, AI-generated voice (Kokoro, made offline by `tools/narration`), so it sounds the same in every browser.
+  - **Fallback:** without a clip, the browser's own voices read the step (Web Speech API).
+  - **Wording:** symbols and code are read as words ("nums at i is less than 5"), and learners pick the voice and speed.
+  - **Bangla pages:** use a Bangla voice where the browser has one (Edge, Android), and the English narration otherwise.
 - **Practice mode** (on by default): the solution stays hidden until you reveal it; hints come one at a time.
 - **Topic quizzes** with instant feedback and saved scores.
 - **Timed mock interviews** with self-rating and a summary of weak areas.

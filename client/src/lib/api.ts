@@ -460,9 +460,13 @@ export const api = {
           exclude: query.exclude,
         },
       }),
-    /** GET /api/questions/:slug (404 if unknown) */
-    get: (slug: string, o?: RequestOptions) =>
-      request<QuestionDetailResponse>(`/questions/${enc(slug)}`, { ...o, content: true }),
+    /** GET /api/questions/:slug (404 if unknown); `lang` overrides the page language (e.g. English notes on a Bangla page) */
+    get: (slug: string, o?: RequestOptions & { lang?: "en" | "bn" }) =>
+      request<QuestionDetailResponse>(`/questions/${enc(slug)}`, {
+        ...o,
+        content: true,
+        query: o?.lang ? { lang: o.lang } : undefined,
+      }),
   },
 
   quiz: {

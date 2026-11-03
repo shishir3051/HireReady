@@ -422,7 +422,7 @@ export function MockSessionView({ questions, topicTitles, startedAt, onFinish, o
                     <h3 className="text-sm font-semibold">{lang === "bn" ? "ভিজ্যুয়াল ওয়াকথ্রু" : "Visual walkthrough"}</h3>
                   </div>
                   <div className="p-3 sm:p-4">
-                    <VisualWalkthrough key={question.slug} visuals={question.visuals} code={jsCode} />
+                    <VisualWalkthrough key={question.slug} visuals={question.visuals} code={jsCode} slug={question.slug} />
                   </div>
                 </div>
               )}

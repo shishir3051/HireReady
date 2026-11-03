@@ -1,8 +1,11 @@
 "use client";
 
 import { useCallback, useId, useRef, useState, type KeyboardEvent } from "react";
+import { useLanguage } from "@/i18n";
 import type { Visual } from "@/lib/types";
-import { typeMeta } from "../lib/steps";
+import { useEnglishVisuals } from "../lib/english-notes";
+import { useNarration, useNarrationSettings } from "../lib/narration";
+import { stepCount, typeMeta } from "../lib/steps";
 import { asArray, clamp, cn, safeId } from "../lib/utils";
 import { VisualErrorBoundary } from "./ErrorBoundary";
 import { VisualStage } from "./Stage";
@@ -73,13 +76,39 @@ function Tabs({
   );
 }
 
-export function Walkthrough({ visuals, code, className }: { visuals: Visual[]; code?: string; className?: string }) {
+export function Walkthrough({
+  visuals,
+  code,
+  slug,
+  englishVisuals,
+  className,
+}: {
+  visuals: Visual[];
+  code?: string;
+  /** the question's slug: lets narration on a Bangla page read the English notes when the learner listens in English */
+  slug?: string;
+  /** the same visuals in English, for content that is not fetched by slug (the homepage demo) */
+  englishVisuals?: Visual[];
+  className?: string;
+}) {
   const list = asArray(visuals).filter((v) => v && typeof v === "object");
   const idBase = safeId(useId());
   const [rawActive, setActive] = useState(0);
   const [steps, setSteps] = useState<Record<string, number>>({});
   const active = clamp(rawActive, 0, Math.max(0, list.length - 1));
   const visual = list[active];
+
+  // English notes for narration, fetched only when a Bangla page is narrated in English
+  const { lang } = useLanguage();
+  const narration = useNarration();
+  const { listen } = useNarrationSettings(lang);
+  const fetched = useEnglishVisuals(englishVisuals ? undefined : slug, lang === "bn" && narration.on && listen === "en");
+  const english = englishVisuals ?? fetched;
+  const englishCandidate = english?.[active];
+  const englishVisual =
+    visual && englishCandidate && englishCandidate.type === visual.type && stepCount(englishCandidate) === stepCount(visual)
+      ? englishCandidate
+      : undefined;
   const stageKey = visual ? `${active}:${visual.type}:${visual.title}` : "none";
   const onStepChange = useCallback((i: number) => setSteps((s) => (s[stageKey] === i ? s : { ...s, [stageKey]: i })), [stageKey]);
 
@@ -101,7 +130,14 @@ export function Walkthrough({ visuals, code, className }: { visuals: Visual[]; c
         className="min-w-0"
       >
         <VisualErrorBoundary key={stageKey} label={typeMeta(visual.type).label.toLowerCase()}>
-          <VisualStage key={stageKey} visual={visual} code={code} initialStep={steps[stageKey] ?? 0} onStepChange={onStepChange} />
+          <VisualStage
+            key={stageKey}
+            visual={visual}
+            englishVisual={englishVisual}
+            code={code}
+            initialStep={steps[stageKey] ?? 0}
+            onStepChange={onStepChange}
+          />
         </VisualErrorBoundary>
       </div>
     </div>

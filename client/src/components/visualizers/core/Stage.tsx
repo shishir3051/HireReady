@@ -4,11 +4,11 @@ import { useCallback, useMemo, type KeyboardEvent } from "react";
 import { motion } from "motion/react";
 import { Keyboard } from "lucide-react";
 import type { Visual } from "@/lib/types";
-import { useT } from "@/i18n";
+import { useLanguage, useT } from "@/i18n";
 import { useStepPlayer } from "../lib/hooks";
-import { useNarration } from "../lib/narration";
+import { useNarration, useNarrationSettings } from "../lib/narration";
 import { useMotionPreference } from "@/lib/motion-preference";
-import { stepCount, stepMeta, typeMeta, usedColors, visualFeatures } from "../lib/steps";
+import { narrationLine, stepCount, stepMeta, typeMeta, usedColors, visualFeatures } from "../lib/steps";
 import { cn, plainText } from "../lib/utils";
 import { T_FAST } from "../lib/motion";
 import { StepCanvas } from "../renderers";
@@ -17,6 +17,7 @@ import { Controls } from "./Controls";
 import { VisualErrorBoundary } from "./ErrorBoundary";
 import { Legend } from "./Legend";
 import { InlineMarkdown } from "./Markdown";
+import { NarrationSettings } from "./NarrationSettings";
 import { PanelCard } from "./Panels";
 import { VarsBox } from "./VarsBox";
 
@@ -60,12 +61,15 @@ export function StageHeader({ visual, className }: { visual: Visual; className?:
 /** One visual with its step player. */
 export function VisualStage({
   visual,
+  englishVisual,
   code,
   initialStep = 0,
   onStepChange,
   className,
 }: {
   visual: Visual;
+  /** the same visual with English notes: narration reads it when a Bangla page is narrated in English */
+  englishVisual?: Visual;
   code?: string;
   initialStep?: number;
   onStepChange?: (i: number) => void;
@@ -76,13 +80,11 @@ export function VisualStage({
   const features = useMemo(() => visualFeatures(visual), [visual]);
   const narration = useNarration();
   const motionPref = useMotionPreference();
-  const narrationText = useCallback(
-    (i: number) => {
-      const note = plainText(stepMeta(visual, i).note) || `Step ${i + 1}.`;
-      return i === 0 && visual?.title ? `${visual.title}. ${note}` : note;
-    },
-    [visual],
-  );
+  const { lang } = useLanguage();
+  const { listen } = useNarrationSettings(lang);
+  // a Bangla page narrated in English (by choice, or because there is no Bangla voice) reads the English notes
+  const spoken = listen === "en" && englishVisual ? englishVisual : visual;
+  const narrationText = useCallback((i: number) => narrationLine(spoken, i, listen), [spoken, listen]);
   const player = useStepPlayer(count, initialStep, onStepChange, { on: narration.on, text: narrationText });
   const { label } = typeMeta(visual?.type);
 
@@ -105,10 +107,12 @@ export function VisualStage({
   const multi = count > 1;
 
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
-    if (!multi || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (!multi || e.altKey || e.ctrlKey || e.metaKey || e.defaultPrevented) return;
     const t = e.target as HTMLElement;
     const tag = t.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t.isContentEditable) return;
+    // arrow keys inside a radio group or tab list (speed, listen language, voice tabs) belong to that control
+    if (t.closest('[role="radiogroup"],[role="tablist"],[role="listbox"]')) return;
     switch (e.key) {
       case "ArrowRight":
         e.preventDefault();
@@ -204,6 +208,7 @@ export function VisualStage({
         {multi ? (
           <div className="flex min-w-0 flex-col gap-1 [grid-area:ctrl]">
             <Controls player={player} label={visual.title || label} narration={narration} />
+            {narration.on && narration.supported ? <NarrationSettings pageLang={lang} onBeforeSample={player.pause} /> : null}
             <p className="hidden items-center gap-1.5 text-[11px] text-muted @2xl:flex">
               <Keyboard aria-hidden className="size-3.5" />
               {t.visualPlayer.keyboardHint}{narration.supported ? t.visualPlayer.keyboardHintNarrate : ""}.
@@ -227,9 +232,10 @@ export function VisualStage({
         ) : null}
       </div>
 
+      {/* with narration on, the voice already reads the note: announce only the step, so two voices never overlap */}
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {multi ? `Step ${index + 1} of ${count}. ` : ""}
-        {plainText(meta.note)}
+        {narration.on ? "" : plainText(meta.note)}
       </p>
     </section>
   );

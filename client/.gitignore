@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# pre-recorded narration clips (made by tools/narration): ~130 MB, host them elsewhere or commit them on purpose
+/public/narration/
