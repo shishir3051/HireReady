@@ -415,7 +415,7 @@ function clipFor(spoken: string, lang: SpeechLang = "en"): { url: string; ms: nu
   // When a static clip is not present for Bangla, use dynamic TTS endpoint so all browsers can listen!
   if (lang === "bn") {
     return {
-      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn&v=female-v2`,
       ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
     };
   }
@@ -677,7 +677,7 @@ function speakAloud(spoken: string, lang: SpeechLang, rate: number, id: number, 
   if (lang === "bn" && !voice) {
     // Dynamic fallback for browsers without local Bangla voice (Brave, Chrome, Firefox)
     const clip = {
-      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn&v=female-v2`,
       ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
     };
     playClip(clip, rate, id, later, finish, () => later(finish, pieces.length ? readingMs(pieces.join(" "), 1) : 0));

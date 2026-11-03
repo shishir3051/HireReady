@@ -57,5 +57,5 @@ function cyrb53(text: string): number {
 export const clipKey = (spoken: string, lang: SpeechLang = "en") =>
   cyrb53(`${CLIP_VOICES[lang]}\n${spoken}`).toString(36).padStart(11, "0");
 
-export const clipUrl = (key: string, lang: SpeechLang = "en") => `${CLIP_BASE}/${lang}/${key}.mp3`;
-export const manifestUrl = (lang: SpeechLang) => `${CLIP_BASE}/${lang}/manifest.json`;
+export const clipUrl = (key: string, lang: SpeechLang = "en") => `${CLIP_BASE}/${lang}/${key}.mp3?v=female-v2`;
+export const manifestUrl = (lang: SpeechLang) => `${CLIP_BASE}/${lang}/manifest.json?v=female-v2`;
