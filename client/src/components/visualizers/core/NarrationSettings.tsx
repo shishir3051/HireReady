@@ -30,9 +30,8 @@ export function NarrationSettings({
   const list = listen === "bn" ? voices.bn : voices.en;
   const wanted = listen === "bn" ? prefs.voiceBn : prefs.voiceEn;
   const natural = true;
-  const naturalSelected = listen === "en" || prefersNaturalVoice(prefs, list, listen);
-  // English only uses the natural HireReady voice; for Bangla, natural is default unless a custom browser voice is picked
-  const selected = listen === "en" ? NATURAL_VOICE : naturalSelected ? NATURAL_VOICE : ((list.find((v) => v.voiceURI === wanted) ?? list[0])?.voiceURI ?? "");
+  const naturalSelected = prefersNaturalVoice(prefs, list, listen);
+  const selected = naturalSelected ? NATURAL_VOICE : ((list.find((v) => v.voiceURI === wanted) ?? list[0])?.voiceURI ?? "");
   const aiNoteId = useId();
 
   function sample(lang: SpeechLang = listen) {
@@ -68,18 +67,12 @@ export function NarrationSettings({
           }}
           className="h-7 min-w-0 max-w-56 truncate rounded-md border border-border bg-surface px-1.5 text-[11px] text-foreground"
         >
-          {listen === "en" ? (
-            <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option>
-          ) : (
-            <>
-              <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option>
-              {list.map((v) => (
-                <option key={v.voiceURI} value={v.voiceURI}>
-                  {voiceLabel(v)}
-                </option>
-              ))}
-            </>
-          )}
+          <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option>
+          {list.map((v) => (
+            <option key={v.voiceURI} value={v.voiceURI}>
+              {voiceLabel(v)}
+            </option>
+          ))}
         </select>
       </label>
       {naturalSelected ? <span id={aiNoteId}>{t.visualPlayer.aiVoice}</span> : null}

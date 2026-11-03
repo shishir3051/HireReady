@@ -273,10 +273,9 @@ export function chosenVoice(lang: SpeechLang): SpeechSynthesisVoice | undefined 
 
 /**
  * Whether a language is read with the pre-recorded voice: it is picked, nothing is picked, or the picked browser
- * voice is no longer installed. English always uses the natural HireReady voice.
+ * voice is no longer installed. While the browser is still listing its voices, a stored browser voice is trusted.
  */
 export function prefersNaturalVoice(p: NarrationPrefs, voices: readonly SpeechSynthesisVoice[], lang: SpeechLang = "en"): boolean {
-  if (lang === "en") return true;
   const wanted = lang === "bn" ? p.voiceBn : p.voiceEn;
   if (!wanted || wanted === NATURAL_VOICE) return true;
   return voices.length > 0 && !voices.some((v) => v.voiceURI === wanted);
