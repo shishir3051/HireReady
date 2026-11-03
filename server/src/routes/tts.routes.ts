@@ -1,20 +1,27 @@
 import { Router, Request, Response } from 'express';
 import crypto from 'node:crypto';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 export const ttsRouter = Router();
 
-const CACHE_DIR = path.resolve(__dirname, '../../cache/tts');
+// In-memory cache for ultra-fast, zero-disk serverless environments (Vercel, AWS Lambda)
+const memoryCache = new Map<string, Buffer>();
+const MAX_CACHE_ITEMS = 500;
 
-// Ensure cache directory exists
-if (!fs.existsSync(CACHE_DIR)) {
-  fs.mkdirSync(CACHE_DIR, { recursive: true });
+// Safe temporary directory cache (never crashes in read-only environments)
+const TMP_CACHE = path.join(os.tmpdir(), 'hr-tts-cache');
+try {
+  if (!fs.existsSync(TMP_CACHE)) {
+    fs.mkdirSync(TMP_CACHE, { recursive: true });
+  }
+} catch {
+  // Silent fallback to pure in-memory cache if /tmp is restricted
 }
 
 function splitText(text: string, maxLen = 150): string[] {
   const chunks: string[] = [];
-  // Split by sentence/clause boundaries
   const parts = text.match(/[^।?!,;:.\n]+[।?!,;:.\n]*/g) || [text];
   let current = '';
 
@@ -56,15 +63,28 @@ ttsRouter.get('/', async (req: Request, res: Response) => {
 
   // Generate unique cache key
   const hash = crypto.createHash('sha256').update(`${lang}:${text}`).digest('hex').slice(0, 16);
-  const cacheFile = path.join(CACHE_DIR, `${hash}.mp3`);
 
-  // Check cache first
-  if (fs.existsSync(cacheFile)) {
+  // 1. Check in-memory cache
+  const cachedMem = memoryCache.get(hash);
+  if (cachedMem) {
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-    fs.createReadStream(cacheFile).pipe(res);
+    res.send(cachedMem);
     return;
   }
+
+  // 2. Check /tmp cache
+  const cacheFile = path.join(TMP_CACHE, `${hash}.mp3`);
+  try {
+    if (fs.existsSync(cacheFile)) {
+      const data = fs.readFileSync(cacheFile);
+      memoryCache.set(hash, data);
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      res.send(data);
+      return;
+    }
+  } catch {}
 
   try {
     const chunks = splitText(text);
@@ -77,8 +97,17 @@ ttsRouter.get('/', async (req: Request, res: Response) => {
 
     const fullAudio = Buffer.concat(audioBuffers);
 
-    // Write to cache asynchronously
-    fs.writeFile(cacheFile, fullAudio, () => {});
+    // Save to memory cache
+    if (memoryCache.size >= MAX_CACHE_ITEMS) {
+      const firstKey = memoryCache.keys().next().value;
+      if (firstKey) memoryCache.delete(firstKey);
+    }
+    memoryCache.set(hash, fullAudio);
+
+    // Optionally save to /tmp
+    try {
+      fs.writeFile(cacheFile, fullAudio, () => {});
+    } catch {}
 
     res.setHeader('Content-Type', 'audio/mpeg');
     res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
