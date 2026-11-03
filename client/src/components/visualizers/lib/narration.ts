@@ -246,6 +246,21 @@ function scoreVoice(v: SpeechSynthesisVoice, lang: SpeechLang): number {
   const rank = locales.indexOf(normalizeLang(v.lang));
   if (rank >= 0) score += 12 - rank * 2;
   if (v.default) score += 3;
+
+  // English fallback prioritizes male voices (e.g. David, Guy, Mark, George) over female voices
+  if (lang === "en") {
+    const isMale = /\b(David|Mark|Guy|George|Ryan|James|Daniel|Oliver|Liam|Noah|Arthur|Thomas|Brian|Christopher|Eric|Michael|Stefan|Richard|Adam)\b/i.test(v.name) || /\bmale\b/i.test(v.name);
+    const isFemale = /\b(Zira|Jenny|Aria|Sara|Catherine|Linda|Susan|Hazel|Heera|Neerja|Samantha|Victoria|Karen|Moira|Tessa|Fiona|Ava|Emma)\b/i.test(v.name) || /Google US English/i.test(v.name) || /\bfemale\b/i.test(v.name);
+    if (isMale) score += 60;
+    if (isFemale) score -= 60;
+  }
+
+  // Bangla fallback prioritizes clear female voices (e.g. Nabaneeta) over male voices
+  if (lang === "bn") {
+    if (/nabaneeta/i.test(v.name) || /female/i.test(v.name)) score += 60;
+    if (/pradeep|arjun|bashkar|male/i.test(v.name)) score -= 60;
+  }
+
   return score;
 }
 

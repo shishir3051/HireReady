@@ -15,7 +15,7 @@ export const CLIP_VOICE = "kokoro-82m-v1.0/am_michael/1";
  * The same per language. Bangla clips are recorded by tools/narration/record-bn.py with AI4Bharat's Indic Parler-TTS
  * (Apache-2.0), so Bangla is heard in browsers that have no Bangla voice (Chrome and Firefox on computers).
  */
-export const CLIP_VOICES: Record<SpeechLang, string> = { en: CLIP_VOICE, bn: "indic-parler-tts/arjun-resonant/1" };
+export const CLIP_VOICES: Record<SpeechLang, string> = { en: CLIP_VOICE, bn: "google-female/bn/1" };
 
 /** The narration-prefs value for the pre-recorded voice (browser voices are stored by voiceURI). */
 export const NATURAL_VOICE = "hireready:natural";
@@ -57,5 +57,7 @@ function cyrb53(text: string): number {
 export const clipKey = (spoken: string, lang: SpeechLang = "en") =>
   cyrb53(`${CLIP_VOICES[lang]}\n${spoken}`).toString(36).padStart(11, "0");
 
-export const clipUrl = (key: string, lang: SpeechLang = "en") => `${CLIP_BASE}/${lang}/${key}.mp3`;
-export const manifestUrl = (lang: SpeechLang) => `${CLIP_BASE}/${lang}/manifest.json`;
+export const clipUrl = (key: string, lang: SpeechLang = "en") =>
+  `${CLIP_BASE}/${lang}/${key}.mp3?v=${lang === "bn" ? "female-v3" : "en-v2"}`;
+export const manifestUrl = (lang: SpeechLang) =>
+  `${CLIP_BASE}/${lang}/manifest.json?v=${lang === "bn" ? "female-v3" : "en-v2"}`;
