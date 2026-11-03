@@ -8,6 +8,7 @@ import { questionsRouter } from './questions.routes';
 import { quizRouter } from './quiz.routes';
 import { roadmapRouter } from './roadmap.routes';
 import { topicsRouter } from './topics.routes';
+import { ttsRouter } from './tts.routes';
 
 /** Everything under /api (see docs/ARCHITECTURE.md). */
 export const apiRouter = Router();
@@ -20,3 +21,4 @@ apiRouter.use('/roadmap', roadmapRouter);
 apiRouter.use('/progress', progressRouter);
 apiRouter.use('/mock-sessions', mockSessionsRouter);
 apiRouter.use('/ai', aiRouter);
+apiRouter.use('/tts', ttsRouter);

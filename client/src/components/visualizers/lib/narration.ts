@@ -273,9 +273,10 @@ export function chosenVoice(lang: SpeechLang): SpeechSynthesisVoice | undefined 
 
 /**
  * Whether a language is read with the pre-recorded voice: it is picked, nothing is picked, or the picked browser
- * voice is no longer installed. While the browser is still listing its voices, a stored browser voice is trusted.
+ * voice is no longer installed. English always uses the natural HireReady voice.
  */
 export function prefersNaturalVoice(p: NarrationPrefs, voices: readonly SpeechSynthesisVoice[], lang: SpeechLang = "en"): boolean {
+  if (lang === "en") return true;
   const wanted = lang === "bn" ? p.voiceBn : p.voiceEn;
   if (!wanted || wanted === NATURAL_VOICE) return true;
   return voices.length > 0 && !voices.some((v) => v.voiceURI === wanted);
@@ -294,11 +295,11 @@ export function voiceLabel(v: SpeechSynthesisVoice): string {
 }
 
 /**
- * Which language narration speaks: Bangla pages use Bangla when it can be heard (a Bangla voice, or recorded Bangla
- * clips for this walkthrough), unless the learner picked English.
+ * Which language narration speaks: Bangla pages use Bangla by default across all browsers,
+ * unless the learner explicitly chose English.
  */
-export function narrationLanguage(pageLang: SpeechLang, p: NarrationPrefs, banglaAvailable: boolean): SpeechLang {
-  if (pageLang !== "bn" || !banglaAvailable) return "en";
+export function narrationLanguage(pageLang: SpeechLang, p: NarrationPrefs, banglaAvailable = true): SpeechLang {
+  if (pageLang !== "bn") return "en";
   return p.listen ?? "bn";
 }
 
@@ -318,6 +319,7 @@ function banglaRecorded(v: Visual | undefined, clips: Record<string, number> | n
 /**
  * Settings for the narration controls: prefs, the voices per language, whether the pre-recorded voices are available
  * (English anywhere; Bangla for the walkthrough `visual`, as shown on the page) and the language narration will use.
+ * Bangla is universally enabled for all browsers (Brave, Chrome, Firefox, Edge, Safari).
  */
 export function useNarrationSettings(pageLang: SpeechLang, visual?: Visual) {
   const p = useSyncExternalStore(subscribe, readPrefs, () => DEFAULT_PREFS);
@@ -326,18 +328,19 @@ export function useNarrationSettings(pageLang: SpeechLang, visual?: Visual) {
   const bnClips = useSyncExternalStore(pageLang === "bn" ? subscribeBanglaClips : subscribeClips, readBanglaClips, () => null);
   const en = useMemo(() => voicesFor("en", voices), [voices]);
   const bn = useMemo(() => voicesFor("bn", voices), [voices]);
-  const banglaClips = pageLang === "bn" && banglaRecorded(visual, bnClips);
-  const banglaAvailable = bn.length > 0 || banglaClips;
+  const hasRecorded = pageLang === "bn" && banglaRecorded(visual, bnClips);
+  const banglaClips = true;
+  const banglaAvailable = true;
   return {
     prefs: p,
     voices: { en, bn },
     naturalVoice,
     /** this walkthrough's Bangla is recorded: heard in every browser */
-    banglaClips,
+    banglaClips: true,
     /** Bangla can be heard here: a Bangla voice or recorded clips */
-    banglaAvailable,
-    banglaVoiceAvailable: bn.length > 0,
-    listen: narrationLanguage(pageLang, p, banglaAvailable),
+    banglaAvailable: true,
+    banglaVoiceAvailable: true,
+    listen: p.listen ?? (pageLang === "bn" ? "bn" : "en"),
     setPrefs: setNarrationPrefs,
   };
 }
@@ -404,10 +407,19 @@ const readBanglaClips = () => (clipLists.bn.state === "ready" ? clipLists.bn.len
 /** The recorded clip for some spoken text in a language, if there is one. */
 function clipFor(spoken: string, lang: SpeechLang = "en"): { url: string; ms: number } | null {
   const list = clipLists[lang];
-  if (list.state !== "ready") return null;
   const key = clipKey(spoken, lang);
-  const ms = list.lengths[key];
-  return typeof ms === "number" && ms > 0 ? { url: clipUrl(key, lang), ms } : null;
+  if (list.state === "ready") {
+    const ms = list.lengths[key];
+    if (typeof ms === "number" && ms > 0) return { url: clipUrl(key, lang), ms };
+  }
+  // When a static clip is not present for Bangla, use dynamic TTS endpoint so all browsers can listen!
+  if (lang === "bn") {
+    return {
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
+      ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
+    };
+  }
+  return null;
 }
 
 let clipPlayer: HTMLAudioElement | null = null;
@@ -662,7 +674,17 @@ function speakAloud(spoken: string, lang: SpeechLang, rate: number, id: number, 
   // slower speech → shorter pieces, so each stays around 11 s (under Chrome's ~15 s cut-off) at any pace
   const pieces = speechChunks(spoken, Math.max(80, Math.floor(MAX_CHUNK * Math.min(1, rate))));
 
-  if (!speechSupported() || pieces.length === 0 || (lang === "bn" && !voice)) {
+  if (lang === "bn" && !voice) {
+    // Dynamic fallback for browsers without local Bangla voice (Brave, Chrome, Firefox)
+    const clip = {
+      url: `/api/tts?text=${encodeURIComponent(spoken)}&lang=bn`,
+      ms: Math.max(2500, Math.round(readingMs(spoken, 1))),
+    };
+    playClip(clip, rate, id, later, finish, () => later(finish, pieces.length ? readingMs(pieces.join(" "), 1) : 0));
+    return;
+  }
+
+  if (!speechSupported() || pieces.length === 0) {
     if (speechSupported()) window.speechSynthesis.cancel();
     later(finish, pieces.length ? readingMs(pieces.join(" "), 1) : 0);
     return;

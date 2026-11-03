@@ -29,10 +29,10 @@ export function NarrationSettings({
   const { prefs, voices, naturalVoice, banglaClips, banglaAvailable, listen, setPrefs } = useNarrationSettings(pageLang, visual);
   const list = listen === "bn" ? voices.bn : voices.en;
   const wanted = listen === "bn" ? prefs.voiceBn : prefs.voiceEn;
-  const natural = listen === "en" ? naturalVoice : banglaClips;
-  const naturalSelected = natural && prefersNaturalVoice(prefs, list, listen);
-  // "" while a stored browser voice is not listed (yet): keeps the select controlled, so every real option can be picked
-  const selected = naturalSelected ? NATURAL_VOICE : ((list.find((v) => v.voiceURI === wanted) ?? list[0])?.voiceURI ?? "");
+  const natural = true;
+  const naturalSelected = listen === "en" || prefersNaturalVoice(prefs, list, listen);
+  // English only uses the natural HireReady voice; for Bangla, natural is default unless a custom browser voice is picked
+  const selected = listen === "en" ? NATURAL_VOICE : naturalSelected ? NATURAL_VOICE : ((list.find((v) => v.voiceURI === wanted) ?? list[0])?.voiceURI ?? "");
   const aiNoteId = useId();
 
   function sample(lang: SpeechLang = listen) {
@@ -51,38 +51,37 @@ export function NarrationSettings({
             value={listen}
             onChange={(l) => setPrefs({ listen: l })}
             options={[
-              { value: "bn", label: "বাংলা", disabled: !banglaAvailable },
+              { value: "bn", label: "বাংলা" },
               { value: "en", label: "English" },
             ]}
           />
         </span>
       ) : null}
-      {list.length > 0 || natural ? (
-        <label className="inline-flex min-w-0 items-center gap-1.5">
-          {t.visualPlayer.voice}
-          <select
-            value={selected}
-            aria-describedby={naturalSelected ? aiNoteId : undefined}
-            onChange={(e) => {
-              setPrefs(listen === "bn" ? { voiceBn: e.target.value } : { voiceEn: e.target.value });
-              sample();
-            }}
-            className="h-7 min-w-0 max-w-56 truncate rounded-md border border-border bg-surface px-1.5 text-[11px] text-foreground"
-          >
-            {selected === "" ? (
-              <option value="" disabled>
-                …
-              </option>
-            ) : null}
-            {natural ? <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option> : null}
-            {list.map((v) => (
-              <option key={v.voiceURI} value={v.voiceURI}>
-                {voiceLabel(v)}
-              </option>
-            ))}
-          </select>
-        </label>
-      ) : null}
+      <label className="inline-flex min-w-0 items-center gap-1.5">
+        {t.visualPlayer.voice}
+        <select
+          value={selected}
+          aria-describedby={naturalSelected ? aiNoteId : undefined}
+          onChange={(e) => {
+            setPrefs(listen === "bn" ? { voiceBn: e.target.value } : { voiceEn: e.target.value });
+            sample();
+          }}
+          className="h-7 min-w-0 max-w-56 truncate rounded-md border border-border bg-surface px-1.5 text-[11px] text-foreground"
+        >
+          {listen === "en" ? (
+            <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option>
+          ) : (
+            <>
+              <option value={NATURAL_VOICE}>{t.visualPlayer.naturalVoice}</option>
+              {list.map((v) => (
+                <option key={v.voiceURI} value={v.voiceURI}>
+                  {voiceLabel(v)}
+                </option>
+              ))}
+            </>
+          )}
+        </select>
+      </label>
       {naturalSelected ? <span id={aiNoteId}>{t.visualPlayer.aiVoice}</span> : null}
       <span className="inline-flex items-center gap-1.5">
         {t.visualPlayer.pace}
