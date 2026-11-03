@@ -269,7 +269,7 @@ Bangla pages without a Bangla voice read the English notes instead. Chrome on Wi
 
 #### Pre-recorded English narration (`narration-audio.ts`, `tools/narration/`)
 
-Every English step line is recorded once, offline, as an MP3 in one natural voice, so English sounds the same in every browser. The voice is Kokoro-82M `af_heart` (Apache-2.0), run on the owner's PC with sherpa-onnx; no cloud service, account or card is needed.
+Every English step line is recorded once, offline, as an MP3 in one natural voice, so English sounds the same in every browser. The voice is Kokoro-82M `am_michael`, a warm, deep, laid-back male voice (Apache-2.0), run on the owner's PC with sherpa-onnx; no cloud service, account or card is needed.
 
 - **What is recorded:** `narrationLine(visual, i, "en")` from `steps.ts`, which is also what the player speaks: the note, or "Step 3." when there is none, after the visual's title on the first step. It is rewritten by `speechText()` and named by `clipKey()`, a cyrb53 hash of that text plus `CLIP_VOICE`. The player and recorder share these functions, so an edited note simply has no clip until it is recorded again, and the browser voice reads it meanwhile. Bumping `CLIP_VOICE` re-records everything.
 - **Files:** `client/public/narration/en/<key>.mp3` (mono, 24 kHz, 40 kbps) plus `manifest.json` (`{ version, voice, format, clips: { key: ms } }`). The whole set is about 3,100 clips and roughly 150 MB. The folder is committed and deployed with the client; only the recorder's half-written `.tmp` files are git-ignored.
@@ -287,6 +287,10 @@ Every English step line is recorded once, offline, as an MP3 in one natural voic
   - **CORS:** the element uses `crossOrigin="anonymous"`, like the prefetch, so a prefetched clip is reused from the cache. A cross-origin host must therefore send CORS headers for the MP3s too.
   - **Network errors:** a network or server error on the clip list is retried a minute later.
   - **No speech synthesis:** browsers without it (many in-app Android WebViews) still get narration through the clips.
+- **Bangla clips:** `client/public/narration/bn/`, recorded by `tools/narration/record-bn.cmd` with AI4Bharat Indic Parler-TTS (Apache-2.0, speaker Arjun in a deep, resonant, laid-back tone, CPU).
+  - **Which lines:** `generate-bn.ts` rebuilds exactly what a Bangla page speaks: the English walkthrough with the overlay merged the way `server/src/content/overlay.ts` does it, read through `narrationLine` and `speechText`. Numbers are written as Bangla words for the voice. Lines that stay English are left to the English clips.
+  - **Unlocking:** `useNarrationSettings(pageLang, visual)` reports `banglaClips` when every Bangla line of that walkthrough has a clip. বাংলা is then offered and chosen even in browsers without a Bangla voice, with "HireReady ভয়েস" as the voice. The Bangla manifest loads only on Bangla pages with narration on.
+  - **Clip names:** both languages use `clipKey(spoken, lang)`, which hashes `CLIP_VOICES[lang]`. English names are unchanged.
 - **Voice picker:** the natural voice is listed first and is the default. Its value in `hr-narrate-prefs` is `hireready:natural`. A browser voice the learner picked still wins. While the natural voice is selected, an "AI-generated voice" label is shown.
 - **Recording (`tools/narration/README.md`):** `npx tsx generate-en.ts` forks 2–3 workers at below-normal priority. On a 6-core laptop it takes about 2.5 h; 3 workers × 2 threads runs at about 0.45× real time. It is resumable, skips clips that exist, keeps the manifest written as it goes and can `--prune` stale clips.
   - It needs **sherpa-onnx-node 1.13.x**: version 2.x dropped espeak-ng and silently skips numbers.

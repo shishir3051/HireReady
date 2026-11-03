@@ -2,7 +2,7 @@
 
 `generate-en.ts` records every English walkthrough step as an MP3 in one natural voice. Walkthrough narration then sounds the same in every browser. It runs offline on your own PC and needs no cloud service, account or card.
 
-- **Voice:** [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) v1.0, voice `af_heart`, run with [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). Both are Apache-2.0, so the audio may be used and served freely, including in a paid app.
+- **Voice:** [Kokoro-82M](https://huggingface.co/hexgrad/Kokoro-82M) v1.0, voice `am_michael` (a warm, deep, laid-back male voice), run with [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx). Both are Apache-2.0, so the audio may be used and served freely, including in a paid app.
 - **Labelling:** the app labels it as an AI-generated voice.
 - **Output:** `client/public/narration/en/<key>.mp3` (mono, 24 kHz, 40 kbps) plus `manifest.json`. That is about 3,100 clips and roughly 150 MB. The folder is committed and deployed with the app; commit it again after each recording run.
 - **Naming:** each clip is named by a hash of the exact words spoken. The app finds clips with the same functions the recorder uses: `narrationLine`, `speechText` and `clipKey` in `client/src/components/visualizers/lib/`.
@@ -40,3 +40,32 @@ npx tsx generate-en.ts --prune    # …and delete clips no note uses any more
 - **Missing manifest:** narration quietly uses the browser voices.
 
 If you change the voice, speed, bitrate or model, bump `CLIP_VOICE` in `narration-audio.ts`, so that old clips are not mixed with new ones.
+
+# Pre-recorded Bangla narration
+
+Chrome and Firefox on computers have no Bangla voice, so Bangla narration used to work only in Edge and on Android. Recorded Bangla clips fix that.
+
+- **Voice:** [AI4Bharat Indic Parler-TTS](https://huggingface.co/ai4bharat/indic-parler-tts) (Apache-2.0, free, runs offline), speaker Arjun, in a deep, resonant, laid-back tone. The app labels it as an AI-generated voice.
+- **Output:** `client/public/narration/bn/<key>.mp3` plus `manifest.json`, for about 3,100 Bangla lines.
+- **What it unlocks:** a walkthrough whose Bangla lines are all recorded unlocks বাংলা in every browser, and plays the clips by default. The rest keep working as before.
+
+## What you need (once)
+
+- **About 6 GB free on C:**: the model is 3.7 GB, plus Python packages and temporary recordings. To keep the model elsewhere, set `HF_HOME`, for example `setx HF_HOME D:\hf-cache`.
+- **Python 3.11** (`py -3.11`), **git** and **Node**. All three are already on this PC.
+- **A free Hugging Face account:** open the [model page](https://huggingface.co/ai4bharat/indic-parler-tts), click *Agree and access repository*, and create a *Read* token at [settings/tokens](https://huggingface.co/settings/tokens). The first run asks you to paste that token; it never goes into the code.
+
+## Record
+
+```bash
+tools\narration\record-bn.cmd --limit 5   :: a quick test: sets everything up, records 5 lines
+tools\narration\record-bn.cmd             :: everything still missing; Ctrl+C to stop, run again to continue
+```
+
+- **Steps:** the runner sets up `.venv-bn`, lists the Bangla lines (`generate-bn.ts export`), records them (`record-bn.py`), then turns them into MP3s and updates the manifest (`generate-bn.ts finish --prune`).
+- **Order:** the homepage demo, the voice sample and the most-asked questions come first.
+- **Time:** it runs on the CPU and is slow. Expect roughly 1–3 days for everything; the speed hasn't been measured on this PC yet. The `--limit 5` test shows the speed in its progress lines.
+- **Odd takes:** a take far longer or shorter than its text is retried once, and logged as `check <key>` if it is still odd.
+- **Publishing:** commit `client/public/narration/bn` and push. If a run was stopped, run `npx.cmd tsx generate-bn.ts finish` first, so the manifest includes everything recorded.
+
+To change the speaker or the description in `record-bn.py`, bump `CLIP_VOICES.bn` in `narration-audio.ts` too.

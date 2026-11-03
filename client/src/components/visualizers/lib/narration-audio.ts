@@ -8,8 +8,14 @@ import type { SpeechLang } from "./speech-text";
  * (the browser voice reads it meanwhile). This module has no browser code at import time: the generator imports it.
  */
 
-/** Model, voice and recording settings baked into every clip name; change it to re-record everything. */
-export const CLIP_VOICE = "kokoro-82m-v1.0/af_heart/1";
+/** Model, voice and recording settings baked into every English clip name; change it to re-record everything. */
+export const CLIP_VOICE = "kokoro-82m-v1.0/am_michael/1";
+
+/**
+ * The same per language. Bangla clips are recorded by tools/narration/record-bn.py with AI4Bharat's Indic Parler-TTS
+ * (Apache-2.0), so Bangla is heard in browsers that have no Bangla voice (Chrome and Firefox on computers).
+ */
+export const CLIP_VOICES: Record<SpeechLang, string> = { en: CLIP_VOICE, bn: "indic-parler-tts/arjun-resonant/1" };
 
 /** The narration-prefs value for the pre-recorded voice (browser voices are stored by voiceURI). */
 export const NATURAL_VOICE = "hireready:natural";
@@ -47,8 +53,9 @@ function cyrb53(text: string): number {
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
 
-/** The clip name for some spoken English text (speechText output), e.g. "0k3x9q2m1ab". */
-export const clipKey = (spoken: string) => cyrb53(`${CLIP_VOICE}\n${spoken}`).toString(36).padStart(11, "0");
+/** The clip name for some spoken text (speechText output) in a language, e.g. "0k3x9q2m1ab". */
+export const clipKey = (spoken: string, lang: SpeechLang = "en") =>
+  cyrb53(`${CLIP_VOICES[lang]}\n${spoken}`).toString(36).padStart(11, "0");
 
-export const clipUrl = (key: string) => `${CLIP_BASE}/en/${key}.mp3`;
-export const MANIFEST_URL = `${CLIP_BASE}/en/manifest.json`;
+export const clipUrl = (key: string, lang: SpeechLang = "en") => `${CLIP_BASE}/${lang}/${key}.mp3`;
+export const manifestUrl = (lang: SpeechLang) => `${CLIP_BASE}/${lang}/manifest.json`;

@@ -101,7 +101,7 @@ export function Walkthrough({
   // English notes for narration, fetched only when a Bangla page is narrated in English
   const { lang } = useLanguage();
   const narration = useNarration();
-  const { listen } = useNarrationSettings(lang);
+  const { listen } = useNarrationSettings(lang, visual);
   const fetched = useEnglishVisuals(englishVisuals ? undefined : slug, lang === "bn" && narration.on && listen === "en");
   const english = englishVisuals ?? fetched;
   const englishCandidate = english?.[active];

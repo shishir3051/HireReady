@@ -1,4 +1,4 @@
-// Records every English walkthrough line as an MP3 with Kokoro (voice af_heart), offline, for pre-recorded narration.
+// Records every English walkthrough line as an MP3 with Kokoro (voice am_michael), offline, for pre-recorded narration.
 // Resumable: lines that already have a clip are skipped, so stop it any time (Ctrl+C) and run it again later.
 //
 //   npx tsx generate-en.ts [--workers 3] [--threads 2] [--limit N] [--prune] [--model <dir>] [--out <dir>]
@@ -15,7 +15,7 @@ import { narrationLine, stepCount } from "../../client/src/components/visualizer
 import { TWO_SUM_VISUAL } from "../../client/src/lib/demo-content";
 
 const ROOT = path.resolve(__dirname, "../..");
-const SPEAKER = 3; // af_heart in Kokoro v1.0 (am_michael is 16)
+const SPEAKER = 16; // am_michael in Kokoro v1.0: a warm, deep, laid-back male voice (af_heart is 3)
 const KBPS = 40; // mono MP3 at the model's 24 kHz: clear speech at ~5 KB a second
 const CLIP_FILE = /^[0-9a-z]{11}\.mp3$/; // what clipKey() names look like: --prune touches nothing else
 
@@ -42,7 +42,8 @@ const pauseMs = (ms: number) => Atomics.wait(new Int32Array(new SharedArrayBuffe
 
 /**
  * Every English line the walkthrough player can speak, keyed exactly as the player looks clips up. The most visible
- * ones (the voice sample, the homepage demo) come first, so a partial run already covers them.
+ * ones come first (the voice sample, the homepage demo, then the most-asked questions), so a partial run already
+ * covers what learners open most.
  */
 function collectJobs(): Job[] {
   const jobs = new Map<string, string>();
@@ -57,11 +58,15 @@ function collectJobs(): Job[] {
   add(NARRATION_SAMPLES.en);
   addVisual(TWO_SUM_VISUAL); // client-only: the homepage demo walkthrough
   const dir = path.join(ROOT, "server/src/data/content");
+  const questions: any[] = [];
   for (const file of fs.readdirSync(dir).filter((f) => f.endsWith(".json")).sort()) {
     const data = JSON.parse(fs.readFileSync(path.join(dir, file), "utf8"));
-    const questions: any[] = Array.isArray(data.questions) ? data.questions : Object.values(data.questions ?? {});
-    for (const q of questions) for (const v of q.visuals ?? []) addVisual(v);
+    questions.push(...(Array.isArray(data.questions) ? data.questions : Object.values(data.questions ?? {})));
   }
+  const order = ["very-high", "high", "medium", "low"];
+  const rank = (f?: string) => (order.includes(f ?? "") ? order.indexOf(f!) : order.length);
+  questions.sort((a, b) => rank(a.frequency) - rank(b.frequency)); // stable: file order within a frequency
+  for (const q of questions) for (const v of q.visuals ?? []) addVisual(v);
   return [...jobs].map(([key, text]) => ({ key, text }));
 }
 

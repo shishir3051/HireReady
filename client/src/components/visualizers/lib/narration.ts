@@ -1,16 +1,18 @@
 "use client";
 
 import { useMemo, useSyncExternalStore } from "react";
+import type { Visual } from "@/lib/types";
 import {
-  CLIP_VOICE,
-  MANIFEST_URL,
+  CLIP_VOICES,
   NARRATION_SAMPLES,
   NATURAL_VOICE,
   clipKey,
   clipUrl,
+  manifestUrl,
   type ClipManifest,
 } from "./narration-audio";
 import { isBanglaText, MAX_CHUNK, speechChunks, speechText, type SpeechLang } from "./speech-text";
+import { narrationLine, stepCount } from "./steps";
 
 /**
  * Narrated walkthroughs: each step's note is read aloud. English notes play a pre-recorded clip in a natural voice
@@ -270,13 +272,13 @@ export function chosenVoice(lang: SpeechLang): SpeechSynthesisVoice | undefined 
 }
 
 /**
- * Whether English is read with the pre-recorded natural voice: it is picked, nothing is picked, or the picked browser
+ * Whether a language is read with the pre-recorded voice: it is picked, nothing is picked, or the picked browser
  * voice is no longer installed. While the browser is still listing its voices, a stored browser voice is trusted.
  */
-export function prefersNaturalVoice(p: NarrationPrefs, english: readonly SpeechSynthesisVoice[]): boolean {
-  const wanted = p.voiceEn;
+export function prefersNaturalVoice(p: NarrationPrefs, voices: readonly SpeechSynthesisVoice[], lang: SpeechLang = "en"): boolean {
+  const wanted = lang === "bn" ? p.voiceBn : p.voiceEn;
   if (!wanted || wanted === NATURAL_VOICE) return true;
-  return english.length > 0 && !english.some((v) => v.voiceURI === wanted);
+  return voices.length > 0 && !voices.some((v) => v.voiceURI === wanted);
 }
 
 /** "Microsoft Aria Online (Natural) - English (United States)" → "Aria (natural) · en-US". */
@@ -291,86 +293,121 @@ export function voiceLabel(v: SpeechSynthesisVoice): string {
   return `${name || v.name} · ${v.lang.replace("_", "-")}`;
 }
 
-/** Which language narration speaks: Bangla pages use Bangla when a Bangla voice exists, unless the learner picked English. */
-export function narrationLanguage(pageLang: SpeechLang, p: NarrationPrefs, banglaVoiceAvailable: boolean): SpeechLang {
-  if (pageLang !== "bn" || !banglaVoiceAvailable) return "en";
+/**
+ * Which language narration speaks: Bangla pages use Bangla when it can be heard (a Bangla voice, or recorded Bangla
+ * clips for this walkthrough), unless the learner picked English.
+ */
+export function narrationLanguage(pageLang: SpeechLang, p: NarrationPrefs, banglaAvailable: boolean): SpeechLang {
+  if (pageLang !== "bn" || !banglaAvailable) return "en";
   return p.listen ?? "bn";
 }
 
+/** Every Bangla line of a walkthrough has a recorded clip (English lines are covered by the English clips/voices). */
+function banglaRecorded(v: Visual | undefined, clips: Record<string, number> | null): boolean {
+  if (!v || !clips) return false;
+  let bangla = 0;
+  for (let i = 0; i < stepCount(v); i++) {
+    const line = narrationLine(v, i, "bn");
+    if (!isBanglaText(line)) continue;
+    bangla++;
+    if (!(clips[clipKey(speechText(line, "bn"), "bn")]! > 0)) return false;
+  }
+  return bangla > 0;
+}
+
 /**
- * Settings for the narration controls: prefs, the voices per language, whether the pre-recorded natural voice is
- * available and the language narration will use.
+ * Settings for the narration controls: prefs, the voices per language, whether the pre-recorded voices are available
+ * (English anywhere; Bangla for the walkthrough `visual`, as shown on the page) and the language narration will use.
  */
-export function useNarrationSettings(pageLang: SpeechLang) {
+export function useNarrationSettings(pageLang: SpeechLang, visual?: Visual) {
   const p = useSyncExternalStore(subscribe, readPrefs, () => DEFAULT_PREFS);
   const voices = useSyncExternalStore(subscribeVoices, readVoices, () => NO_VOICES);
   const naturalVoice = useSyncExternalStore(subscribeClips, readClipsReady, () => false);
+  const bnClips = useSyncExternalStore(pageLang === "bn" ? subscribeBanglaClips : subscribeClips, readBanglaClips, () => null);
   const en = useMemo(() => voicesFor("en", voices), [voices]);
   const bn = useMemo(() => voicesFor("bn", voices), [voices]);
+  const banglaClips = pageLang === "bn" && banglaRecorded(visual, bnClips);
+  const banglaAvailable = bn.length > 0 || banglaClips;
   return {
     prefs: p,
     voices: { en, bn },
     naturalVoice,
+    /** this walkthrough's Bangla is recorded: heard in every browser */
+    banglaClips,
+    /** Bangla can be heard here: a Bangla voice or recorded clips */
+    banglaAvailable,
     banglaVoiceAvailable: bn.length > 0,
-    listen: narrationLanguage(pageLang, p, bn.length > 0),
+    listen: narrationLanguage(pageLang, p, banglaAvailable),
     setPrefs: setNarrationPrefs,
   };
 }
 
 // ------------------------------------------------------------------ pre-recorded clips
 
-let clipState: "idle" | "loading" | "ready" | "none" = "idle";
-let clipLengths: Record<string, number> = {};
-let clipLoad: Promise<void> | null = null;
-let clipRetryAt = 0; // after a network error or a server error, try the list again from this time on
+interface ClipList {
+  state: "idle" | "loading" | "ready" | "none";
+  lengths: Record<string, number>;
+  load: Promise<void> | null;
+  retryAt: number; // after a network error or a server error, try the list again from this time on
+}
+const newClipList = (): ClipList => ({ state: "idle", lengths: {}, load: null, retryAt: 0 });
+const clipLists: Record<SpeechLang, ClipList> = { en: newClipList(), bn: newClipList() };
 const clipListeners = new Set<() => void>();
 
 /**
- * Fetches the list of recorded clips once per page. Without one (not hosted, offline) the browser voices are used; a
- * network or server error is retried a minute later, the next time narration needs the list.
+ * Fetches a language's list of recorded clips once per page. Without one (not hosted, offline, nothing recorded yet)
+ * the browser voices are used; a network or server error is retried a minute later, the next time it is needed.
  */
-function loadClips(): Promise<void> {
-  const retry = clipState === "none" && clipRetryAt > 0 && Date.now() >= clipRetryAt;
-  if (!clipLoad || retry) {
-    clipState = "loading";
-    clipRetryAt = 0;
-    clipLoad = fetch(MANIFEST_URL)
+function loadClips(lang: SpeechLang = "en"): Promise<void> {
+  const list = clipLists[lang];
+  const retry = list.state === "none" && list.retryAt > 0 && Date.now() >= list.retryAt;
+  if (!list.load || retry) {
+    list.state = "loading";
+    list.retryAt = 0;
+    list.load = fetch(manifestUrl(lang))
       .then((r) => {
         if (r.ok) return r.json() as Promise<ClipManifest>;
-        if (r.status >= 500) clipRetryAt = Date.now() + 60_000;
+        if (r.status >= 500) list.retryAt = Date.now() + 60_000;
         return null;
       })
       .then((m) => {
-        const usable = m?.version === 1 && m.voice === CLIP_VOICE && typeof m.clips === "object" && m.clips !== null;
-        clipLengths = usable ? m.clips : {};
-        clipState = Object.keys(clipLengths).length > 0 ? "ready" : "none";
+        const usable = m?.version === 1 && m.voice === CLIP_VOICES[lang] && typeof m.clips === "object" && m.clips !== null;
+        list.lengths = usable ? m.clips : {};
+        list.state = Object.keys(list.lengths).length > 0 ? "ready" : "none";
       })
       .catch(() => {
-        clipState = "none";
-        clipRetryAt = Date.now() + 60_000;
+        list.state = "none";
+        list.retryAt = Date.now() + 60_000;
       })
       .finally(() => clipListeners.forEach((l) => l()));
   }
-  return clipLoad;
+  return list.load;
 }
 
-// Only fetch the list once narration is on: most visits never narrate.
+// Only fetch the lists once narration is on: most visits never narrate. Bangla pages also need the Bangla list.
 function subscribeClips(onChange: () => void) {
   clipListeners.add(onChange);
-  if (readEnabled()) void loadClips();
+  if (readEnabled()) void loadClips("en");
   return () => {
     clipListeners.delete(onChange);
   };
 }
+function subscribeBanglaClips(onChange: () => void) {
+  const unsubscribe = subscribeClips(onChange);
+  if (readEnabled()) void loadClips("bn");
+  return unsubscribe;
+}
 
-const readClipsReady = () => clipState === "ready";
+const readClipsReady = () => clipLists.en.state === "ready";
+const readBanglaClips = () => (clipLists.bn.state === "ready" ? clipLists.bn.lengths : null);
 
-/** The recorded clip for some spoken English text, if there is one. */
-function clipFor(spoken: string): { url: string; ms: number } | null {
-  if (clipState !== "ready") return null;
-  const key = clipKey(spoken);
-  const ms = clipLengths[key];
-  return typeof ms === "number" && ms > 0 ? { url: clipUrl(key), ms } : null;
+/** The recorded clip for some spoken text in a language, if there is one. */
+function clipFor(spoken: string, lang: SpeechLang = "en"): { url: string; ms: number } | null {
+  const list = clipLists[lang];
+  if (list.state !== "ready") return null;
+  const key = clipKey(spoken, lang);
+  const ms = list.lengths[key];
+  return typeof ms === "number" && ms > 0 ? { url: clipUrl(key, lang), ms } : null;
 }
 
 let clipPlayer: HTMLAudioElement | null = null;
@@ -451,12 +488,14 @@ const prefetched = new Set<string>();
 
 /** Warms the browser cache with a step's clip (the next one, during autoplay) so the player moves on without a gap. */
 export function prefetchSpeech(text: string) {
-  if (clipState === "loading") {
-    void loadClips().then(() => prefetchSpeech(text));
+  const lang: SpeechLang = isBanglaText(text) ? "bn" : "en";
+  const list = clipLists[lang];
+  if (list.state === "loading") {
+    void loadClips(lang).then(() => prefetchSpeech(text));
     return;
   }
-  if (clipState !== "ready" || isBanglaText(text) || !prefersNaturalVoice(readPrefs(), voicesFor("en"))) return;
-  const clip = clipFor(speechText(text, "en"));
+  if (list.state !== "ready" || !prefersNaturalVoice(readPrefs(), voicesFor(lang), lang)) return;
+  const clip = clipFor(speechText(text, lang), lang);
   if (!clip || prefetched.has(clip.url)) return;
   prefetched.add(clip.url);
   fetch(clip.url)
@@ -497,8 +536,8 @@ export interface SpeakOptions {
 }
 
 /**
- * Speaks a step note, cancelling anything already playing. English notes with a recorded clip play it at the
- * learner's pace (pitch kept); otherwise the note is rewritten into speakable words and spoken piece by piece with
+ * Speaks a step note, cancelling anything already playing. A note with a recorded clip (English, or Bangla where it
+ * has been recorded) plays it at the learner's pace (pitch kept); otherwise the note is rewritten into speakable words and spoken piece by piece with
  * the learner's voice and pace. `onDone` runs once when it has finished — or after a safety timeout, because some
  * browsers never report the end — and never runs when the speech is cancelled first. A Bangla note is never handed
  * to an English voice (it would be gibberish): without a Bangla voice nothing is said and `onDone` runs after the
@@ -532,15 +571,18 @@ export function speak(text: string, opts: SpeakOptions = {}, onDone?: () => void
   };
   const live = () => !finished && id === session;
 
-  if (lang === "en" && prefersNaturalVoice(readPrefs(), voicesFor("en"))) {
-    if (clipState === "none") void loadClips(); // fetches again only if an earlier attempt failed a while ago
+  if (prefersNaturalVoice(readPrefs(), voicesFor(lang), lang)) {
+    const list = clipLists[lang];
+    if (list.state === "none") void loadClips(lang); // fetches again only if an earlier attempt failed a while ago
     const start = () => {
       if (!live()) return;
-      const clip = clipFor(spoken);
-      if (clip) playClip(clip, rate, id, later, finish, () => speakAloud(spoken, lang, rate, id, later, finish));
+      const clip = clipFor(spoken, lang);
+      // recordings keep their natural pace: the extra Bangla slow-down is for browser voices only
+      const clipRate = rateFor(opts.speed, "en");
+      if (clip) playClip(clip, clipRate, id, later, finish, () => speakAloud(spoken, lang, rate, id, later, finish));
       else speakAloud(spoken, lang, rate, id, later, finish);
     };
-    if (clipState === "ready" || clipState === "none") start();
+    if (list.state === "ready" || list.state === "none") start();
     else {
       // first step after narration is switched on: wait briefly for the clip list rather than start in another voice
       let started = false;
@@ -549,7 +591,7 @@ export function speak(text: string, opts: SpeakOptions = {}, onDone?: () => void
         started = true;
         start();
       };
-      void loadClips().then(once);
+      void loadClips(lang).then(once);
       later(once, CLIP_LIST_WAIT_MS);
     }
     return cancel;

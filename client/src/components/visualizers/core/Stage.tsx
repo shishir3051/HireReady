@@ -81,7 +81,7 @@ export function VisualStage({
   const narration = useNarration();
   const motionPref = useMotionPreference();
   const { lang } = useLanguage();
-  const { listen } = useNarrationSettings(lang);
+  const { listen } = useNarrationSettings(lang, visual);
   // a Bangla page narrated in English (by choice, or because there is no Bangla voice) reads the English notes
   const spoken = listen === "en" && englishVisual ? englishVisual : visual;
   const narrationText = useCallback((i: number) => narrationLine(spoken, i, listen), [spoken, listen]);
@@ -208,7 +208,7 @@ export function VisualStage({
         {multi ? (
           <div className="flex min-w-0 flex-col gap-1 [grid-area:ctrl]">
             <Controls player={player} label={visual.title || label} narration={narration} />
-            {narration.on && narration.supported ? <NarrationSettings pageLang={lang} onBeforeSample={player.pause} /> : null}
+            {narration.on && narration.supported ? <NarrationSettings pageLang={lang} visual={visual} onBeforeSample={player.pause} /> : null}
             <p className="hidden items-center gap-1.5 text-[11px] text-muted @2xl:flex">
               <Keyboard aria-hidden className="size-3.5" />
               {t.visualPlayer.keyboardHint}{narration.supported ? t.visualPlayer.keyboardHintNarrate : ""}.
