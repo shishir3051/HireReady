@@ -8,9 +8,11 @@ export const ttsRouter = Router();
 const CACHE_DIR = path.resolve(__dirname, '../../cache/tts');
 
 // Ensure cache directory exists
-if (!fs.existsSync(CACHE_DIR)) {
-  fs.mkdirSync(CACHE_DIR, { recursive: true });
-}
+try {
+  if (!fs.existsSync(CACHE_DIR)) {
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
+  }
+} catch {}
 
 function splitText(text: string, maxLen = 150): string[] {
   const chunks: string[] = [];
